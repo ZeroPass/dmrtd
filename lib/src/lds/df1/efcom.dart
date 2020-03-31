@@ -1,0 +1,72 @@
+//  Created by smlu, copyright © 2020 ZeroPass. All rights reserved.
+import 'dart:core';
+import 'dart:typed_data';
+
+import 'dg.dart';
+import '../ef.dart';
+import '../tlv.dart';
+
+class EfCOM extends ElementaryFile {
+  static const FID = 0x011E;
+  static const SFI = 0x1E;
+  static const TAG = 0x60;
+
+  String _ver;
+  String _uver;
+  final  _tags = Set<DgTag>();
+
+  get version => _ver;
+  get uincodeVersion => _uver;
+  Set<DgTag> get dgTags => _tags;
+
+  EfCOM.fromBytes(Uint8List data) : super.fromBytes(data);
+
+  @override
+  int get fid => FID;
+  
+  @override
+  int get sfi => SFI;
+
+  @override
+  void parse(final Uint8List data) {
+    final tlv = TLV.fromBytes(data);
+    if(tlv.tag != TAG) {
+      throw EfParseError(
+        "Invalid EF.COM tag=${tlv.tag.toRadixString(16)}, expected tag=${TAG.toRadixString(16)}"
+      );
+    }
+    final content = tlv.value;
+
+    // Parse version number
+    final vtv = TLV.decode(content);
+    if(vtv.tag.value != 0x5F01) {
+      throw EfParseError(
+        "Invalid version object tag=${vtv.tag.value.toRadixString(16)}, expected version object with tag=5F01"
+      );
+    }
+    _ver = String.fromCharCodes(vtv.value);
+    
+    // Parse string version
+    final uvtv = TLV.decode(content.sublist(vtv.encodedLen));
+    if(uvtv.tag.value != 0x5F36) {
+      throw EfParseError(
+        "Invalid unicode version object tag=${uvtv.tag.value.toRadixString(16)}, expected unicode version object with tag=${0x5F36.toRadixString(16)}"
+      );
+    }
+    _uver = String.fromCharCodes(uvtv.value);
+    
+    // Parse tag list
+    final tvTagList = TLV.decode(content.sublist(vtv.encodedLen + uvtv.encodedLen));
+    if(tvTagList.tag.value != 0x5C) {
+      throw EfParseError(
+        "Invalid tag list object tag=${tvTagList.tag.value.toRadixString(16)}, expected tag list object with tag=${0x5C.toRadixString(16)}"
+      );
+    }
+    
+    // fill _tags set. 
+    // Each tag should be represented as 1 byte
+    for(final t in tvTagList.value) {
+      _tags.add(DgTag(t));
+    }
+  }
+}
