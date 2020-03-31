@@ -1,7 +1,7 @@
 import 'package:dmrtd/dmrtd.dart';
-import 'package:test/test.dart';
 import 'package:dmrtd/extensions.dart';
-import 'package:dmrtd/src/lds/tlv.dart';
+import 'package:dmrtd/internal.dart';
+import 'package:test/test.dart';
 
 void main() {
     test('TLV encoding test', () {
