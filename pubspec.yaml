@@ -1,0 +1,31 @@
+name: dmrtd
+description: Dart implementation of ICAO Doc 9303 MRTD, created by ZeroPass
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.6.0 <3.0.0"
+
+dependencies:
+  archive: ^2.0.11 # flutter_test depends on version 2.0.11
+  asn1lib: ^0.6.4
+  crypto: ^2.1.3
+  fixnum: ^0.10.11
+  logging: ^0.11.4
+  meta: ^1.1.6
+  flutter_nfc_kit:
+    git:
+      url: https://github.com/smlu/flutter_nfc_kit.git
+      ref: patch-ios-alert-msg
+
+  tripledes: ^2.1.0
+
+dev_dependencies:
+  flutter_test: # needed for flutter_nfc_kit
+    sdk: flutter
+  flutter:      # needed for flutter_nfc_kit
+    sdk: flutter
+  test: ^1.14.1
+
+dependency_overrides:
+  test_api: ^ 0.2.14
