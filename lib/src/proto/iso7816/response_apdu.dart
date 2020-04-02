@@ -119,6 +119,7 @@ class StatusWord {
   }
 
   String description() {
+    // ignore: case_expression_type_implements_equals
     switch(this) {
       case noInformationGiven:               return "No information given";
       case possibleCorruptedData:            return "Part of returned data my be corrupted";
