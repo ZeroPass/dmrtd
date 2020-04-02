@@ -26,24 +26,24 @@ void main() {
     expect( CommandAPDU(cla: 0x00, ins: 0x10, p1: 0x20, p2: 0x30, data: "0102030405060708".parseHex(), ne: 256).toBytes()     , "0010203008010203040506070800".parseHex()       );  //ne: 256 should be serialized as 0x00
     expect( CommandAPDU(cla: 0x00, ins: 0x10, p1: 0x20, p2: 0x30, data: "0102030405060708".parseHex(), ne: 0x0180).toBytes()  , "0010203000000801020304050607080180".parseHex() );
     expect( CommandAPDU(cla: 0x00, ins: 0x10, p1: 0x20, p2: 0x30, data: "0102030405060708".parseHex(), ne: 65536).toBytes()   , "0010203000000801020304050607080000".parseHex() );  //ne: 65536 should be serialized as 0x00 0x00
-    
+
     // Test case 4 - data size (extended Lc) over 255 bytes
-    var data = randomBytes(256); 
+    var data = randomBytes(256);
     var tv   = Uint8List.fromList("00102030000100".parseHex() + data);
     expect( CommandAPDU(cla: 0x00, ins: 0x10, p1: 0x20, p2: 0x30, data: data).toBytes() , tv );
 
     tv   = Uint8List.fromList("00102030000100".parseHex() + data + "00A0".parseHex()); // Due to extended Lc, Le is encoded as 2 bytes
     expect( CommandAPDU(cla: 0x00, ins: 0x10, p1: 0x20, p2: 0x30, data: data, ne: 0xA0).toBytes() , tv );
-    
+
     tv   = Uint8List.fromList("00102030000100".parseHex() + data + "0000".parseHex()); // Due to extended Lc, Le is encoded as 2 bytes
     expect( CommandAPDU(cla: 0x00, ins: 0x10, p1: 0x20, p2: 0x30, data: data, ne: 256).toBytes() , tv );
 
     tv   = Uint8List.fromList("00102030000100".parseHex() + data + "0180".parseHex()); // Due to extended Lc, Le is encoded as 2 bytes
     expect( CommandAPDU(cla: 0x00, ins: 0x10, p1: 0x20, p2: 0x30, data: data, ne: 0x0180).toBytes(), tv );
 
-    tv   = Uint8List.fromList("00102030000100".parseHex() + data + "0000".parseHex()); // Due to extended Lc, Le is encoded as 2 bytes 
+    tv   = Uint8List.fromList("00102030000100".parseHex() + data + "0000".parseHex()); // Due to extended Lc, Le is encoded as 2 bytes
     expect( CommandAPDU(cla: 0x00, ins: 0x10, p1: 0x20, p2: 0x30, data: data, ne: 65536).toBytes() , tv );
-    
+
     // Test case 5
     // Test vectors from https://www.openscdp.org/sse4e/isosecurechannel.html
     expect( CommandAPDU(cla: 0x00, ins: 0x10, p1: 0x20, p2: 0x30).toBytes()                                         , "00102030".parseHex()                   ); // Case 1 Command APDU
@@ -73,7 +73,7 @@ void main() {
     expect( rapdu.status.sw1 , 0x90 );
     expect( rapdu.status.sw2 , 0x00 );
     expect( rapdu.data       , "871901FB9235F4E4037F2327DCC8964F1F9B8C30F42C8E2FFF224A990290008E08C8B2787EAEA07D74".parseHex() );
-  
+
     // Test response status word
     rapdu = ResponseAPDU.fromBytes("9000".parseHex());
     expect( rapdu.status.sw1 , 0x90 );

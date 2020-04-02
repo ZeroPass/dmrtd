@@ -1,6 +1,5 @@
 //  Created by smlu, copyright © 2020 ZeroPass. All rights reserved.
 import 'dart:typed_data';
-
 import 'dg.dart';
 import '../ef.dart';
 import '../mrz.dart';
@@ -18,7 +17,7 @@ class EfDG1 extends DataGroup {
 
   @override
   int get fid => FID;
-  
+
   @override
   int get sfi => SFI;
 

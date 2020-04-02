@@ -16,7 +16,7 @@ class DBAKeys {
   String _dob;
   String _doe;
   Uint8List _cachedSeed;
-  
+
   /// Constructs [DBAKeys] using passport number [mrtdNumber],
   /// passport owner's [dateOfBirth] and passport [dateOfExpiry].
   DBAKeys(String mrtdNumber, DateTime dateOfBirth, DateTime dateOfExpiry) {
@@ -39,7 +39,7 @@ class DBAKeys {
   Uint8List get macKey {
     return DeriveKey.iso9797MacAlg3(keySeed);
   }
-  
+
   /// Returns Kseed as specified in Appendix D.2
   /// to the Part 11 of doc ICAO 9303 p11
   Uint8List get keySeed {
@@ -48,19 +48,19 @@ class DBAKeys {
       final cdn = MRZ.calculateCheckDigit(paddedMrtdNum);
       final cdb = MRZ.calculateCheckDigit(_dob);
       final cde = MRZ.calculateCheckDigit(_doe);
-      
+
       final kmrz = "$paddedMrtdNum$cdn$_dob$cdb$_doe$cde";
       final hash = sha1.convert(kmrz.codeUnits);
       _cachedSeed = hash.bytes.sublist(0, 16);
     }
     return _cachedSeed;
   }
-  
+
   /// Returns passport number used for calculating key seed.
   String get mrtdNumber => _mrtdNum;
 
-  /// Returns passport owner's date of birth used for calculating key seed.    
-  DateTime get dateOfBirth => _dob.parseDateYYMMDD(); 
+  /// Returns passport owner's date of birth used for calculating key seed.
+  DateTime get dateOfBirth => _dob.parseDateYYMMDD();
 
   /// Returns passport date of expiry used for calculating key seed.
   DateTime get dateOfExpiry => _doe.parseDateYYMMDD();

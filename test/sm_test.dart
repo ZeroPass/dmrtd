@@ -49,13 +49,13 @@ void testUprotecting(final ResponseAPDU rapdu, final SMCipher cipher, final SSC 
   if(rapdu.status != StatusWord.success) {
     return;
   }
-  
+
   final sscCpy = SSC(ssc.toBytes(), ssc.bitSize);
   final sm = MrtdSM(cipher, ssc);
 
   final dataDO  = sm.parseDataDOFromRAPDU(rapdu);
   expect( dataDO != null ? TLV.encode(dataDO.tag.value, dataDO.value) : null, tvDataDO );
-  
+
   final do99 = sm.parseDO99FromRAPDU(rapdu, (dataDO?.encodedLen ?? 0));
   expect( do99 != null , true );
   expect( TLV.encode(do99.tag.value, do99.value), tvDO99 );
@@ -100,16 +100,16 @@ void main() {
     var tvProtectedCmd   = "0CA4020C158709016375432908C044F68E08BF8B92D635FF24F800".parseHex();
 
     testProtecting(
-      tvCmdAPDU, 
-      smCipher, 
-      tvSSC, 
+      tvCmdAPDU,
+      smCipher,
+      tvSSC,
       tvMaskedHeader,
-      tvDataDO, 
-      tvDO97, 
-      tvM, 
-      tvN, 
-      tvCC, 
-      tvDO8E, 
+      tvDataDO,
+      tvDO97,
+      tvM,
+      tvN,
+      tvCC,
+      tvDO8E,
       tvProtectedCmd
     );
 
@@ -150,16 +150,16 @@ void main() {
 
     expect( tvSSC.toBytes() , "887022120C06C228".parseHex() );
     testProtecting(
-      tvCmdAPDU, 
-      smCipher, 
-      tvSSC, 
+      tvCmdAPDU,
+      smCipher,
+      tvSSC,
       tvMaskedHeader,
-      tvDataDO, 
-      tvDO97, 
-      tvM, 
-      tvN, 
-      tvCC, 
-      tvDO8E, 
+      tvDataDO,
+      tvDO97,
+      tvM,
+      tvN,
+      tvCC,
+      tvDO8E,
       tvProtectedCmd
     );
 
@@ -200,16 +200,16 @@ void main() {
 
     expect( tvSSC.toBytes() , "887022120C06C22A".parseHex() );
     testProtecting(
-      tvCmdAPDU, 
-      smCipher, 
-      tvSSC, 
+      tvCmdAPDU,
+      smCipher,
+      tvSSC,
       tvMaskedHeader,
-      tvDataDO, 
-      tvDO97, 
-      tvM, 
-      tvN, 
-      tvCC, 
-      tvDO8E, 
+      tvDataDO,
+      tvDO97,
+      tvM,
+      tvN,
+      tvCC,
+      tvDO8E,
       tvProtectedCmd
     );
 

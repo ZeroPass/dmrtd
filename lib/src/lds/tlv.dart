@@ -58,7 +58,7 @@ class TLV {
   }
 
   /// Constructs [TLV] from [tag] and integer [n] as value.
- /// [n] is serialized in big endian byte order. 
+ /// [n] is serialized in big endian byte order.
   factory TLV.fromIntValue(final int tag, int n) {
     return TLV(tag, Utils.intToBin(n));
   }
@@ -75,7 +75,7 @@ class TLV {
   }
 
   /// Returns BER encoded TLV from [tag] and [n].
-  /// [n] is serialized in big endian byte order. 
+  /// [n] is serialized in big endian byte order.
   static Uint8List encodeIntValue(final int tag, final int n) {
     return TLV.fromIntValue(tag, n).toBytes();
   }

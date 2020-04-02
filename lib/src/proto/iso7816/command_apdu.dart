@@ -12,14 +12,14 @@ class CommandAPDU {
   int _ne;
 
   /// Required parameters are [cla], [ins], [p1], [p2].
-  /// 
+  ///
   /// [data] represents additional command data and is optional.
   /// Max [data] length is 65535.
-  /// 
+  ///
   /// [ne] is optional and represents expected response length.
   /// Max [ne] is 65536.
   /// If [ne] is set to 0, [ne] won't be serialized and send with the command.
-  /// If [ne] is set to 256 or 65536 [ne] will be encoded as 0x00, which means arbitrary long data is expected in the response. 
+  /// If [ne] is set to 256 or 65536 [ne] will be encoded as 0x00, which means arbitrary long data is expected in the response.
   CommandAPDU({ @required int cla, @required int ins, @required int p1, @required int p2, final Uint8List data, int ne = 0}) {
     this.cla  = cla;
     this.ins  = ins;
@@ -114,8 +114,8 @@ class CommandAPDU {
     final le  = Uint8List(extended ? 2 + addByte : 1);
     final lev = ByteData.view(le.buffer);
     if(!extended) { // case 2s or 4s
-      lev.setUint8(0, ne == 256 ? 0 : ne); // 256 is encoded as 0x00 e.g. variable long 
-    } 
+      lev.setUint8(0, ne == 256 ? 0 : ne); // 256 is encoded as 0x00 e.g. variable long
+    }
     else { // extended, case 2e or 4e
       lev.setUint16(addByte, (ne == 256 || ne == 65536) ? 0 : ne, Endian.big); // 256 and 65536 are encoded as 0x00 0x00
     }

@@ -24,7 +24,7 @@ class MrtdApiError implements Exception {
   String toString() => "MRTDApiError: $message";
 }
 
-/// Defines ICAO 9303 MRTD standard API to 
+/// Defines ICAO 9303 MRTD standard API to
 /// communicate and send commands to MRTD.
 class MrtdApi {
 
@@ -43,7 +43,7 @@ class MrtdApi {
   /// Sends active authentication command to MRTD with [challenge].
   /// [challenge] must be 8 bytes long.
   /// MRTD returns signature of size [sigLength] or of arbitrarily size if [sigLength] is 256.
-  /// Can throw [ICCError] if [challenge] is not 8 bytes or [sigLength] is wrong signature length.  
+  /// Can throw [ICCError] if [challenge] is not 8 bytes or [sigLength] is wrong signature length.
   /// Can throw [ComProviderError] in case connection with MRTD is lost.
   Future<Uint8List> activeAuthenticate(final Uint8List challenge, { int sigLength = 256 }) async {
     assert(challenge.length == challengeLen);
@@ -52,7 +52,7 @@ class MrtdApi {
   }
 
   /// Initializes Secure Messaging session via BAC protocol using [keys].
-  /// Can throw [ICCError] if provided wrong keys. 
+  /// Can throw [ICCError] if provided wrong keys.
   /// Can throw [ComProviderError] in case connection with MRTD is lost.
   Future<void> initSessionViaBAC(final DBAKeys keys) async {
     _log.debug("Initiating SM session using BAC protocol");
@@ -72,12 +72,12 @@ class MrtdApi {
   /// Can throw [ComProviderError] in case connection with MRTD is lost.
   Future<void> selectMasterFile() async {
     _log.debug("Selecting MF");
-    // In ICAO 9303 p10 doc, the command to select Master File is defined as sending select APDU 
+    // In ICAO 9303 p10 doc, the command to select Master File is defined as sending select APDU
     // command with empty data field. On some passport this command doesn't work and MF is not selected,
     // although success status (9000) is returned. In doc ISO/IEC 7816-4 section 6 an alternative option
-    // is specified by sending the same command as described in ICAO 9303 p10 doc but in this case 
+    // is specified by sending the same command as described in ICAO 9303 p10 doc but in this case
     // data field should be equal to '0x3F00'.
-    // see: https://cardwerk.com/smart-card-standard-iso7816-4-section-6-basic-interindustry-commands 
+    // see: https://cardwerk.com/smart-card-standard-iso7816-4-section-6-basic-interindustry-commands
     //     'If P1-P2=’0000′ and if the data field is empty or equal to ‘3F00’, then select the MF.'
     //
     // To maximize our chance for MF to be selected we choose to send the second option as
@@ -86,7 +86,7 @@ class MrtdApi {
   }
 
   /// Returns raw EF file bytes of selected DF identified by [fid] from MRTD.
-  /// Can throw [ICCError] in case when file doesn't exist, read errors or 
+  /// Can throw [ICCError] in case when file doesn't exist, read errors or
   /// SM session is not established but required to read file.
   /// Can throw [ComProviderError] in case connection with MRTD is lost.
   Future<Uint8List> readFile(final int fid) async {
@@ -99,7 +99,7 @@ class MrtdApi {
     final efId = Uint8List(2);
     ByteData.view(efId.buffer).setUint16(0, fid);
     await icc.selectEF(efId: efId, p2: _defaultSelectP2);
-    
+
     // Read chunk of file to obtain file length
     final chunk1 = await icc.readBinary(offset: 0, ne: _readAheadLength);
     final dtl = TLV.decodeTagAndLength(chunk1.data);
@@ -123,15 +123,15 @@ class MrtdApi {
     if(sfi > 0x9F) {
       throw ArgumentError.value(sfi, null, "Invalid SFI value");
     }
-    
+
     // Read chunk of file to obtain file length
     final chunk1 = await icc.readBinaryBySFI(sfi: sfi, offset: 0, ne: _readAheadLength);
     final dtl = TLV.decodeTagAndLength(chunk1.data);
-    
+
     // Read the rest of the file
     final length =  dtl.length.value - (chunk1.data.length - dtl.encodedLen);
     final chunk2 = await _readBinary(offset: chunk1.data.length, length:length);
-    
+
     final rawFile = Uint8List.fromList(chunk1.data + chunk2);
     assert(rawFile.length == dtl.encodedLen + dtl.length.value);
     return rawFile;
@@ -166,7 +166,7 @@ class MrtdApi {
           throw MrtdApiError("An error has occurred while trying to read file chunk. ${rapdu.status}");
         }
         _log.warning("_readBinary: Reducing max read length due to read error ${rapdu.status}");
-        _reduceMaxRead(rapdu.data.length);        
+        _reduceMaxRead(rapdu.data.length);
       }
 
       data = Uint8List.fromList(data + rapdu.data);

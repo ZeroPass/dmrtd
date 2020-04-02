@@ -1,5 +1,4 @@
 //  Copyright © 2020 ZeroPass. All rights reserved.
-
 import 'dart:math';
 import 'dart:typed_data';
 

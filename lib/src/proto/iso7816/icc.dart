@@ -25,7 +25,7 @@ class ICCError implements Exception {
 class ICC {
   final ComProvider _com;
   final _log = Logger("icc");
-  SecureMessaging sm;  
+  SecureMessaging sm;
 
   ICC(this._com);
 
@@ -70,7 +70,7 @@ class ICC {
   }
 
   /// Sends GET CHALLENGE command to ICC and ICC should return
-  /// [challengeLength] long challenge. 
+  /// [challengeLength] long challenge.
   /// Can throw [ICCError] or [ComProviderError].
   Future<Uint8List> getChallenge({ @required int challengeLength, int cla: ISO7816_CLA.NO_SM }) async {
     final rapdu = await _transceive(
@@ -86,7 +86,7 @@ class ICC {
   /// It returns [ne] long chunk of data at [offset].
   /// Max [offset] can be 32 766. [ne] must not overlap offset 32 767.
   /// Can throw [ICCError] or [ComProviderError].
-  /// 
+  ///
   /// Note: Use [readBinaryExt] to read data chunks at offsets greater than 32 767.
   Future<ResponseAPDU> readBinary({ @required int offset, @required int ne, int cla: ISO7816_CLA.NO_SM }) async {
     if(offset > 32766) {
@@ -130,7 +130,7 @@ class ICC {
     final enNeLen  = TLV.encodeLength(ne).length;
     final addBytes =  1 /*byte = tag*/ + enNeLen;
 		ne = ne <= 256 ? min(256, ne + addBytes) : ne + addBytes;
-    
+
     final data  =  TLV.encodeIntValue(0x54, offset);
     final rapdu = await _readBinary(
       CommandAPDU(cla: cla, ins: ISO7816_INS.READ_BINARY_EXT, p1: 0x00, p2: 0x00, data: data, ne: ne)
@@ -188,7 +188,7 @@ class ICC {
 
   /// Selects file by [path].
   /// If [fromMF] is true, then is selected by [path] starting from MF, otherwise from currentDF.
-  /// [path] must not include MF/Current DF ID. 
+  /// [path] must not include MF/Current DF ID.
   /// Can throw [ICCError] or [ComProviderError].
   Future<Uint8List> selectFileByPath({ @required Uint8List path, bool fromMF, int p2 = 0, int cla: ISO7816_CLA.NO_SM, int ne = 0 }) async {
     final p1 = fromMF ? ISO97816_SelectFileP1.byPathFromMF : ISO97816_SelectFileP1.byPath;
@@ -200,7 +200,7 @@ class ICC {
   Future<ResponseAPDU> _readBinary(final CommandAPDU cmd) async {
     assert(cmd.ins == ISO7816_INS.READ_BINARY_EXT ||
            cmd.ins == ISO7816_INS.READ_BINARY);
-    
+
     final rapdu = await _transceive(cmd);
     if(((rapdu.data?.isEmpty ?? true) && rapdu.status != StatusWord.success)) {
       /// Should probably happen when SM errors (0x6987 & 0x6988) are received.

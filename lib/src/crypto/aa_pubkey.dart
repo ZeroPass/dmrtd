@@ -55,7 +55,7 @@ class AAPublicKey {
     final rsaOID = "2A864886F70D010101".parseHex();
     if(ListEquality().equals(tvAlgOID.value, rsaOID)) {
       _type = AAPublicKeyType.RSA;
-    }    
+    }
 
     _subPubKeyBytes = tvPubKeyInfo.value.sublist(tvAlg.encodedLen);
     if(_subPubKeyBytes[0] != 0x03) {

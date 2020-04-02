@@ -25,7 +25,7 @@ abstract class SecureMessaging {
 
   final SMCipher cipher;
   SecureMessaging(this.cipher);
-  
+
   CommandAPDU protect(final CommandAPDU cmd);
   ResponseAPDU unprotect(final ResponseAPDU rapdu);
 

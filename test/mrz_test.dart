@@ -16,7 +16,7 @@ void main() {
 
   group('MRZ parsing', () {
     test('parsing TD1', () {
-      // Test vector from: https://www.icao.int/publications/Documents/9303_p5_cons_en.pdf  Appendix A to Part 5 
+      // Test vector from: https://www.icao.int/publications/Documents/9303_p5_cons_en.pdf  Appendix A to Part 5
       MRZ mrz = MRZ(Uint8List.fromList("I<UTOD231458907<<<<<<<<<<<<<<<7408122F1204159UTO<<<<<<<<<<<6ERIKSSON<<ANNA<MARIA<<<<<<<<<<".codeUnits));
       expect( mrz.version       , MRZVersion.td1        );
       expect( mrz.documentCode  , 'I'                   );

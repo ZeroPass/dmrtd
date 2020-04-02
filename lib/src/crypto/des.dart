@@ -49,7 +49,7 @@ class DESCipher {
   }
 
   /// Returns encrypted [data].
-  /// 
+  ///
   /// The [data] if [padData] is set to false should be padded to the nearest multiple of 8.
   /// When [padData] is true, the [data] is padded according to the ISO/IEC 9797-1, padding method 2.
   Uint8List encrypt(final Uint8List data, {final bool padData = true}) {
@@ -58,7 +58,7 @@ class DESCipher {
   }
 
   /// Returns decrypted [edata].
-  /// 
+  ///
   /// When [paddedData] is true, function expects decrypted [edata] is padded according to
   /// the ISO/IEC 9797-1, padding method 2 and will attempt to unpad it (see encrypt).
   Uint8List decrypt(final Uint8List edata, {final bool paddedData = true}) {
@@ -92,7 +92,7 @@ class DESCipher {
   void _processBlock(final List<int> block)
   {
     _bc.processBlock(block, 0);
-  } 
+  }
 
   /// Encrypts/decrypts [data] using CBC block cipher mode.
   Uint8List _process(final Uint8List data)
@@ -109,7 +109,7 @@ class DESCipher {
 
       // copy current block - to be used for CBC xoring when decrypting
       List<int> pblock = List.from(block);
-     
+
       // CBC
       if(_bc.forEncryption) {
         // xor block with previous encrypted block
@@ -187,7 +187,7 @@ class DESedeCipher extends DESCipher {
   ///
   /// [key] length must be 8, 16 or 24 bytes.
   /// [iv] length must be 8 bytes.
-  DESedeCipher({ @required final Uint8List key, @required final Uint8List iv }) : 
+  DESedeCipher({ @required final Uint8List key, @required final Uint8List iv }) :
     super(key: key, iv: iv);
 
   /// Sets new key. [key] length must be 8, 16 or 24 bytes.
@@ -231,7 +231,7 @@ class DESedeCipher extends DESCipher {
 
 
 /// Returns encrypted [data] using Triple DES encryption algorithm and CBD block cipher mode.
-/// 
+///
 /// The [data] if [padData] is set to false should be padded to the nearest multiple of 8.
 /// When [padData] is true, the [data] is padded according to the ISO/IEC 9797-1, padding method 2.
 Uint8List DESedeEncrypt({ @required final Uint8List key, @required final Uint8List iv, @required final Uint8List data, bool padData = true}) {
@@ -240,7 +240,7 @@ Uint8List DESedeEncrypt({ @required final Uint8List key, @required final Uint8Li
 
 
 /// Returns decrypted [data] using Triple DES encryption algorithm and CBD block cipher mode.
-/// 
+///
 /// The [data] if [padData] is set to false should be padded to the nearest multiple of 8.
 /// When [padData] is true, the [data] is padded according to the ISO/IEC 9797-1, padding method 2.
 Uint8List DESedeDecrypt({ @required final Uint8List key, @required final Uint8List iv, @required final Uint8List edata, bool paddedData = true}) {

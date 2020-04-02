@@ -23,7 +23,7 @@ class EfCOM extends ElementaryFile {
 
   @override
   int get fid => FID;
-  
+
   @override
   int get sfi => SFI;
 
@@ -45,7 +45,7 @@ class EfCOM extends ElementaryFile {
       );
     }
     _ver = String.fromCharCodes(vtv.value);
-    
+
     // Parse string version
     final uvtv = TLV.decode(content.sublist(vtv.encodedLen));
     if(uvtv.tag.value != 0x5F36) {
@@ -54,7 +54,7 @@ class EfCOM extends ElementaryFile {
       );
     }
     _uver = String.fromCharCodes(uvtv.value);
-    
+
     // Parse tag list
     final tvTagList = TLV.decode(content.sublist(vtv.encodedLen + uvtv.encodedLen));
     if(tvTagList.tag.value != 0x5C) {
@@ -62,8 +62,8 @@ class EfCOM extends ElementaryFile {
         "Invalid tag list object tag=${tvTagList.tag.value.toRadixString(16)}, expected tag list object with tag=${0x5C.toRadixString(16)}"
       );
     }
-    
-    // fill _tags set. 
+
+    // fill _tags set.
     // Each tag should be represented as 1 byte
     for(final t in tvTagList.value) {
       _tags.add(DgTag(t));

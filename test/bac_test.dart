@@ -13,13 +13,13 @@ void main() {
     // Test vectors taken from: https://www.icao.int/publications/Documents/9303_p11_cons_en.pdf Appendix D to Part 11  section D.2
     var mrz = MRZ(Uint8List.fromList("I<UTOSTEVENSON<<PETER<JOHN<<<<<<<<<<D23145890<UTO3407127M95071227349<<<8".codeUnits));
     expect( DBAKeys.fromMRZ(mrz).keySeed , "b366ad857ddca2b08c0e299811714730".parseHex() );
-  
+
     mrz = MRZ(Uint8List.fromList("I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<L898902C<3UTO6908061F9406236<<<<<<<2".codeUnits)); // Note: composite CD changed from 8 to 2
     expect( DBAKeys(mrz.documentNumber, mrz.dateOfBirth, mrz.dateOfExpiry).keySeed , "239ab9cb282daf66231dc5a4df6bfbae".parseHex() );
 
     mrz = MRZ(Uint8List.fromList("I<UTOD23145890<7349<<<<<<<<<<<3407127M9507122UTO<<<<<<<<<<<2STEVENSON<<PETER<JOHN<<<<<<<<<".codeUnits));
     expect( DBAKeys(mrz.documentNumber, mrz.dateOfBirth, mrz.dateOfExpiry).keySeed , "b366ad857ddca2b08c0e299811714730".parseHex() );
-  
+
     mrz = MRZ(Uint8List.fromList("I<UTOL898902C<3<<<<<<<<<<<<<<<6908061F9406236UTO<<<<<<<<<<<2ERIKSSON<<ANNA<MARIA<<<<<<<<<<".codeUnits)); // Note: Composite CD changed from 1 to 2
     expect( DBAKeys.fromMRZ(mrz).keySeed , "239AB9CB282DAF66231DC5A4DF6BFBAE".parseHex() );
   });
@@ -69,7 +69,7 @@ void main() {
     expect( BAC.verifyEicc(Eicc: tvEicc, Kmac: tvKmac, Micc: tvMicc), true );
     expect( BAC.D(Kdec: tvKenc, Eicc: tvEicc), tvR );
     expect( BAC.verifyRNDifdAndExtractKicc(RNDifd: tvRNDifd, R: tvR), tvKicc );
-    
+
     // Calculate session keys KSenc, KSmac and SCC
     final pairKS = BAC.calculateSessionKeys(Kifd: tvKifd, Kicc: tvKicc);
     expect( pairKS.first , tvKSenc );

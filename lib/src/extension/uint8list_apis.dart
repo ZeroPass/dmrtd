@@ -1,6 +1,5 @@
 //  Created by smlu on 17/01/2020.
 //  Copyright © 2020 ZeroPass. All rights reserved.
-
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:convert/convert.dart' as C;

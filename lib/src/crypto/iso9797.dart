@@ -12,8 +12,8 @@ class ISO9797 {
 
   /// Function returns CMAC result according to ISO9797-1 Algorithm 3 scheme
   /// using DES encryption algorithm.
-  /// 
-  /// The size of [key] should be 16 or 24 bytes. 
+  ///
+  /// The size of [key] should be 16 or 24 bytes.
   /// The [msg] if [padMsg] is set to false should be padded to the nearest multiple of 8.
   /// When [padMsg] is true, the [msg] is padded according to the ISO/IEC 9797-1, padding method 2.
   ///

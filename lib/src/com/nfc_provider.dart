@@ -78,7 +78,7 @@ class NfcProvider extends ComProvider {
     }
   }
 
-  @override 
+  @override
   bool isConnected() {
     return _tag != null;
   }

@@ -33,9 +33,9 @@ class Passport {
 
   /// Starts new Secure Messaging session with passport
   /// using Document Basic Access [keys].
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection failure.
-  /// Throws [PassportError] when provided [keys] are invalid or 
+  /// Throws [PassportError] when provided [keys] are invalid or
   /// if BAC session is not supported.
   Future<void> startSession(final DBAKeys keys) async {
     _log.debug("Starting session");
@@ -47,24 +47,24 @@ class Passport {
   /// Executes Active Authentication command with [challenge] and
   /// returns signature bytes. The [challenge] should be 8 bytes long.
   /// Session with passport should be already established before calling this function.
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection error.
   /// Throws [PassportError] if invalid [challenge] length, AA is not supported
   /// or if calling this function prior establishing session with passport.
-  /// 
+  ///
   /// Note: AA is not available if EF.DG15 file is missing from passport.
   ///       Read EF.COM file To determine if file EF.DG15.
   Future<Uint8List> activeAuthenticate(final Uint8List challenge) async {
-    return await _exec(() => 
+    return await _exec(() =>
       _api.activeAuthenticate(challenge)
     );
   }
 
   /// Reads file EF.CardAccess from passport.
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection error.
   /// Throws [ComProviderError] if file doesn't exist.
-  /// 
+  ///
   /// Note: Might not be available if PACE is not supported
   Future<EfCardAccess> readEfCardAccess() async {
     await _selectMF();
@@ -77,15 +77,15 @@ class Passport {
   /// Reads file EF.CardSecurity from passport.
   /// Session with passport via PACE protocol
   /// should be established prior calling this function.
-  /// 
+  ///
   /// Note: PACE protocol is not supported yet.
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection error.
   /// Throws [ComProviderError] if file doesn't exist or
   /// if session was not established via PACE protocol.
   Future<EfCardSecurity> readEfCardSecurity() async {
     await _selectMF();
-    return EfCardSecurity.fromBytes( 
+    return EfCardSecurity.fromBytes(
       await _exec(() => _api.readFileBySFI(EfCardSecurity.SFI))
     );
   }
@@ -93,14 +93,14 @@ class Passport {
   /// Reads file EF.COM from passport.
   /// Session with passport should be already
   /// established before calling this function.
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection error.
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
   Future<EfCOM> readEfCOM() async {
     await _selectDF1();
     _log.debug("Reading EF.COM");
-    return EfCOM.fromBytes( 
+    return EfCOM.fromBytes(
       await _exec(() => _api.readFileBySFI(EfCOM.SFI))
     );
   }
@@ -108,7 +108,7 @@ class Passport {
   /// Reads file EF.DG1 from passport.
   /// Session with passport should be already
   /// established before calling this function.
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection error.
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
@@ -123,7 +123,7 @@ class Passport {
   /// Reads file EF.DG2 from passport.
   /// Session with passport should be already
   /// established before calling this function.
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection error.
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
@@ -138,13 +138,13 @@ class Passport {
   /// Reads file EF.DG3 from passport.
   /// Session with passport should be already
   /// established before calling this function.
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection error.
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
   /// [PassportError] is also thrown if extended authentication is required
   /// but wasn't successfully executed first.
-  /// 
+  ///
   /// Note: Extended authentication not supported.
   Future<EfDG3> readEfDG3() async {
     await _selectDF1();
@@ -157,13 +157,13 @@ class Passport {
   /// Reads file EF.DG4 from passport.
   /// Session with passport should be already
   /// established before calling this function.
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection error.
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
   /// [PassportError] is also thrown if extended authentication is required
   /// but wasn't successfully executed first.
-  /// 
+  ///
   /// Note: Extended authentication not supported.
   Future<EfDG4> readEfDG4() async {
     await _selectDF1();
@@ -176,7 +176,7 @@ class Passport {
   /// Reads file EF.DG5 from passport.
   /// Session with passport should be already
   /// established before calling this function.
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection error.
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
@@ -191,7 +191,7 @@ class Passport {
   /// Reads file EF.DG7 from passport.
   /// Session with passport should be already
   /// established before calling this function.
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection error.
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
@@ -206,7 +206,7 @@ class Passport {
   /// Reads file EF.DG8 from passport.
   /// Session with passport should be already
   /// established before calling this function.
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection error.
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
@@ -221,7 +221,7 @@ class Passport {
   /// Reads file EF.DG9 from passport.
   /// Session with passport should be already
   /// established before calling this function.
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection error.
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
@@ -236,7 +236,7 @@ class Passport {
   /// Reads file EF.DG10 from passport.
   /// Session with passport should be already
   /// established before calling this function.
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection error.
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
@@ -251,7 +251,7 @@ class Passport {
   /// Reads file EF.DG11 from passport.
   /// Session with passport should be already
   /// established before calling this function.
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection error.
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
@@ -266,7 +266,7 @@ class Passport {
   /// Reads file EF.DG12 from passport.
   /// Session with passport should be already
   /// established before calling this function.
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection error.
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
@@ -281,7 +281,7 @@ class Passport {
   /// Reads file EF.DG13 from passport.
   /// Session with passport should be already
   /// established before calling this function.
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection error.
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
@@ -296,7 +296,7 @@ class Passport {
   /// Reads file EF.DG14 from passport.
   /// Session with passport should be already
   /// established before calling this function.
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection error.
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
@@ -311,7 +311,7 @@ class Passport {
   /// Reads file EF.DG15 from passport.
   /// Session with passport should be already
   /// established before calling this function.
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection error.
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
@@ -326,7 +326,7 @@ class Passport {
   /// Reads file EF.DG16 from passport.
   /// Session with passport should be already
   /// established before calling this function.
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection error.
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
@@ -341,7 +341,7 @@ class Passport {
   /// Reads file EF.SOD.
   /// Session with passport should be already
   /// established before calling this function.
-  /// 
+  ///
   /// Can throw [ComProviderError] on connection error.
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.

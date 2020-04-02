@@ -12,7 +12,7 @@ class EfDG6 extends DataGroup {
 
   @override
   int get fid => FID;
-  
+
   @override
   int get sfi => SFI;
 

@@ -19,7 +19,7 @@ void main() {
     expect( Eifd, tvEifd );
 
     final dS = DESedeCipher(key: tvKenc, iv: zeroIV).decrypt(Eifd, paddedData: false);
-    expect( dS, tvS );  
+    expect( dS, tvS );
 
     // Test vectors from ICAO 9303 p11 - Appendix D to Part 11, section D.3
     final tvR   = "4608F91988702212781723860C06C2260B4F80323EB3191CB04970CB4052790B".parseHex();
@@ -28,7 +28,7 @@ void main() {
     expect( Eic, tvEic );
 
     final dR = DESedeDecrypt(key: tvKenc, iv: zeroIV, edata: Eic, paddedData: false);
-    expect( dR, tvR );  
+    expect( dR, tvR );
   });
 
   test('DESedeCipher Encryption/Decryption with padding', () {
@@ -41,7 +41,7 @@ void main() {
     expect( edata, tvEData );
 
     var data = DESedeCipher(key: tvKSenc, iv: zeroIV).decrypt(edata, paddedData: true);
-    expect( data, tvData ); 
+    expect( data, tvData );
 
     // Test vectors from ICAO 9303 p11 - Appendix D to Part 11, section D.4.2
     tvData  = "60145F01".parseHex();
@@ -50,7 +50,7 @@ void main() {
     expect( edata, tvEData );
 
     data = DESedeCipher(key: tvKSenc, iv: zeroIV).decrypt(edata);   // should be unpadded by default
-    expect( data, tvData ); 
+    expect( data, tvData );
 
     // Test vectors from ICAO 9303 p11 - Appendix D to Part 11, section D.4.3
     tvData  = "04303130365F36063034303030305C026175".parseHex();
@@ -59,6 +59,6 @@ void main() {
     expect( edata, tvEData );
 
     data = DESedeDecrypt(key: tvKSenc, iv: zeroIV, edata: edata);   // should be unpadded by default
-    expect( data, tvData ); 
+    expect( data, tvData );
   });
 }

@@ -8,7 +8,7 @@ class ComProviderError implements Exception {
   const ComProviderError([this.message = ""]);
   String toString() => 'ComProviderError: $message';
 }
- 
+
 
 /// Abstract interface for communicating with ICC.
 abstract class ComProvider {

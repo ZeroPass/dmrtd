@@ -69,7 +69,7 @@ class StatusWord {
   static const classNotSupported                 = StatusWord(sw1: 0x6E, sw2: 0x00);
   static const noPreciseDiagnostics              = StatusWord(sw1: 0x6F, sw2: 0x00);
   static const success                           = StatusWord(sw1: 0x90, sw2: 0x00);
-  
+
   static remainingAvailableResponseBytes(int numBytes) { // This is considered as normal status. It's the same as sw=0x9000 - success.
     return StatusWord(sw1: 0x61, sw2: numBytes);
   }
@@ -87,8 +87,8 @@ class StatusWord {
     ).getUint16(0);
   }
 
-  const StatusWord({ @required this.sw1, @required this.sw2 }) : 
-    assert(sw1 < 256), 
+  const StatusWord({ @required this.sw1, @required this.sw2 }) :
+    assert(sw1 < 256),
     assert(sw2 < 256);
 
   static StatusWord fromBytes(Uint8List data, [int offset = 0]) {
@@ -154,7 +154,7 @@ class StatusWord {
       case noPreciseDiagnostics:             return "No precise diagnosis";
       case success:                          return "Success";
       default: {
-        if(sw1 == 0x6C) { // Wrong length (wrong Le field: 'XX' indicates the exact length). 
+        if(sw1 == 0x6C) { // Wrong length (wrong Le field: 'XX' indicates the exact length).
           return "Wrong length (exact length: $sw2)";
         }
         else if(sw1 == 0x61) { // Normal processing,  SW2 indicates the number of response bytes still available

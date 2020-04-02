@@ -22,8 +22,8 @@ class Utils {
     return (bitCount(n) / 8).ceil();
   }
 
-  /// Returns serialized [n] in big endian byte order and shrunk to the first set byte or [minLen]. 
-  /// If [minLen] is 0 and [n] is 0, empty [Uint8List] will be returned. 
+  /// Returns serialized [n] in big endian byte order and shrunk to the first set byte or [minLen].
+  /// If [minLen] is 0 and [n] is 0, empty [Uint8List] will be returned.
   static Uint8List intToBin(int n, {int minLen = 1}) {
     assert(minLen >= 0);
     final raw = Uint8List(8);

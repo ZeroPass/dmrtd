@@ -10,7 +10,7 @@ class EfCardSecurity extends ElementaryFile {
 
   @override
   int get fid => FID;
-  
+
   @override
   int get sfi => SFI;
 }

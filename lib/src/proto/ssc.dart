@@ -7,7 +7,7 @@ import 'package:dmrtd/src/crypto/des.dart';
 
 /// Class represents Send Sequence Counter as specified in
 /// section 9.8.2 of ICAO 9303 p11 doc.
-/// 
+///
 /// SSC by definition is unsigned integer whose bit size
 /// is equal to the block size of block cipher.
 class SSC {
@@ -43,6 +43,6 @@ class SSC {
 }
 
 class DESedeSSC extends SSC {
-  DESedeSSC(Uint8List ssc) : 
+  DESedeSSC(Uint8List ssc) :
     super(ssc, DESedeCipher.blockSize * 8);
 }

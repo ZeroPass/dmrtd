@@ -44,7 +44,7 @@ String formatDG15(final EfDG15 dg15) {
   var str = "EF.DG15:\n"
             "  AAPublicKey\n"
             "    type: ";
-  
+
   final rawSubPubKey = dg15.aaPublicKey.rawSubjectPublicKey();
   if(dg15.aaPublicKey.type == AAPublicKeyType.RSA) {
     final tvSubPubKey = TLV.fromBytes(rawSubPubKey);
@@ -268,16 +268,16 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
           strAASig = "AA.sig=${sig.hex()}";
         }
 
-        _result =  strAccess + "\n\n\n" + 
+        _result =  strAccess + "\n\n\n" +
                    strCom    + "\n\n\n" +
                    strDG1    + "\n\n\n" +
                    strDG15   + "\n\n\n" +
                    strAASig  + "\n\n\n" +
-                   strDG14   + "\n\n\n" +    
+                   strDG14   + "\n\n\n" +
                    "EF.SOD=${sod.toBytes().hex()}" + "\n\n\n" +
                    strDG2;
       });
-    
+
       setState(() {
         _alertMessage = "";
       });
@@ -285,7 +285,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
       _scrollController.animateTo(300.0,
         duration: Duration(milliseconds: 500), curve: Curves.ease
       );
-    } 
+    }
     on Exception catch(e) {
       final se = e.toString().toLowerCase();
       String alertMsg = "An error has ocurred while reading Passport!";
@@ -495,7 +495,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
                 final date = await _pickDate(context, firstDate,
                   initDate != null ? initDate : firstDate, lastDate
                 );
-                
+
                 FocusScope.of(context).requestFocus(new FocusNode());
                 if(date != null) {
                   _doe.text = date;

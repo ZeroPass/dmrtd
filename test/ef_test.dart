@@ -2,7 +2,7 @@
 
 import 'dart:typed_data';
 import 'package:test/test.dart';
- 
+
 import 'package:dmrtd/dmrtd.dart';
 import 'package:dmrtd/extensions.dart';
 
@@ -53,14 +53,14 @@ void main() {
     expect( dg1.mrz.optionalData2 , ''                    );
     expect( dg1.mrz.optionalData2 , ''                    );
 
-    // A.2.2 - Note: The serialized MRZ in doc is malformed! 
+    // A.2.2 - Note: The serialized MRZ in doc is malformed!
     //               The data was modified:
     //                 - by removing extra '<' right of name field and optional data
     //                 - removed last invalid digit '4',
     //                 - CD for date of birth was changed to 1
     //                 - CD for date of expiry was changed to 2
     //                 - CD for doc. no. was changed to 2
-    //                 - CD for composite was changed to0        
+    //                 - CD for composite was changed to0
     final tvDG1TD2 = "614B5F1F48493C415441534D4954483C3C4A4F484E3C543C3C3C3C3C3C3C3C3C3C3C3C3C3C3C3C3C3C3132333435363738393C484D44373430363232314D31303132333132303132323C3C3C30".parseHex();
     dg1 = EfDG1.fromBytes(tvDG1TD2);
     expect( dg1.toBytes()         , tvDG1TD2               );

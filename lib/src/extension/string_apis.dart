@@ -29,7 +29,7 @@ extension StringYYMMDDateApi on String {
     // Sub 100 years from parsed year if greater than 10 years and 5 months from now.
     final now = DateTime.now();
     final tenYearsFromNow = now.year + 10;
-    if (y > tenYearsFromNow || 
+    if (y > tenYearsFromNow ||
        (y == tenYearsFromNow && now.month + 5 < m)) {
       y -= 100;
     }
