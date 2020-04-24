@@ -130,7 +130,7 @@ class MrtdApi {
 
     // Read the rest of the file
     final length =  dtl.length.value - (chunk1.data.length - dtl.encodedLen);
-    final chunk2 = await _readBinary(offset: chunk1.data.length, length:length);
+    final chunk2 = await _readBinary(offset: chunk1.data.length, length: length);
 
     final rawFile = Uint8List.fromList(chunk1.data + chunk2);
     assert(rawFile.length == dtl.encodedLen + dtl.length.value);
@@ -169,7 +169,14 @@ class MrtdApi {
         _reduceMaxRead(rapdu.data.length);
       }
 
-      data = Uint8List.fromList(data + rapdu.data);
+      var rdata = rapdu.data;
+      if(nRead == 256 &&  rdata.length > length) { //remove padding
+        _log.deVerbose("Removing padding from rdata=${rdata.hex()}");
+        rdata = Uint8List.fromList(rdata.sublist(0, length));
+        _log.deVerbose("Unpadded rdata=${rdata.hex()}");
+      }
+
+      data = Uint8List.fromList(data + rdata);
       offset += rapdu.data.length;
       length -= rapdu.data.length;
     }
