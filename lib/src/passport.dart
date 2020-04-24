@@ -5,6 +5,7 @@ import 'package:dmrtd/extensions.dart';
 import 'package:logging/logging.dart';
 
 import 'proto/iso7816/icc.dart';
+import 'proto/iso7816/response_apdu.dart';
 import 'proto/mrtd_api.dart';
 
 
@@ -378,7 +379,12 @@ class Passport {
       return await f();
     }
     on ICCError catch(e) {
-      throw PassportError(e.sw.description());
+      var msg = e.sw.description();
+      if(e.sw.sw1 == 0x63 && e.sw.sw2 == 0xcf) {
+        // some older passports return sw=63cf when data to establish session is wrong. (Wrong DBAKeys)
+        msg = StatusWord.securityStatusNotSatisfied.description();
+      }
+      throw PassportError(msg);
     }
     on MrtdApiError catch(e) {
       throw PassportError(e.message);
