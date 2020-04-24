@@ -161,7 +161,7 @@ class StatusWord {
         else if(sw1 == 0x61) { // Normal processing,  SW2 indicates the number of response bytes still available
           return "$sw2 bytes still available";
         }
-        return '${value.toRadixString(16)}';
+        return toString();
       }
     }
   }
