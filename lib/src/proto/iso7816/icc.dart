@@ -16,7 +16,8 @@ import 'sm.dart';
 class ICCError implements Exception {
   final String message;
   final StatusWord sw;
-  ICCError(this.message, this.sw);
+  final Uint8List data;
+  ICCError(this.message, this.sw, this.data);
   String toString() => 'ICC Error: $message $sw';
 }
 
@@ -51,7 +52,7 @@ class ICC {
       CommandAPDU(cla: cla, ins: ISO7816_INS.EXTERNAL_AUTHENTICATE, p1: 0x00, p2: 0x00, data: data, ne: ne)
     );
     if(rapdu.status != StatusWord.success) {
-      throw ICCError("External authenticate failed", rapdu.status);
+      throw ICCError("External authenticate failed", rapdu.status, rapdu.data);
     }
     return rapdu.data;
   }
@@ -64,7 +65,7 @@ class ICC {
       CommandAPDU(cla: cla, ins: ISO7816_INS.INTERNAL_AUTHENTICATE, p1: p1, p2: p2, data: data, ne: ne)
     );
     if(rapdu.status != StatusWord.success) {
-      throw ICCError("Internal authenticate failed", rapdu.status);
+      throw ICCError("Internal authenticate failed", rapdu.status, rapdu.data);
     }
     return rapdu.data;
   }
@@ -77,7 +78,7 @@ class ICC {
       CommandAPDU(cla: cla, ins: ISO7816_INS.GET_CHALLENGE, p1: 0x00, p2: 0x00, ne: challengeLength)
     );
     if(rapdu.status != StatusWord.success) {
-      throw ICCError("Get challenge failed", rapdu.status);
+      throw ICCError("Get challenge failed", rapdu.status, rapdu.data);
     }
     return rapdu.data;
   }
@@ -138,7 +139,11 @@ class ICC {
 
     final rtlv = TLV.fromBytes(rapdu.data);
     if(rtlv.tag != 0x53) {
-      throw ICCError("readBinaryExt failed. Received invalid BER-TLV encoded data with tag=0x${rtlv.tag.toRadixString(16)}, expected tag=0x53", rapdu.status);
+      throw ICCError(
+        "readBinaryExt failed. Received invalid BER-TLV encoded data with tag=0x${rtlv.tag.toRadixString(16)}, expected tag=0x53",
+        rapdu.status,
+        rapdu.data
+      );
     }
     return ResponseAPDU(rapdu.status, rtlv.value);
   }
@@ -150,7 +155,7 @@ class ICC {
       CommandAPDU(cla: cla, ins: ISO7816_INS.SELECT_FILE, p1: p1, p2: p2, data: data, ne: ne)
     );
     if(rapdu.status != StatusWord.success) {
-      throw ICCError("Select File failed", rapdu.status);
+      throw ICCError("Select File failed", rapdu.status, rapdu.data);
     }
     return rapdu.data;
   }
@@ -204,7 +209,7 @@ class ICC {
     final rapdu = await _transceive(cmd);
     if(((rapdu.data?.isEmpty ?? true) && rapdu.status != StatusWord.success)) {
       /// Should probably happen when SM errors (0x6987 & 0x6988) are received.
-      throw ICCError("Read binary failed", rapdu.status);
+      throw ICCError("Read binary failed", rapdu.status, rapdu.data);
     }
     return rapdu;
   }
