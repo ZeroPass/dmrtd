@@ -84,11 +84,10 @@ class NfcProvider extends ComProvider {
   }
 
   @override
-  Future<Uint8List> transceive(final Uint8List data) async {
+  Future<Uint8List> transceive(final Uint8List data, {Duration timeout = const Duration(seconds: 10)}) async {
     try {
-      String r = await FlutterNfcKit.transceive(data.hex());
-      return r.parseHex();
-    } catch(e) {
+      return await FlutterNfcKit.transceive(data, timeout: timeout);
+    } on Exception catch(e) {
       throw NfcProviderError.fromException(e);
     }
   }
