@@ -10,10 +10,7 @@ dependencies:
   archive: ^2.0.11 # flutter_test depends on version 2.0.11
   crypto: ^2.1.3
   fixnum: ^0.10.11
-  flutter_nfc_kit:
-    git:
-      url: https://github.com/smlu/flutter_nfc_kit.git
-      ref: patch-trnx
+  flutter_nfc_kit: ^1.1.0
   logging: ^0.11.4
   meta: ^1.1.6
   tripledes: ^2.1.0
