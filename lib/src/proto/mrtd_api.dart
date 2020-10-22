@@ -20,7 +20,8 @@ import 'package:logging/logging.dart';
 
 class MrtdApiError implements Exception {
   final String message;
-  const MrtdApiError(this.message);
+  final StatuwWord code;
+  const MrtdApiError(this.message, {this.code});
   String toString() => "MRTDApiError: $message";
 }
 
@@ -163,7 +164,7 @@ class MrtdApi {
         // In general when receiving errors: unexpectedEOF, wrongLength or sw1=0x6C
         // the chunk of read data should accompany it. If not, we throw here.
         if((rapdu.data?.isEmpty ?? true)) {
-          throw MrtdApiError("An error has occurred while trying to read file chunk. ${rapdu.status}");
+          throw MrtdApiError("An error has occurred while trying to read file chunk.", code: rapdu.status);
         }
         _log.warning("_readBinary: Reducing max read length due to read error ${rapdu.status}");
         _reduceMaxRead(rapdu.data.length);

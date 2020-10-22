@@ -11,7 +11,8 @@ import 'proto/mrtd_api.dart';
 
 class PassportError implements Exception {
   final String message;
-  PassportError(this.message);
+  final StatusWord code;
+  PassportError(this.message, {this.code});
   String toString() => message;
 }
 
@@ -384,10 +385,10 @@ class Passport {
         // some older passports return sw=63cf when data to establish session is wrong. (Wrong DBAKeys)
         msg = StatusWord.securityStatusNotSatisfied.description();
       }
-      throw PassportError(msg);
+      throw PassportError(msg, code: e.sw);
     }
     on MrtdApiError catch(e) {
-      throw PassportError(e.message);
+      throw PassportError(e.message, code: e.code);
     }
   }
 }
