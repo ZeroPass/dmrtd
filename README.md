@@ -4,30 +4,30 @@ Library provide APIs to send commands to and read data from MRTD.
 
 ## Key features
 * BAC session key establishment
-* Reading all elementary files from MRTD e.g. EF.SOD, EF.DG1, EF.DG15 ...  
+* Reading all elementary files from MRTD e.g. EF.SOD, EF.DG1, EF.DG15 ...
   *Note: most of files can't be fully parsed yet*
 * Executing `Active Authentication` on MRTD
 * Basic implementation of ICC ISO7816-4 smart card standard
 * Implementation of ISO 9797 Algorithm 3 MAC and padding scheme
 
 ## Library structure
-dmrtd.dart - public passport API  
-extensions.dart - exposes library's dart [extensions](lib/src/extension)  
+dmrtd.dart - public passport API
+extensions.dart - exposes library's dart [extensions](lib/src/extension)
 internal.dart - exposes internal components of the library such as MrtdApi, ICC and crypto
 
 ## Usage
- 1) Include `dmrtd` library in your project's `pubspec.yaml` file:  
+ 1) Include `dmrtd` library in your project's `pubspec.yaml` file:
 ```
 dependencies:
   dmrtd:
     path: '<path_to_dmrtd_folder>'
 ```
- 2) Run 
+ 2) Run
  ```
  flutter pub get
  ```
- 
-**Example:**  
+
+**Example:**
 *Note: See also [example](example) app*
 
 ```dart
@@ -75,10 +75,10 @@ try {
 
   nfc.setIosAlertMessage(formatProgressMsg("Reading EF.SOD ...", 80));
   final sod = await passport.readEfSOD();
-}  
+}
 on Exception catch(e) {
   final se = e.toString().toLowerCase();
-  String alertMsg = "An error has ocurred while reading Passport!";
+  String alertMsg = "An error has occurred while reading Passport!";
   if(e is PassportError) {
     if(se.contains("security status not satisfied")) {
       alertMsg = "Failed to initiate session with passport.\nCheck input data!";

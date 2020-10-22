@@ -288,7 +288,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
     }
     on Exception catch(e) {
       final se = e.toString().toLowerCase();
-      String alertMsg = "An error has ocurred while reading Passport!";
+      String alertMsg = "An error has occurred while reading Passport!";
       if(e is PassportError) {
         if(se.contains("security status not satisfied")) {
           alertMsg = "Failed to initiate session with passport.\nCheck input data!";
