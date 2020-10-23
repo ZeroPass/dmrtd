@@ -20,7 +20,7 @@ import 'package:logging/logging.dart';
 
 class MrtdApiError implements Exception {
   final String message;
-  final StatuwWord code;
+  final StatusWord code;
   const MrtdApiError(this.message, {this.code});
   String toString() => "MRTDApiError: $message";
 }
