@@ -161,44 +161,65 @@ class MrtdApi {
 
       // Check if we got an error
       if(rapdu.status != StatusWord.success && rapdu.status.sw1 != 0x61 /* success with remaining data len info */) {
-        // In general when receiving errors: unexpectedEOF, wrongLength or sw1=0x6C
-        // the chunk of read data should accompany it. If not, we throw here.
-        if((rapdu.data?.isEmpty ?? true)) {
+        if ((rapdu.status == StatusWord.wrongLength
+          || rapdu.status == StatusWord.unexpectedEOF) 
+          && _maxRead != 1) { // if _maxRead == 1 then we tried all possible lengths and failed, so this check should throw us out of the loop
+          _reduceMaxRead();
+        }
+        else if(rapdu.status.sw1 == 0x6C) { // Wrong length sw2 indicates the exact length
+          _maxRead = rapdu.status.sw2;
+        }
+        else {
+          _maxRead = 256;
           throw MrtdApiError("An error has occurred while trying to read file chunk.", code: rapdu.status);
         }
-        _log.warning("_readBinary: Reducing max read length due to read error ${rapdu.status}");
-        _reduceMaxRead(rapdu.data.length);
+        _log.info("Max read changed to: $_maxRead");
       }
 
       var rdata = rapdu.data;
-      if(nRead == 256 &&  rdata.length > length) { //remove padding
-        _log.deVerbose("Removing padding from rdata=${rdata.hex()}");
-        rdata = Uint8List.fromList(rdata.sublist(0, length));
-        _log.deVerbose("Unpadded rdata=${rdata.hex()}");
-      }
+      if(rdata != null) {
+        if(nRead == 256 &&  rdata.length > length) { //remove padding
+          _log.deVerbose("Removing padding from rdata=${rdata.hex()}");
+          rdata = Uint8List.fromList(rdata.sublist(0, length));
+          _log.deVerbose("Unpadded rdata=${rdata.hex()}");
+        }
 
-      data = Uint8List.fromList(data + rdata);
-      offset += rapdu.data.length;
-      length -= rapdu.data.length;
+        data = Uint8List.fromList(data + rdata);
+        offset += rapdu.data.length;
+        length -= rapdu.data.length;
+      }
     }
 
     return data;
   }
 
-  void _reduceMaxRead(int n) {
-    assert(_maxRead >= n);
-    if(_maxRead > n && n > 224) {
-      _maxRead = n;
-    }
-    else if(_maxRead > 224) {
-      _maxRead = 224;
+  void _reduceMaxRead() {
+    if(_maxRead > 224) {
+      _maxRead = 224;         // JMRTD lib's default read size
     }
     else if(_maxRead > 160) { // Some passports can't handle more then 160 bytes per read
       _maxRead = 160;
     }
-    else if(_maxRead > n) {
-      _maxRead = max(n, 1); // must not be 0
+    else if(_maxRead > 128) {
+      _maxRead = 128;
     }
-    _log.info("Max read changed to: $_maxRead");
+    else if(_maxRead > 96) {
+      _maxRead = 96;
+    }
+    else if(_maxRead > 64) {
+      _maxRead = 64;
+    }
+    else if(_maxRead > 32) {
+      _maxRead = 32;
+    }
+    else if(_maxRead > 16) { 
+      _maxRead = 16;
+    }
+    else if(_maxRead > 8) { 
+      _maxRead = 8;
+    }
+    else {
+      _maxRead = 1; // last resort try to read 1 byte at the time
+    }
   }
 }
