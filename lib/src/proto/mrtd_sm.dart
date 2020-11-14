@@ -61,7 +61,7 @@ class MrtdSM extends SecureMessaging {
   ResponseAPDU unprotect(ResponseAPDU rapdu) {
     if(rapdu.status == StatusWord.smDataMissing ||
        rapdu.status == StatusWord.smDataInvalid ||
-       (rapdu.data?.isEmpty ?? true )) { //RAPDU should have data
+      (rapdu.data?.isEmpty ?? true )) { //RAPDU should have data
       return rapdu;
     }
 
