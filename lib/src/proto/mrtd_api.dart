@@ -35,10 +35,11 @@ class MrtdApi {
   MrtdApi(ComProvider com) : icc = ICC(com);
 
   // See: Section 4.1 https://www.icao.int/publications/Documents/9303_p10_cons_en.pdf
-  static const _defaultSelectP2     = ISO97816_SelectFileP2.returnFCP | ISO97816_SelectFileP2.returnFMD;
-  final _log                        = Logger("mrtd.api");
-  int _maxRead                      = 256; // 256 = expect maximum number of bytes
-  static const int _readAheadLength = 8;   // Number of bytes to read at the start of file to determine file length.
+  static const _defaultSelectP2          = ISO97816_SelectFileP2.returnFCP | ISO97816_SelectFileP2.returnFMD;
+  final _log                             = Logger("mrtd.api");
+  int _maxRead                           = 256; // 256 = expect maximum number of bytes
+  static const int _readAheadLength      = 8;   // Number of bytes to read at the start of file to determine file length.
+  Future<void> Function() _reinitSession = null;
 
 
   /// Sends active authentication command to MRTD with [challenge].
@@ -58,6 +59,11 @@ class MrtdApi {
   Future<void> initSessionViaBAC(final DBAKeys keys) async {
     _log.debug("Initiating SM session using BAC protocol");
     await BAC.initSession(dbaKeys: keys, icc: icc);
+    _reinitSession = () async { 
+      _log.debug("Re-initiating SM session using BAC protocol");
+      icc.sm = null;
+      await BAC.initSession(dbaKeys: keys, icc: icc);
+    };
   }
 
   /// Selects eMRTD application (DF1) applet.
@@ -180,6 +186,7 @@ class MrtdApi {
             throw MrtdApiError("An error has occurred while trying to read file chunk.", code: e.sw);
           }
           _log.info("Max read changed to: $_maxRead");
+          await _reinitSession?.call();
         }
       }
 
