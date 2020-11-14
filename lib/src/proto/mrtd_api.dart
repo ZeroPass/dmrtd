@@ -148,35 +148,41 @@ class MrtdApi {
       }
       _log.debug("_readBinary: offset=$offset nRead=$nRead remaining=$length maxRead=$_maxRead");
 
-      ResponseAPDU rapdu;
-      if(offset > 0x7FFF) { // extended read binary
-        rapdu = await icc.readBinaryExt(offset: offset, ne: nRead);
-      }
-      else {
-        if(offset + nRead > 0x7FFF) { // Do not overlap offset 32 767 with even READ BINARY command
-          nRead = 0x7FFF - offset;
-        }
-        rapdu = await icc.readBinary(offset: offset, ne: nRead);
-      }
-
-      // Check if we got an error
-      if(rapdu.status != StatusWord.success && rapdu.status.sw1 != 0x61 /* success with remaining data len info */) {
-        if ((rapdu.status == StatusWord.wrongLength
-          || rapdu.status == StatusWord.unexpectedEOF) 
-          && _maxRead != 1) { // if _maxRead == 1 then we tried all possible lengths and failed, so this check should throw us out of the loop
-          _reduceMaxRead();
-        }
-        else if(rapdu.status.sw1 == 0x6C) { // Wrong length sw2 indicates the exact length
-          _maxRead = rapdu.status.sw2;
+      Uint8List rdata;
+      try {
+        if(offset > 0x7FFF) { // extended read binary
+          final rapdu = await icc.readBinaryExt(offset: offset, ne: nRead);
+          rdata = rapdu.data;
         }
         else {
-          _maxRead = 256;
-          throw MrtdApiError("An error has occurred while trying to read file chunk.", code: rapdu.status);
+          if(offset + nRead > 0x7FFF) { // Do not overlap offset 32 767 with even READ BINARY command
+            nRead = 0x7FFF - offset;
+          }
+          final rapdu = await icc.readBinary(offset: offset, ne: nRead);
+          rdata = rapdu.data;
         }
-        _log.info("Max read changed to: $_maxRead");
+      }
+      on ICCError catch(e) {
+        if(e.sw.sw1 == 0x61) { // success with remaining data len info
+          rdata = e.data;
+        }
+        else {
+          if ((e.sw == StatusWord.wrongLength
+            || e.sw == StatusWord.unexpectedEOF) 
+            && _maxRead != 1) { // if _maxRead == 1 then we tried all possible lengths and failed, so this check should throw us out of the loop
+            _reduceMaxRead();
+          }
+          else if(e.sw.sw1 == 0x6C) { // Wrong length sw2 indicates the exact length
+            _maxRead = e.sw.sw2;
+          }
+          else {
+            _maxRead = 256;
+            throw MrtdApiError("An error has occurred while trying to read file chunk.", code: e.sw);
+          }
+          _log.info("Max read changed to: $_maxRead");
+        }
       }
 
-      var rdata = rapdu.data;
       if(rdata != null) {
         if(nRead == 256 &&  rdata.length > length) { //remove padding
           _log.deVerbose("Removing padding from rdata=${rdata.hex()}");
@@ -185,8 +191,8 @@ class MrtdApi {
         }
 
         data = Uint8List.fromList(data + rdata);
-        offset += rapdu.data.length;
-        length -= rapdu.data.length;
+        offset += rdata.length;
+        length -= rdata.length;
       }
     }
 
