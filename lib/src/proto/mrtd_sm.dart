@@ -30,7 +30,7 @@ class MrtdSM extends SecureMessaging {
     _log.debug("Protecting APDU");
     _log.verbose("  header=${cmd.rawHeader().hex()}");
     _log.deVerbose("  data=${cmd.data?.hex()}");
-    _log.verbose("  ne=${cmd.ne}");
+    _log.verbose("  Le=${cmd.ne}");
 
     final pcmd   = maskCmd(cmd);
     _log.verbose("masked APDU header=${pcmd.rawHeader().hex()}");
@@ -46,6 +46,7 @@ class MrtdSM extends SecureMessaging {
 
     final N  = generateN(M: M);
     _log.verbose("Generated N=${N.hex()}");
+    _log.verbose("  used SSC=${_ssc.toBytes().hex()}");
 
     final CC   = cipher.mac(N);
     final do8E = SecureMessaging.do8E(CC);
@@ -73,6 +74,8 @@ class MrtdSM extends SecureMessaging {
     final K         = generateK(data: rapdu.data.sublist(0, do8EStart));
     final CC        = cipher.mac(K);
 
+    _log.verbose("Generated K=${K.hex()}");
+    _log.verbose("  used SSC=${_ssc.toBytes().hex()}");
     _log.verbose("APDU CC=${do8E.value.hex()}");
     _log.verbose("Calculated CC=${CC.hex()}");
     if(!_eq(CC, do8E.value)) {
@@ -80,11 +83,13 @@ class MrtdSM extends SecureMessaging {
     }
 
     final data = decryptDataDO(tvDataDO);
+    _log.deVerbose("Decrypted and upadded data=${data.hex()}");
     return ResponseAPDU(StatusWord.fromBytes(do99.value), data);
   }
 
   @visibleForTesting
   Uint8List decryptDataDO(final DecodedTV dtv) {
+    _log.verbose("Decrypting data=${dtv.value?.hex()}");
     if(dtv == null || dtv.value == null || dtv.value.isEmpty) {
       return null;
     }
@@ -98,6 +103,8 @@ class MrtdSM extends SecureMessaging {
     final bool isDO87 = tag == SecureMessaging.tagDO87;
     final bool padded = !isDO87 || dtv.value[0] == 0x01; // Defined in ISO/IEC 7816-4 part 5
     var data = cipher.decrypt(dtv.value.sublist(isDO87 ? 1 : 0));
+    _log.deVerbose("Decrypted data=${data.hex()}");
+    _log.verbose("Decrypted data is padded: $padded");
     if(padded) {
       data = ISO9797.unpad(data);
     }
