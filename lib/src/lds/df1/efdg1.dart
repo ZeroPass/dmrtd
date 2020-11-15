@@ -1,5 +1,6 @@
 //  Created by smlu, copyright © 2020 ZeroPass. All rights reserved.
 import 'dart:typed_data';
+import 'package:dmrtd/extensions.dart';
 import 'dg.dart';
 import '../ef.dart';
 import '../mrz.dart';
@@ -29,7 +30,7 @@ class EfDG1 extends DataGroup {
     final tlv = TLV.fromBytes(content);
     if(tlv.tag != 0x5F1F) {
       throw EfParseError(
-        "Invalid data object tag=${tlv.tag.toRadixString(16)}, expected object with tag=5F1F"
+        "Invalid data object tag=${tlv.tag.hex()}, expected object with tag=5F1F"
       );
     }
     _mrz = MRZ(tlv.value);

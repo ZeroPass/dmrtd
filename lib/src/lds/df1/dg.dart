@@ -1,6 +1,7 @@
 //  Created by smlu, copyright © 2020 ZeroPass. All rights reserved.
 import 'dart:typed_data';
 import 'package:meta/meta.dart';
+import 'package:dmrtd/extensions.dart';
 
 import '../ef.dart';
 import '../tlv.dart';
@@ -28,7 +29,7 @@ abstract class DataGroup extends ElementaryFile {
     final tlv = TLV.fromBytes(data);
     if(tlv.tag != tag) {
       throw EfParseError(
-        "Invalid tag=${tlv.tag.toRadixString(16)}, expected tag=${tag.toRadixString(16)}"
+        "Invalid tag=${tlv.tag.hex()}, expected tag=${tag.hex()}"
       );
     }
     parseContent(tlv.value);

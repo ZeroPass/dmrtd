@@ -1,6 +1,7 @@
 //  Created by smlu, copyright © 2020 ZeroPass. All rights reserved.
 import 'dart:core';
 import 'dart:typed_data';
+import 'package:dmrtd/extensions.dart';
 
 import 'dg.dart';
 import '../ef.dart';
@@ -32,7 +33,7 @@ class EfCOM extends ElementaryFile {
     final tlv = TLV.fromBytes(data);
     if(tlv.tag != TAG) {
       throw EfParseError(
-        "Invalid EF.COM tag=${tlv.tag.toRadixString(16)}, expected tag=${TAG.toRadixString(16)}"
+        "Invalid EF.COM tag=${tlv.tag.hex()}, expected tag=${TAG.hex()}"
       );
     }
     final content = tlv.value;
@@ -41,7 +42,7 @@ class EfCOM extends ElementaryFile {
     final vtv = TLV.decode(content);
     if(vtv.tag.value != 0x5F01) {
       throw EfParseError(
-        "Invalid version object tag=${vtv.tag.value.toRadixString(16)}, expected version object with tag=5F01"
+        "Invalid version object tag=${vtv.tag.value.hex()}, expected version object with tag=5F01"
       );
     }
     _ver = String.fromCharCodes(vtv.value);
@@ -50,7 +51,7 @@ class EfCOM extends ElementaryFile {
     final uvtv = TLV.decode(content.sublist(vtv.encodedLen));
     if(uvtv.tag.value != 0x5F36) {
       throw EfParseError(
-        "Invalid unicode version object tag=${uvtv.tag.value.toRadixString(16)}, expected unicode version object with tag=${0x5F36.toRadixString(16)}"
+        "Invalid unicode version object tag=${uvtv.tag.value.hex()}, expected unicode version object with tag=5F36"
       );
     }
     _uver = String.fromCharCodes(uvtv.value);
@@ -59,7 +60,7 @@ class EfCOM extends ElementaryFile {
     final tvTagList = TLV.decode(content.sublist(vtv.encodedLen + uvtv.encodedLen));
     if(tvTagList.tag.value != 0x5C) {
       throw EfParseError(
-        "Invalid tag list object tag=${tvTagList.tag.value.toRadixString(16)}, expected tag list object with tag=${0x5C.toRadixString(16)}"
+        "Invalid tag list object tag=${tvTagList.tag.value.hex()}, expected tag list object with tag=5C"
       );
     }
 

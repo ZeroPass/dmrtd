@@ -34,21 +34,21 @@ class AAPublicKey {
     final tvPubKeyInfo = TLV.decode(encPubKey);
     if(tvPubKeyInfo.tag.value != 0x30) { // Sequence
       EfParseError(
-        "Invalid SubjectPublicKeyInfo tag=${tvPubKeyInfo.tag.value.toRadixString(16)}, expected tag=0x30"
+        "Invalid SubjectPublicKeyInfo tag=${tvPubKeyInfo.tag.value.hex()}, expected tag=30"
       );
     }
 
     final tvAlg = TLV.decode(tvPubKeyInfo.value);
     if(tvAlg.tag.value != 0x30) { // Sequence
       EfParseError(
-        "Invalid AlgorithmIdentifier tag=${tvAlg.tag.value.toRadixString(16)}, expected tag=0x30"
+        "Invalid AlgorithmIdentifier tag=${tvAlg.tag.value.hex()}, expected tag=30"
       );
     }
 
     final tvAlgOID = TLV.decode(tvAlg.value);
-    if(tvAlg.tag.value != 0x06) {
+    if(tvAlg.tag.value != 0x06) { // OID
       EfParseError(
-        "Invalid Algorithm OID object tag=${tvAlgOID.tag.value.toRadixString(16)}, expected tag=0x06"
+        "Invalid Algorithm OID object tag=${tvAlgOID.tag.value.hex()}, expected tag=06"
       );
     }
 
@@ -58,9 +58,9 @@ class AAPublicKey {
     }
 
     _subPubKeyBytes = tvPubKeyInfo.value.sublist(tvAlg.encodedLen);
-    if(_subPubKeyBytes[0] != 0x03) {
+    if(_subPubKeyBytes[0] != 0x03) { // Bit String
       EfParseError(
-        "Invalid SubjectPublicKey object tag=${_subPubKeyBytes[0].toRadixString(16)}, expected tag=0x03"
+        "Invalid SubjectPublicKey object tag=${_subPubKeyBytes[0].hex()}, expected tag=03"
       );
     }
   }
