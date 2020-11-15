@@ -9,6 +9,7 @@ import 'iso7816/iso7816.dart';
 import 'iso7816/icc.dart';
 import 'iso7816/response_apdu.dart';
 
+import '../crypto/iso9797.dart';
 import '../com/com_provider.dart';
 import '../lds/df1/df1.dart';
 import '../lds/tlv.dart';
@@ -37,7 +38,8 @@ class MrtdApi {
   // See: Section 4.1 https://www.icao.int/publications/Documents/9303_p10_cons_en.pdf
   static const _defaultSelectP2          = ISO97816_SelectFileP2.returnFCP | ISO97816_SelectFileP2.returnFMD;
   final _log                             = Logger("mrtd.api");
-  int _maxRead                           = 256; // 256 = expect maximum number of bytes
+  static const int _defaultReadLength    = 256; // 256 = expect maximum number of bytes. TODO: in production set it to 224 - JMRTD
+  int _maxRead                           = _defaultReadLength; 
   static const int _readAheadLength      = 8;   // Number of bytes to read at the start of file to determine file length.
   Future<void> Function() _reinitSession = null;
 
@@ -125,7 +127,7 @@ class MrtdApi {
   /// SM session is not established but required to read file.
   /// Can throw [ComProviderError] in case connection with MRTD is lost.
   Future<Uint8List> readFileBySFI(int sfi) async {
-    _log.debug("Reading file sfi=0x${sfi.toRadixString(16)}");
+    _log.debug("Reading file sfi=0x${sfi.hex()}");
     sfi |= 0x80;
     if(sfi > 0x9F) {
       throw ArgumentError.value(sfi, null, "Invalid SFI value");
@@ -152,55 +154,76 @@ class MrtdApi {
       if(nRead != 256 && nRead > length) {
         nRead = length;
       }
-      _log.debug("_readBinary: offset=$offset nRead=$nRead remaining=$length maxRead=$_maxRead");
 
-      Uint8List rdata;
+      _log.debug("_readBinary: offset=$offset nRead=$nRead remaining=$length maxRead=$_maxRead");
       try {
+        ResponseAPDU rapdu;
         if(offset > 0x7FFF) { // extended read binary
-          final rapdu = await icc.readBinaryExt(offset: offset, ne: nRead);
-          rdata = rapdu.data;
+          rapdu = await icc.readBinaryExt(offset: offset, ne: nRead);
         }
         else {
           if(offset + nRead > 0x7FFF) { // Do not overlap offset 32 767 with even READ BINARY command
             nRead = 0x7FFF - offset;
           }
-          final rapdu = await icc.readBinary(offset: offset, ne: nRead);
-          rdata = rapdu.data;
+          rapdu = await icc.readBinary(offset: offset, ne: nRead);
         }
-      }
-      on ICCError catch(e) {
-        if(e.sw.sw1 == 0x61) { // success with remaining data len info
-          rdata = e.data;
+
+        if(rapdu.status.sw1 == StatusWord.sw1SuccessWithRemainingBytes) {
+          // This should probably happen only in case of calling 
+          // command GET STATUS, which we don't call here.
+          // We log it for tracing purpose.
+          _log.debug("Received ${rapdu.data?.length ?? 0} byte(s), ${rapdu.status.description()}");
+        }
+        else if(rapdu.status == StatusWord.unexpectedEOF) {
+          _log.warning(rapdu.status.description());
+          _reduceMaxRead();
+        }
+        else if(rapdu.status == StatusWord.possibleCorruptedData) {
+          _log.warning("Part of received data chunk my be corrupted");
+        }
+        else if(rapdu.status.isError()) {
+          // Just making sure if an error has occured we still have valid session
+          _log.warning("An error ${rapdu.status} has occured while reading file but have received some data. Re-initializing SM session and trying to continue normally.");
+          await _reinitSession?.call();
+        }
+
+        if(rapdu.data != null) {
+          data    = Uint8List.fromList(data + rapdu.data);
+          offset += rapdu.data.length;
+          length -= rapdu.data.length;
         }
         else {
-          if ((e.sw == StatusWord.wrongLength
-            || e.sw == StatusWord.unexpectedEOF) 
-            && _maxRead != 1) { // if _maxRead == 1 then we tried all possible lengths and failed, so this check should throw us out of the loop
-            _reduceMaxRead();
-          }
-          else if(e.sw.sw1 == 0x6C) { // Wrong length sw2 indicates the exact length
-            _maxRead = e.sw.sw2;
-          }
-          else {
-            _maxRead = 256;
-            throw MrtdApiError("An error has occurred while trying to read file chunk.", code: e.sw);
-          }
-          _log.info("Max read changed to: $_maxRead");
+          _log.warning("No data received when trying to read binary");
+        }
+      }
+      on ICCError catch(e) { // thrown on _readBinary error when no data is received.
+        if (e.sw == StatusWord.wrongLength && _maxRead != 1) { // if _maxRead == 1 then we tried all possible lengths and failed, so this check should throw us out of the loop
+          _reduceMaxRead();
+        }
+        else if(e.sw.sw1 == StatusWord.sw1WrongLengthWithExactLength) {
+          _log.warning("Reducing max read to ${e.sw.sw2} byte(s) due to wrong length error");
+          _maxRead = e.sw.sw2;
+        }
+        else {
+          _maxRead = _defaultReadLength;
+          throw MrtdApiError("An error has occurred while trying to read file chunk.", code: e.sw);
+        }
+        if(e.sw.isError()) { // Just a sanity check as ICCError is thrown only on error
+          _log.info("Re-initializing SM session due to read binary error");
           await _reinitSession?.call();
         }
       }
+    }
 
-      if(rdata != null) {
-        if(nRead == 256 &&  rdata.length > length) { //remove padding
-          _log.deVerbose("Removing padding from rdata=${rdata.hex()}");
-          rdata = Uint8List.fromList(rdata.sublist(0, length));
-          _log.deVerbose("Unpadded rdata=${rdata.hex()}");
-        }
-
-        data = Uint8List.fromList(data + rdata);
-        offset += rdata.length;
-        length -= rdata.length;
-      }
+    // Verify total received data size is not greater than
+    // requested and remove excess data.
+    // Some passports e.g.: Slovenian on SW:0x6282 (unexpectedEOF)
+    // add possible wrong pad data: 0x000080 instead of 0x800000.
+    if(length < 0) {
+      final newSize = data.length - length.abs();
+      _log.warning("Total read data size is greater than requested, removing last ${length.abs()} byte(s)");
+      _log.debug("  Requested size:${newSize} byte(s) actual size:${data.length} byte(s)");
+      data = data.sublist(0, newSize);
     }
 
     return data;
@@ -234,5 +257,6 @@ class MrtdApi {
     else {
       _maxRead = 1; // last resort try to read 1 byte at the time
     }
+    _log.info("Max read changed to: $_maxRead");
   }
 }
