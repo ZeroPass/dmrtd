@@ -35,12 +35,19 @@ class ResponseAPDU {
 
 /// Class represents trailer status bytes of ISO/IEC 7816-4 response APDU.
 class StatusWord {
+  final int sw1;
+  final int sw2;
+
   // Defined in ISO/IEC 7816-4 Figure 7 - Structural scheme of status bytes
+
+  // Warnings
   static const noInformationGiven                = StatusWord(sw1: 0x62, sw2: 0x00);
   static const possibleCorruptedData             = StatusWord(sw1: 0x62, sw2: 0x81);
   static const unexpectedEOF                     = StatusWord(sw1: 0x62, sw2: 0x82);
   static const selectedFileInvalidated           = StatusWord(sw1: 0x62, sw2: 0x83);
   static const wrongFCIFormat                    = StatusWord(sw1: 0x62, sw2: 0x84);
+
+  // Errors
   static const wrongLength                       = StatusWord(sw1: 0x67, sw2: 0x00);
   static const claFunctionNotSupported           = StatusWord(sw1: 0x68, sw2: 0x00);
   static const logicalChannelNotSupported        = StatusWord(sw1: 0x68, sw2: 0x81);
@@ -68,18 +75,21 @@ class StatusWord {
   static const invalidInstructionCode            = StatusWord(sw1: 0x6D, sw2: 0x00);
   static const classNotSupported                 = StatusWord(sw1: 0x6E, sw2: 0x00);
   static const noPreciseDiagnostics              = StatusWord(sw1: 0x6F, sw2: 0x00);
-  static const success                           = StatusWord(sw1: 0x90, sw2: 0x00);
+  static const int sw1WrongLengthWithExactLength = 0x6C; // An error incicating wrong length (wrong Le field), sw2 indicates the exact length
 
-  static remainingAvailableResponseBytes(int numBytes) { // This is considered as normal status. It's the same as sw=0x9000 - success.
-    return StatusWord(sw1: 0x61, sw2: numBytes);
+  // Normal processing - success
+  static const success                           = StatusWord(sw1: 0x90, sw2: 0x00);
+  static const int sw1SuccessWithRemainingBytes  = 0x61; // This is considered as normal status e.g. success.
+                                                         // SW2 indicates a number of extra data bytes still available.
+                                                         // Can be returned by GET RESPONSE command (ISO 7816-4 section 7)
+
+  static remainingAvailableResponseBytes(int numBytes) { 
+    return StatusWord(sw1: sw1SuccessWithRemainingBytes, sw2: numBytes); // Normal execution
   }
 
   static leWrongLength(int exactLength) { // Indicates wrong length of Le field. SW2 SW2 indicates the exact length.
-    return StatusWord(sw1: 0x6C, sw2: exactLength);
+    return StatusWord(sw1: sw1WrongLengthWithExactLength, sw2: exactLength);
   }
-
-  final int sw1;
-  final int sw2;
 
   int get value {
     return ByteData.view(
@@ -102,6 +112,19 @@ class StatusWord {
     return StatusWord(sw1: data[offset], sw2: data[offset + 1]);
   }
 
+  bool isSuccess() {
+    return this == success || 
+           sw1 == sw1SuccessWithRemainingBytes;
+  }
+
+  bool isWarning() {
+    return sw1 >= 0x62 && sw1 <= 0x63;
+  }
+
+  bool isError() {
+    return sw1 >= 0x64 && sw1 != 0x90;
+  }
+
   @override
   bool operator == (rhs) {
     return sw1 == rhs?.sw1 && sw2 == rhs?.sw2;
@@ -115,7 +138,7 @@ class StatusWord {
   }
 
   String toString() {
-    return 'sw=${value.toRadixString(16)}';
+    return 'sw=${value.hex()}';
   }
 
   String description() {
@@ -155,11 +178,11 @@ class StatusWord {
       case noPreciseDiagnostics:             return "No precise diagnosis";
       case success:                          return "Success";
       default: {
-        if(sw1 == 0x6C) { // Wrong length (wrong Le field: 'XX' indicates the exact length).
+        if(sw1 == sw1WrongLengthWithExactLength) { // Wrong length (wrong Le field: 'XX' indicates the exact length).
           return "Wrong length (exact length: $sw2)";
         }
-        else if(sw1 == 0x61) { // Normal processing,  SW2 indicates the number of response bytes still available
-          return "$sw2 bytes still available";
+        else if(sw1 == sw1SuccessWithRemainingBytes) { // SW2 indicates the number of response bytes still available
+          return "$sw2 byte(s) are still available";
         }
         return toString();
       }
