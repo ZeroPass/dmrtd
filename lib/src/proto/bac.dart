@@ -97,9 +97,9 @@ class BAC {
 
     // Calculate session keys from Kifd and Kicc
     final pairKS = calculateSessionKeys(Kifd: Kifd, Kicc: Kicc);
-    _log.verbose("Calculated session keys:");
-    _log.verbose("  KSenc=${pairKS.first.hex()}");
-    _log.verbose("  KSmac=${pairKS.second.hex()}");
+    _log.deVerbose("Calculated session keys:");
+    _log.deVerbose("  KSenc=${pairKS.first.hex()}");
+    _log.deVerbose("  KSmac=${pairKS.second.hex()}");
 
     // Calculate SCC from RND.IFD and RND.ICC
     final ssc = calculateSCC(RNDifd: RNDifd, RNDicc: RNDicc);
