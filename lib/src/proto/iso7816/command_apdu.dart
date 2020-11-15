@@ -1,5 +1,6 @@
 //  Created by smlu, copyright © 2020 ZeroPass. All rights reserved.
 import 'dart:typed_data';
+import 'package:dmrtd/extensions.dart';
 import 'package:meta/meta.dart';
 
 // Class defines ISO/IEC 7816-4 command APDU
@@ -133,4 +134,8 @@ class CommandAPDU {
     final le = _getLe();
     return Uint8List.fromList(rawHeader() + [ ...lc, ...?_data, ...le]);
   }
+
+  /// Returns string representation of command APDU
+  String toString() => 
+    "C-APDU(CLA:${_cla.hex()} INS:${_ins.hex()} P1:${_p1.hex()} P2:${_p2.hex()} Le:${_ne} Lc:${_data?.length ?? 0x00} Data:${_data?.hex()})";
 }
