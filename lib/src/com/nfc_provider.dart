@@ -18,6 +18,8 @@ class NfcProviderError extends ComProviderError {
 
 class NfcProvider extends ComProvider {
   static final _log = Logger('nfc.provider');
+
+  Duration timeout = const Duration(seconds: 10); /// Default transceive timeout. (Android only)
   NfcProvider() : super(_log);
 
   NFCTag _tag;
@@ -84,9 +86,10 @@ class NfcProvider extends ComProvider {
   }
 
   @override
-  Future<Uint8List> transceive(final Uint8List data, {Duration timeout = const Duration(seconds: 10)}) async {
+  Future<Uint8List> transceive(final Uint8List data,
+      {Duration timeout}) async {
     try {
-      return await FlutterNfcKit.transceive(data, timeout: timeout);
+      return await FlutterNfcKit.transceive(data, timeout: timeout ?? this.timeout);
     } on Exception catch(e) {
       throw NfcProviderError.fromException(e);
     }
