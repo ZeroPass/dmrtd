@@ -83,13 +83,13 @@ class MrtdSM extends SecureMessaging {
     }
 
     final data = decryptDataDO(tvDataDO);
-    _log.deVerbose("Decrypted and upadded data=${data.hex()}");
+    _log.deVerbose("Decrypted and upadded data=${data?.hex()}");
     return ResponseAPDU(StatusWord.fromBytes(do99.value), data);
   }
 
   @visibleForTesting
   Uint8List decryptDataDO(final DecodedTV dtv) {
-    _log.verbose("Decrypting data=${dtv.value?.hex()}");
+    _log.verbose("Decrypting data=${dtv?.value?.hex()}");
     if(dtv == null || dtv.value == null || dtv.value.isEmpty) {
       return null;
     }
