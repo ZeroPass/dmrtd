@@ -92,8 +92,8 @@ class MrtdEgApp extends StatelessWidget  {
         DefaultCupertinoLocalizations.delegate,
         DefaultWidgetsLocalizations.delegate,
       ],
-      android: (_) => MaterialAppData(),
-      ios: (_) => CupertinoAppData(),
+      material: (_, __) => MaterialAppData(),
+      cupertino: (_, __) => CupertinoAppData(),
       home: MrtdHomePage()
     );
   }
@@ -117,7 +117,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
   final _doe = TextEditingController(); // date of doc expiry
 
   String _result ="";
-    NfcProvider _nfc = NfcProvider();
+  NfcProvider _nfc = NfcProvider();
   Timer _timerStateUpdater;
   final _scrollController = ScrollController();
 
