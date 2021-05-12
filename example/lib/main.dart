@@ -423,7 +423,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
                 fillColor: Colors.white
               ),
               inputFormatters: <TextInputFormatter>[
-                WhitelistingTextInputFormatter(RegExp(r'[A-Z0-9]+')),
+                FilteringTextInputFormatter.allow(RegExp(r'[A-Z0-9]+')),
                 LengthLimitingTextInputFormatter(14)
               ],
               textInputAction: TextInputAction.done,
