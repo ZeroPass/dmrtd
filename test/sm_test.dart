@@ -5,7 +5,6 @@ import 'package:dmrtd/src/proto/bac_smcipher.dart';
 import 'package:test/test.dart';
 
 import 'dart:typed_data';
-import 'package:test/test.dart';
 
 import 'package:dmrtd/src/lds/tlv.dart';
 import 'package:dmrtd/src/proto/mrtd_sm.dart';

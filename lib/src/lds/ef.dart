@@ -1,7 +1,6 @@
 //  Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
 import 'dart:typed_data';
 import 'package:meta/meta.dart';
-import 'tlv.dart';
 
 class EfParseError implements Exception {
   String message;

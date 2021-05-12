@@ -1,3 +1,4 @@
+// Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
 import 'package:dmrtd/dmrtd.dart';
 import 'package:dmrtd/extensions.dart';
 import 'package:dmrtd/internal.dart';
