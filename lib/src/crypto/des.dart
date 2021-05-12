@@ -100,7 +100,7 @@ class DESCipher {
       throw ArgumentError.value(data, "data size should be multiple of $blockSize bytes");
     }
 
-    List<int> pdata = List<int>(0);
+    List<int> pdata = List<int>.empty(growable: true);
     List<int> xord = _iv;
     final size = data.length / blockSize;
     for( int i = 0; i < size; i++) {
@@ -157,7 +157,7 @@ class DESCipher {
   }
 
   static List<int> _bytesToDWordList(final Uint8List bytes) {
-    final dwords = List<int>((bytes.length / 4).round());
+    final dwords = List<int>.filled((bytes.length / 4).round(), 0);
     final view = ByteData.view(bytes.buffer);
     for (int i = 0; i < dwords.length; i++) {
       dwords[i] = view.getInt32(i * 4);
