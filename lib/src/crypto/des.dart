@@ -24,7 +24,7 @@ class DESCipher {
 
   /// Returns current key
   get key {
-    return _DWordListToBytes(_key);
+    return _dwordListToBytes(_key);
   }
 
   /// Sets new key. The [key] length must be 8 bytes.
@@ -37,7 +37,7 @@ class DESCipher {
 
   /// Returns current iv.
   get iv {
-    return _DWordListToBytes(_iv);
+    return _dwordListToBytes(_iv);
   }
 
   /// Sets new iv. The [iv] length must be 8 bytes.
@@ -74,7 +74,7 @@ class DESCipher {
     _bc.init(true, _key);
     final wblock = _bytesToDWordList(block);
     _processBlock(wblock);
-    return _DWordListToBytes(wblock);
+    return _dwordListToBytes(wblock);
   }
 
   // Returns decrypted [eblock].
@@ -85,7 +85,7 @@ class DESCipher {
     _bc.init(false, _key);
     final wblock = _bytesToDWordList(eblock);
     _processBlock(wblock);
-    return _DWordListToBytes(wblock);
+    return _dwordListToBytes(wblock);
   }
 
   /// block should be list of 2 ints
@@ -131,7 +131,7 @@ class DESCipher {
       pdata += block;
     }
 
-    return _DWordListToBytes(pdata);
+    return _dwordListToBytes(pdata);
   }
 
   Uint8List _padOrRef(final Uint8List data, final bool padData) {
@@ -166,7 +166,7 @@ class DESCipher {
     return dwords;
   }
 
-  static Uint8List _DWordListToBytes(final List<int> dwords) {
+  static Uint8List _dwordListToBytes(final List<int> dwords) {
     final bytes = Uint8List(dwords.length * 4);
     final view = ByteData.view(bytes.buffer);
     for (int i = 0; i < dwords.length;  i++) {
