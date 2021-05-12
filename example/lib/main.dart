@@ -314,7 +314,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
       });
     }
     finally {
-      if(_alertMessage?.isNotEmpty){
+      if(_alertMessage?.isNotEmpty ?? false){
         await _nfc.disconnect(iosErrorMessage: _alertMessage);
       }
       else {
