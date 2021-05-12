@@ -1,4 +1,4 @@
-//  Created by smlu, copyright © 2020 ZeroPass. All rights reserved.
+// Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
 import 'package:test/test.dart';
 
 import 'package:dmrtd/src/crypto/kdf.dart';

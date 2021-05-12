@@ -1,4 +1,4 @@
-// Created by smlu, copyright © 2020 ZeroPass. All rights reserved.
+// Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:dmrtd/dmrtd.dart';

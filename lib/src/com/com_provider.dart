@@ -1,7 +1,6 @@
-//  Created by smlu, copyright © 2020 ZeroPass. All rights reserved.
+//  Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
 import 'dart:typed_data';
 import 'package:logging/logging.dart';
-
 
 class ComProviderError implements Exception {
   final String message;

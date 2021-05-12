@@ -1,4 +1,4 @@
-//  Created by smlu, copyright © 2020 ZeroPass. All rights reserved.
+// Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
 
 class Pair<T1, T2> {
   /// Returns the first item of the pair

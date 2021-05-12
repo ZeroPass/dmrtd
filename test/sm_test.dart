@@ -1,4 +1,4 @@
-//  Created by smlu, copyright © 2020 ZeroPass. All rights reserved.
+// Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
 import 'package:dmrtd/dmrtd.dart';
 import 'package:dmrtd/extensions.dart';
 import 'package:dmrtd/src/proto/bac_smcipher.dart';

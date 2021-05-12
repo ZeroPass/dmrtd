@@ -1,5 +1,4 @@
-//  Created by smlu on 17/02/2020.
-//  Copyright © 2020 ZeroPass. All rights reserved.
+//  Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
 import 'dart:typed_data';
 import 'des.dart';
 

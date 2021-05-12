@@ -1,3 +1,5 @@
+//  Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
+
 extension IntApis on int {
   String hex() {
     final str = toRadixString(16);
