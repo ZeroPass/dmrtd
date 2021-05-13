@@ -17,7 +17,7 @@ extension StringDecodeApis on String {
 extension StringYYMMDDateApi on String {
   DateTime parseDateYYMMDD() {
     if(length < 6) {
-      throw FormatException("invalid string length");
+      throw FormatException("invalid length of compact date string");
     }
 
     int y = int.parse(substring(0, 2)) + 2000;
