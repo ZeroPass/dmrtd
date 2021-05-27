@@ -96,5 +96,26 @@ void main() {
       expect( mrz.optionalData  , 'ZE184226B'           );
       expect( mrz.optionalData2 , null                  );
     });
+
+    test('fuzz tests', () {
+      expect( ()=> MRZ(Uint8List(0)), throwsMRZParseError(message: "Invalid MRZ data") );
+
+      // TD1
+      expect( ()=> MRZ(Uint8List.fromList("I<UTOD231458902<<<<<<<<<<<<<<<7408122F1204159UTO<<<<<<<<<<<6ERIKSSON<<ANNA<MARIA<<<<<<<<<<".codeUnits)), throwsMRZParseError(message: "Document Number check digit mismatch") );
+      expect( ()=> MRZ(Uint8List.fromList("I<UTOD231458907<<<<<<<<<<<<<<<7408123F1204159UTO<<<<<<<<<<<6ERIKSSON<<ANNA<MARIA<<<<<<<<<<".codeUnits)), throwsMRZParseError(message: "Data of Birth check digit mismatch")   );
+      expect( ()=> MRZ(Uint8List.fromList("I<UTOD231458907<<<<<<<<<<<<<<<7408122F1204158UTO<<<<<<<<<<<6ERIKSSON<<ANNA<MARIA<<<<<<<<<<".codeUnits)), throwsMRZParseError(message: "Data of Expiry check digit mismatch")  );
+      expect( ()=> MRZ(Uint8List.fromList("I<UTOD231458907<<<<<<<<<<<<<<<7408122F1204159UTO<<<<<<<<<<<5ERIKSSON<<ANNA<MARIA<<<<<<<<<>".codeUnits)), throwsMRZParseError(message: "Composite check digit mismatch")       );
+      // TD2
+      expect( ()=> MRZ(Uint8List.fromList("I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<D231458908UTO7408122F1204159<<<<<<<6".codeUnits)), throwsMRZParseError(message: "Document Number check digit mismatch") );
+      expect( ()=> MRZ(Uint8List.fromList("I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<D231458907UTO7408123F1204159<<<<<<<6".codeUnits)), throwsMRZParseError(message: "Data of Birth check digit mismatch")   );
+      expect( ()=> MRZ(Uint8List.fromList("I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<D231458907UTO7408122F1204158<<<<<<<6".codeUnits)), throwsMRZParseError(message: "Data of Expiry check digit mismatch")  );
+      expect( ()=> MRZ(Uint8List.fromList("I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<D231458907UTO7408122F1204159<<<<<<<7".codeUnits)), throwsMRZParseError(message: "Composite check digit mismatch")       );
+      // TD3
+      expect( ()=> MRZ(Uint8List.fromList("P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<L898902C35UTO7408122F1204159ZE184226B<<<<<10".codeUnits)), throwsMRZParseError(message: "Document Number check digit mismatch") );
+      expect( ()=> MRZ(Uint8List.fromList("P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<L898902C36UTO7408123F1204159ZE184226B<<<<<10".codeUnits)), throwsMRZParseError(message: "Data of Birth check digit mismatch")   );
+      expect( ()=> MRZ(Uint8List.fromList("P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<L898902C36UTO7408122F1204158ZE184226B<<<<<10".codeUnits)), throwsMRZParseError(message: "Data of Expiry check digit mismatch")  );
+      expect( ()=> MRZ(Uint8List.fromList("P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<L898902C36UTO7408122F1204159ZE184226B<<<<<20".codeUnits)), throwsMRZParseError(message: "Optional data check digit mismatch")   );
+      expect( ()=> MRZ(Uint8List.fromList("P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<L898902C36UTO7408122F1204159ZE184226B<<<<<12".codeUnits)), throwsMRZParseError(message: "Composite check digit mismatch")       );
+    });
   });
 }
