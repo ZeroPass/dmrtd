@@ -49,7 +49,6 @@ void main() {
     expect( dg1.mrz.dateOfExpiry  , DateTime(2011, 8, 26) );
     expect( dg1.mrz.optionalData  , '999999990'           );
     expect( dg1.mrz.optionalData2 , ''                    );
-    expect( dg1.mrz.optionalData2 , ''                    );
 
     // A.2.2 - Note: The serialized MRZ in doc is malformed!
     //               The data was modified:

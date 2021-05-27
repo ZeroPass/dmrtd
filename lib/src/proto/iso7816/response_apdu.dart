@@ -75,7 +75,7 @@ class StatusWord {
   static const invalidInstructionCode            = StatusWord(sw1: 0x6D, sw2: 0x00);
   static const classNotSupported                 = StatusWord(sw1: 0x6E, sw2: 0x00);
   static const noPreciseDiagnostics              = StatusWord(sw1: 0x6F, sw2: 0x00);
-  static const int sw1WrongLengthWithExactLength = 0x6C; // An error incicating wrong length (wrong Le field), sw2 indicates the exact length
+  static const int sw1WrongLengthWithExactLength = 0x6C; // An error indicating wrong length (wrong Le field), sw2 indicates the exact length
 
   // Normal processing - success
   static const success                           = StatusWord(sw1: 0x90, sw2: 0x00);
@@ -83,11 +83,11 @@ class StatusWord {
                                                          // SW2 indicates a number of extra data bytes still available.
                                                          // Can be returned by GET RESPONSE command (ISO 7816-4 section 7)
 
-  static remainingAvailableResponseBytes(int numBytes) { 
+  static remainingAvailableResponseBytes(int numBytes) {
     return StatusWord(sw1: sw1SuccessWithRemainingBytes, sw2: numBytes); // Normal execution
   }
 
-  static leWrongLength(int exactLength) { // Indicates wrong length of Le field. SW2 SW2 indicates the exact length.
+  static leWrongLength(int exactLength) { // Indicates wrong length of Le field. The SW2 indicates the exact length.
     return StatusWord(sw1: sw1WrongLengthWithExactLength, sw2: exactLength);
   }
 
@@ -113,7 +113,7 @@ class StatusWord {
   }
 
   bool isSuccess() {
-    return this == success || 
+    return this == success ||
            sw1 == sw1SuccessWithRemainingBytes;
   }
 

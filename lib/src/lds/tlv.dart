@@ -46,8 +46,7 @@ class TLV {
   Uint8List value;
 
   TLV(this.tag, this.value) {
-    // TODO: check that tag and value can be encoded and
-    //       if not, throw
+    // TODO: check that tag and value can be encoded, and throw if not
   }
 
   /// Returns decoded [TLV] from [encodedTLV] bytes.

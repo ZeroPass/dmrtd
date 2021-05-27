@@ -1,5 +1,4 @@
 // Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
-import 'dart:math';
 import 'dart:typed_data';
 import 'package:meta/meta.dart';
 
@@ -9,7 +8,6 @@ import 'iso7816/iso7816.dart';
 import 'iso7816/icc.dart';
 import 'iso7816/response_apdu.dart';
 
-import '../crypto/iso9797.dart';
 import '../com/com_provider.dart';
 import '../lds/df1/df1.dart';
 import '../lds/tlv.dart';
@@ -39,7 +37,7 @@ class MrtdApi {
   static const _defaultSelectP2          = ISO97816_SelectFileP2.returnFCP | ISO97816_SelectFileP2.returnFMD;
   final _log                             = Logger("mrtd.api");
   static const int _defaultReadLength    = 256; // 256 = expect maximum number of bytes. TODO: in production set it to 224 - JMRTD
-  int _maxRead                           = _defaultReadLength; 
+  int _maxRead                           = _defaultReadLength;
   static const int _readAheadLength      = 8;   // Number of bytes to read at the start of file to determine file length.
   Future<void> Function() _reinitSession = null;
 
@@ -61,7 +59,7 @@ class MrtdApi {
   Future<void> initSessionViaBAC(final DBAKeys keys) async {
     _log.debug("Initiating SM session using BAC protocol");
     await BAC.initSession(dbaKeys: keys, icc: icc);
-    _reinitSession = () async { 
+    _reinitSession = () async {
       _log.debug("Re-initiating SM session using BAC protocol");
       icc.sm = null;
       await BAC.initSession(dbaKeys: keys, icc: icc);
@@ -169,7 +167,7 @@ class MrtdApi {
         }
 
         if(rapdu.status.sw1 == StatusWord.sw1SuccessWithRemainingBytes) {
-          // This should probably happen only in case of calling 
+          // This should probably happen only in case of calling
           // command GET STATUS, which we don't call here.
           // We log it for tracing purpose.
           _log.debug("Received ${rapdu.data?.length ?? 0} byte(s), ${rapdu.status.description()}");
@@ -183,7 +181,7 @@ class MrtdApi {
         }
         else if(rapdu.status.isError()) {
           // Just making sure if an error has occured we still have valid session
-          _log.warning("An error ${rapdu.status} has occured while reading file but have received some data. Re-initializing SM session and trying to continue normally.");
+          _log.warning("An error ${rapdu.status} has occurred while reading file but have received some data. Re-initializing SM session and trying to continue normally.");
           await _reinitSession?.call();
         }
 
@@ -222,7 +220,7 @@ class MrtdApi {
     if(length < 0) {
       final newSize = data.length - length.abs();
       _log.warning("Total read data size is greater than requested, removing last ${length.abs()} byte(s)");
-      _log.debug("  Requested size:${newSize} byte(s) actual size:${data.length} byte(s)");
+      _log.debug("  Requested size:$newSize byte(s) actual size:${data.length} byte(s)");
       data = data.sublist(0, newSize);
     }
 
@@ -248,10 +246,10 @@ class MrtdApi {
     else if(_maxRead > 32) {
       _maxRead = 32;
     }
-    else if(_maxRead > 16) { 
+    else if(_maxRead > 16) {
       _maxRead = 16;
     }
-    else if(_maxRead > 8) { 
+    else if(_maxRead > 8) {
       _maxRead = 8;
     }
     else {

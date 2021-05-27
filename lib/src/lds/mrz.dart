@@ -152,7 +152,7 @@ class MRZ {
     optionalData   = _read(istream, 7);
     _parseExtendedDocumentNumber(cdDocNum);
 
-    final cdComposit = _readInt(istream, 1);
+    final cdComposite = _readInt(istream, 1);
 
     // Extract composite and calculate/verify its CD
     istream.rewind(36);
@@ -161,8 +161,8 @@ class MRZ {
     composite += _readWithPad(istream, 7);
     istream.skip(1);
     composite += _readWithPad(istream, 14);
-    _assertCheckDigit(composite, cdComposit,
-      "Composit check digit mismatch"
+    _assertCheckDigit(composite, cdComposite,
+      "Composite check digit mismatch"
     );
   }
 
@@ -202,8 +202,8 @@ class MRZ {
     composite += _readWithPad(istream, 7);
     istream.skip(1);
     composite += _readWithPad(istream, 22);
-    _assertCheckDigit(composite, cdComposit,
-      "Composit check digit mismatch"
+    _assertCheckDigit(composite, cdComposite,
+      "Composite check digit mismatch"
     );
   }
 
