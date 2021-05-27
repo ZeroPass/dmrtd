@@ -91,11 +91,7 @@ class StatusWord {
     return StatusWord(sw1: sw1WrongLengthWithExactLength, sw2: exactLength);
   }
 
-  int get value {
-    return ByteData.view(
-      toBytes().buffer
-    ).getUint16(0);
-  }
+  int get value => (sw1 << 8) + sw2;
 
   const StatusWord({ @required this.sw1, @required this.sw2 }) :
     assert(sw1 < 256),
@@ -131,7 +127,7 @@ class StatusWord {
   }
 
   @override
-  get hashCode => (sw1 << 8) + sw2;
+  int get hashCode => value;
 
   Uint8List toBytes() {
     return Uint8List.fromList([sw1, sw2]);
