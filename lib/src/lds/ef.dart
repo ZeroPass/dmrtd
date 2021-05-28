@@ -23,5 +23,5 @@ abstract class ElementaryFile{
   }
 
   @protected
-  void parse(final Uint8List content) {}
+  void parse(final Uint8List content);
 }

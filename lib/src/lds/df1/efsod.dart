@@ -16,4 +16,7 @@ class EfSOD extends ElementaryFile {
 
   @override
   int get sfi => SFI;
+
+  @override
+  void parse(Uint8List content) {}
 }
