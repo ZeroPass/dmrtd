@@ -7,9 +7,10 @@ import '../extension/datetime_apis.dart';
 import '../extension/string_apis.dart';
 
 enum MRZVersion { td1, td2, td3 }
-class MRZParseError {
+class MRZParseError implements Exception {
   final String message;
   MRZParseError(this.message);
+  String toString() => message;
 }
 
 class MRZ {
