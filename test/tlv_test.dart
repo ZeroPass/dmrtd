@@ -1,8 +1,12 @@
 // Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
+import 'dart:typed_data';
+
 import 'package:dmrtd/dmrtd.dart';
 import 'package:dmrtd/extensions.dart';
 import 'package:dmrtd/internal.dart';
 import 'package:test/test.dart';
+
+import 'utils.dart';
 
 void main() {
     test('TLV encoding test', () {
@@ -27,11 +31,65 @@ void main() {
     });
 
     test('TLV decoding test', () {
-      expect( () => TLV.decodeLength("".parseHex())             ,  throwsException ); // No byte data
-      expect( () => TLV.decodeLength("0x82".parseHex())         ,  throwsException ); // Missing 2 bytes
-      expect( () => TLV.decodeLength("0x84FFFFFFFF".parseHex()) ,  throwsException ); // Encoded length too big
+      expect( TLV.decodeLength("00".parseHex()).value           ,  0x00            );
+      expect( TLV.decodeLength("0f".parseHex()).value           ,  0x0f            );
+      expect( TLV.decodeLength("10".parseHex()).value           ,  0x10            );
       expect( TLV.decodeLength("7f".parseHex()).value           ,  0x7f            );
       expect( TLV.decodeLength("8180".parseHex()).value         ,  0x80            );
+      expect( TLV.decodeLength("828000".parseHex()).value       ,  0x8000          );
+      expect( TLV.decodeLength("83800000".parseHex()).value     ,  0x800000        );
+
+      DecodedTV tv = TLV.decode("0000".parseHex());
+      expect( tv.tag.value      , 0   );
+      expect( tv.tag.encodedLen , 1   );
+      expect( tv.encodedLen     , 2   );
+      expect( tv.value.isEmpty , true );
+
+      tv = TLV.decode("0100".parseHex());
+      expect( tv.tag.value      , 1   );
+      expect( tv.tag.encodedLen , 1   );
+      expect( tv.encodedLen     , 2   );
+      expect( tv.value.isEmpty , true );
+
+      tv = TLV.decode("1000".parseHex());
+      expect( tv.tag.value      , 0x10 );
+      expect( tv.tag.encodedLen , 1    );
+      expect( tv.encodedLen     , 2    );
+      expect( tv.value.isEmpty  , true );
+
+      tv = TLV.decode("1100".parseHex());
+      expect( tv.tag.value      , 0x11 );
+      expect( tv.tag.encodedLen , 1    );
+      expect( tv.encodedLen     , 2    );
+      expect( tv.value.isEmpty  , true );
+
+      tv = TLV.decode("110100".parseHex());
+      expect( tv.tag.value      , 0x11            );
+      expect( tv.tag.encodedLen , 1               );
+      expect( tv.encodedLen     , 3               );
+      expect( tv.value.isEmpty  , false           );
+      expect( tv.value          , "00".parseHex() );
+
+      tv = TLV.decode("110101".parseHex());
+      expect( tv.tag.value      , 0x11            );
+      expect( tv.tag.encodedLen , 1               );
+      expect( tv.encodedLen     , 3               );
+      expect( tv.value.isEmpty  , false           );
+      expect( tv.value          , "01".parseHex() );
+
+      tv = TLV.decode("11010F".parseHex());
+      expect( tv.tag.value      , 0x11            );
+      expect( tv.tag.encodedLen , 1               );
+      expect( tv.encodedLen     , 3               );
+      expect( tv.value.isEmpty  , false           );
+      expect( tv.value          , "0F".parseHex() );
+
+      tv = TLV.decode("1101FF".parseHex());
+      expect( tv.tag.value      , 0x11            );
+      expect( tv.tag.encodedLen , 1               );
+      expect( tv.encodedLen     , 3               );
+      expect( tv.value.isEmpty  , false           );
+      expect( tv.value          , "FF".parseHex() );
 
       // test vectors from ICAO 9303 p11 Appendix D.4 to the Part 11
       // ref: https://www.icao.int/publications/Documents/9303_p11_cons_en.pdf
@@ -74,5 +132,10 @@ void main() {
       expect( do99.value            , "9000".parseHex() );
       expect( do8E.tag.value        , 0x8E );
       expect( do8E.value            , "C8B2787EAEA07D74".parseHex() );
+
+      // Fuzz testing
+      expect( () => TLV.decodeLength("".parseHex())           , throwsTLVError(message: "Can't decode empty encodedLength") ); // No byte data
+      expect( () => TLV.decodeLength("82".parseHex())         , throwsTLVError(message: "Invalid encoded length")           ); // Missing 2 bytes
+      expect( () => TLV.decodeLength("8410000000".parseHex()) , throwsTLVError(message: "Encoded length is too big")        ); // Encoded length too big
     });
 }
