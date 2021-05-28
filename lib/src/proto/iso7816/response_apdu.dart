@@ -138,50 +138,47 @@ class StatusWord {
   }
 
   String description() {
-    // ignore: case_expression_type_implements_equals
-    switch(this) {
-      case noInformationGiven:               return "No information given";
-      case possibleCorruptedData:            return "Part of returned data my be corrupted";
-      case unexpectedEOF:                    return "End of file reached before reading Le bytes";
-      case selectedFileInvalidated:          return "Selected file invalidated";
-      case wrongFCIFormat:                   return "FCI not formatted according to 5.1.5";
-      case wrongLength:                      return "Wrong length (e.g. wrong Le field)";
-      case claFunctionNotSupported:          return "Functions in CLA not support";
-      case logicalChannelNotSupported:       return "Logical channel not supported";
-      case secureMessagingNotSupported:      return "Secure messaging not supported";
-      case commandNotAllowed:                return "Command not allowed";
-      case incompatibleFileStructureCommand: return "Command incompatible with file structure";
-      case securityStatusNotSatisfied:       return "Security status not satisfied";
-      case authenticationMethodBlocked:      return "Authentication method blocked";
-      case referencedDataInvalidated:        return "Referenced data invalidated";
-      case conditionsNotSatisfied:           return "Conditions of use not satisfied";
-      case commandNotAllowedNoEF:            return "Command not allowed (no current EF)";
-      case smDataMissing:                    return "Expected SM data objects missing"; // SM - Secure messaging
-      case smDataInvalid:                    return "SM data objects incorrect"; // SM - Secure messaging
-      case wrongParameters:                  return "Wrong parameter(s) P1-P2";
-      case invalidDataFieldParameters:       return "Incorrect parameters in the data field";
-      case notSupported:                     return "Function not supported";
-      case fileNotFound:                     return "File not found";
-      case recordNotFound:                   return "Record not found";
-      case notEnoughSpaceInFile:             return "Not enough memory space in the file";
-      case lcInconsistentWithTLV:            return "Lc inconsistent with TLV structure";
-      case incorrectParameters:              return "Incorrect parameters P1-P2";
-      case lcInconsistentWithParameters:     return "Lc inconsistent with P1-P2";
-      case referencedDataNotFound:           return "Referenced data not found";
-      case wrongParameters2:                 return "Wrong parameter(s) P1-P2";
-      case invalidInstructionCode:           return "Instruction code not supported or invalid";
-      case classNotSupported:                return "Class not supported";
-      case noPreciseDiagnostics:             return "No precise diagnosis";
-      case success:                          return "Success";
-      default: {
-        if(sw1 == sw1WrongLengthWithExactLength) { // Wrong length (wrong Le field: 'XX' indicates the exact length).
-          return "Wrong length (exact length: $sw2)";
-        }
-        else if(sw1 == sw1SuccessWithRemainingBytes) { // SW2 indicates the number of response bytes still available
-          return "$sw2 byte(s) are still available";
-        }
-        return toString();
+         if (this == noInformationGiven)               return "No information given";
+    else if (this == possibleCorruptedData)            return "Part of returned data my be corrupted";
+    else if (this == unexpectedEOF)                    return "End of file reached before reading Le bytes";
+    else if (this == selectedFileInvalidated)          return "Selected file invalidated";
+    else if (this == wrongFCIFormat)                   return "FCI not formatted according to 5.1.5";
+    else if (this == wrongLength)                      return "Wrong length (e.g. wrong Le field)";
+    else if (this == claFunctionNotSupported)          return "Functions in CLA not support";
+    else if (this == logicalChannelNotSupported)       return "Logical channel not supported";
+    else if (this == secureMessagingNotSupported)      return "Secure messaging not supported";
+    else if (this == commandNotAllowed)                return "Command not allowed";
+    else if (this == incompatibleFileStructureCommand) return "Command incompatible with file structure";
+    else if (this == securityStatusNotSatisfied)       return "Security status not satisfied";
+    else if (this == authenticationMethodBlocked)      return "Authentication method blocked";
+    else if (this == referencedDataInvalidated)        return "Referenced data invalidated";
+    else if (this == conditionsNotSatisfied)           return "Conditions of use not satisfied";
+    else if (this == commandNotAllowedNoEF)            return "Command not allowed (no current EF)";
+    else if (this == smDataMissing)                    return "Expected SM data objects missing"; // SM - Secure messaging
+    else if (this == smDataInvalid)                    return "SM data objects incorrect"; // SM - Secure messaging
+    else if (this == wrongParameters)                  return "Wrong parameter(s) P1-P2";
+    else if (this == invalidDataFieldParameters)       return "Incorrect parameters in the data field";
+    else if (this == notSupported)                     return "Function not supported";
+    else if (this == fileNotFound)                     return "File not found";
+    else if (this == recordNotFound)                   return "Record not found";
+    else if (this == notEnoughSpaceInFile)             return "Not enough memory space in the file";
+    else if (this == lcInconsistentWithTLV)            return "Lc inconsistent with TLV structure";
+    else if (this == incorrectParameters)              return "Incorrect parameters P1-P2";
+    else if (this == lcInconsistentWithParameters)     return "Lc inconsistent with P1-P2";
+    else if (this == referencedDataNotFound)           return "Referenced data not found";
+    else if (this == wrongParameters2)                 return "Wrong parameter(s) P1-P2";
+    else if (this == invalidInstructionCode)           return "Instruction code not supported or invalid";
+    else if (this == classNotSupported)                return "Class not supported";
+    else if (this == noPreciseDiagnostics)             return "No precise diagnosis";
+    else if (this == success)                          return "Success";
+    else {
+      if(sw1 == sw1WrongLengthWithExactLength) { // Wrong length (wrong Le field: 'XX' indicates the exact length).
+        return "Wrong length (exact length: $sw2)";
       }
+      else if(sw1 == sw1SuccessWithRemainingBytes) { // SW2 indicates the number of response bytes still available
+        return "$sw2 byte(s) are still available";
+      }
+      return toString();
     }
   }
 }
