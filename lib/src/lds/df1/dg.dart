@@ -11,7 +11,7 @@ class DgTag {
   const DgTag(this.value);
 
   @override
-  bool operator == (rhs) {
+  bool operator == (covariant DgTag rhs) {
     return value == rhs.value;
   }
 

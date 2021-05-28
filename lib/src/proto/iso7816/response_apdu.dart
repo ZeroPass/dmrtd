@@ -122,8 +122,8 @@ class StatusWord {
   }
 
   @override
-  bool operator == (rhs) {
-    return sw1 == rhs?.sw1 && sw2 == rhs?.sw2;
+  bool operator == (covariant StatusWord rhs) {
+    return sw1 == rhs.sw1 && sw2 == rhs.sw2;
   }
 
   @override
