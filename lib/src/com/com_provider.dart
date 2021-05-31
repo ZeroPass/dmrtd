@@ -11,6 +11,7 @@ class ComProviderError implements Exception {
 
 /// Abstract interface for communicating with ICC.
 abstract class ComProvider {
+  // ignore: unused_field
   final Logger _log;
   ComProvider(Logger log) : _log = log;
 

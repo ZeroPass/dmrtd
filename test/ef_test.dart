@@ -71,7 +71,7 @@ void main() {
     expect( dg1.mrz.sex           , 'M'                    );
     expect( dg1.mrz.dateOfBirth   , DateTime(1974, 6, 22)  );
     expect( dg1.mrz.dateOfExpiry  , DateTime(2010, 12, 31) );
-    expect( dg1.mrz.optionalData  , null                   );
+    expect( dg1.mrz.optionalData  , ''                     );
     expect( dg1.mrz.optionalData2 , null                   );
   });
 }

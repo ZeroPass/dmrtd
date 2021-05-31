@@ -18,7 +18,7 @@ import '../lds/tlv.dart';
 /// Class defines secure messaging protocol as specified in ICAO 9303 p11.
 class MrtdSM extends SecureMessaging {
   final _log = Logger("mrtd.sm");
-  static final _eq  = const ListEquality().equals;
+  static final bool Function(List<dynamic>, List<dynamic>) _eq  = const ListEquality().equals;
 
   SSC _ssc;
   set ssc(final SSC ssc) => _ssc = ssc;
@@ -71,7 +71,7 @@ class MrtdSM extends SecureMessaging {
     final do99      = parseDO99FromRAPDU(rapdu, (tvDataDO?.encodedLen ?? 0));
     final do8EStart = (tvDataDO?.encodedLen ?? 0) + do99.encodedLen;
     final do8E      = parseDO8EFromRAPDU(rapdu, do8EStart);
-    final K         = generateK(data: rapdu.data.sublist(0, do8EStart));
+    final K         = generateK(data: rapdu.data!.sublist(0, do8EStart));
     final CC        = cipher.mac(K);
 
     _log.verbose("Generated K=${K.hex()}");
@@ -88,16 +88,16 @@ class MrtdSM extends SecureMessaging {
   }
 
   @visibleForTesting
-  Uint8List decryptDataDO(final DecodedTV dtv) {
-    _log.verbose("Decrypting data=${dtv?.value?.hex()}");
-    if(dtv == null || dtv.value == null || dtv.value.isEmpty) {
+  Uint8List? decryptDataDO(final DecodedTV? dtv) {
+    _log.verbose("Decrypting data=${dtv?.value.hex()}");
+    if(dtv == null || dtv.value.isEmpty) {
       return null;
     }
 
     final tag = dtv.tag.value;
     if(tag != SecureMessaging.tagDO85 &&
        tag != SecureMessaging.tagDO87) {
-      throw SMError("Can't decrypt invalid data DO with tag=${tag} value=${dtv.value.hex()}");
+      throw SMError("Can't decrypt invalid data DO with tag=$tag value=${dtv.value.hex()}");
     }
 
     final bool isDO87 = tag == SecureMessaging.tagDO87;
@@ -114,8 +114,8 @@ class MrtdSM extends SecureMessaging {
   @visibleForTesting
   Uint8List generateDataDO(final CommandAPDU cmd) {
     var dataDO = Uint8List(0);
-    if(cmd.data != null && cmd.data.isNotEmpty) {
-      final edata = cipher.encrypt(ISO9797.pad(cmd.data));
+    if(cmd.data != null && cmd.data!.isNotEmpty) {
+      final edata = cipher.encrypt(ISO9797.pad(cmd.data!));
       if(cmd.ins == ISO7816_INS.READ_BINARY_EXT) {
         dataDO = SecureMessaging.do85(edata);
       }
@@ -127,23 +127,20 @@ class MrtdSM extends SecureMessaging {
   }
 
   @visibleForTesting
-  Uint8List generateK({ @required final Uint8List data }) {
-    assert(data != null);
+  Uint8List generateK({ required final Uint8List data }) {
     _ssc.increment();
     final upK = Uint8List.fromList(_ssc.toBytes() + data);
     return ISO9797.pad(upK);
   }
 
   @visibleForTesting
-  Uint8List generateM({ @required final CommandAPDU cmd, @required final Uint8List dataDO, @required final Uint8List do97 }) {
-    assert(cmd != null && dataDO != null && do97 != null);
+  Uint8List generateM({ required final CommandAPDU cmd, required final Uint8List dataDO, required final Uint8List do97 }) {
     final rawHeader = ISO9797.pad(cmd.rawHeader());
     return Uint8List.fromList(rawHeader + dataDO + do97);
   }
 
   @visibleForTesting
-  Uint8List generateN({ @required final Uint8List M }) {
-    assert(M != null);
+  Uint8List generateN({ required final Uint8List M }) {
     _ssc.increment();
     final upN = Uint8List.fromList(_ssc.toBytes() + M);
     return ISO9797.pad(upN);
@@ -158,32 +155,32 @@ class MrtdSM extends SecureMessaging {
 
   /// Returns decoded data from DO85 or DO87 if they are present in [rapdu].
   @visibleForTesting
-  DecodedTV parseDataDOFromRAPDU(final ResponseAPDU rapdu) {
-    if(rapdu.data == null || rapdu.data.isEmpty ||
-      (rapdu.data[0] != SecureMessaging.tagDO85 &&
-       rapdu.data[0] != SecureMessaging.tagDO87)) {
+  DecodedTV? parseDataDOFromRAPDU(final ResponseAPDU rapdu) {
+    if(rapdu.data == null || rapdu.data!.isEmpty ||
+      (rapdu.data![0] != SecureMessaging.tagDO85 &&
+       rapdu.data![0] != SecureMessaging.tagDO87)) {
       return null;
     }
 
-    final DO = TLV.decode(rapdu.data);
+    final DO = TLV.decode(rapdu.data!);
     return DO;
   }
 
   @visibleForTesting
   DecodedTV parseDO8EFromRAPDU(final ResponseAPDU rapdu, int offset) {
-    if(rapdu.data == null || rapdu.data.isEmpty ||
-      rapdu.data[offset] != SecureMessaging.tagDO8E) {
+    if(rapdu.data == null || rapdu.data!.isEmpty ||
+      rapdu.data![offset] != SecureMessaging.tagDO8E) {
       throw SMError("Missing DO'8E' in response APDU or invalid offset");
     }
-    return TLV.decode(rapdu.data.sublist(offset));
+    return TLV.decode(rapdu.data!.sublist(offset));
   }
 
   @visibleForTesting
   DecodedTV parseDO99FromRAPDU(final ResponseAPDU rapdu, int offset) {
-    if(rapdu.data == null || rapdu.data.isEmpty ||
-      rapdu.data[offset] != SecureMessaging.tagDO99) {
+    if(rapdu.data == null || rapdu.data!.isEmpty ||
+      rapdu.data![offset] != SecureMessaging.tagDO99) {
       throw SMError("Missing DO'99' in response APDU or invalid offset");
     }
-    return TLV.decode(rapdu.data.sublist(offset));
+    return TLV.decode(rapdu.data!.sublist(offset));
   }
 }

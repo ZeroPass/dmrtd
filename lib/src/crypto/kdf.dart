@@ -12,7 +12,7 @@ Uint8List KDF(final Hash hash, final Uint8List keySeed, final Int32 counter) {
 
   ByteData  piview = ByteData.view(preimage.buffer);
   piview.setInt32(keySeed.length, counter.toInt(), Endian.big);
-  return hash.convert(preimage).bytes;
+  return hash.convert(preimage).bytes as Uint8List;
 }
 
 

@@ -11,10 +11,10 @@ import '../extension/string_apis.dart';
 /// Class defines Document Basic Access Keys as specified in section 9.7.2 of doc ICAO 9303 p11
 /// which are used to establish secure messaging session via BAC protocol.
 class DBAKeys {
-  String _mrtdNum;
-  String _dob;
-  String _doe;
-  Uint8List _cachedSeed;
+  late String _mrtdNum;
+  late String _dob;
+  late String _doe;
+  Uint8List? _cachedSeed;
 
   /// Constructs [DBAKeys] using passport number [mrtdNumber],
   /// passport owner's [dateOfBirth] and passport [dateOfExpiry].
@@ -50,9 +50,9 @@ class DBAKeys {
 
       final kmrz = "$paddedMrtdNum$cdn$_dob$cdb$_doe$cde";
       final hash = sha1.convert(kmrz.codeUnits);
-      _cachedSeed = hash.bytes.sublist(0, 16);
+      _cachedSeed = hash.bytes.sublist(0, 16) as Uint8List?;
     }
-    return _cachedSeed;
+    return _cachedSeed!;
   }
 
   /// Returns passport number used for calculating key seed.

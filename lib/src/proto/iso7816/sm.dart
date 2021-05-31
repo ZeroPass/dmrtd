@@ -34,7 +34,7 @@ abstract class SecureMessaging {
   }
 
   static Uint8List do87(final Uint8List data, {bool dataIsPadded = true}) {
-    if(data == null || data.isEmpty) {
+    if(data.isEmpty) {
       return Uint8List(0);
     }
     final data1 = Uint8List.fromList([dataIsPadded ? 0x01 : 0x02] + data); // Padding info byte defined in ISO/IEC 7816-4 part 5
@@ -58,7 +58,7 @@ abstract class SecureMessaging {
 
   static Uint8List _buildDO(final int tag, final Uint8List data) {
     assert(tag < 256);
-    if(data == null || data.isEmpty) {
+    if(data.isEmpty) {
       return Uint8List(0);
     }
     return TLV.encode(tag, data);

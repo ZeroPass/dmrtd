@@ -1,22 +1,18 @@
 //  Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
 import 'dart:typed_data';
 import 'package:dmrtd/extensions.dart';
-import 'package:meta/meta.dart';
 
 /// Class defines ISO/IEC 7816-4 response APDU
 class ResponseAPDU {
-    StatusWord _sw;
-    Uint8List _data;
+    late StatusWord _sw;
+    Uint8List? _data;
 
     StatusWord get status => _sw;
-    Uint8List get data => _data;
+    Uint8List? get data => _data;
 
     ResponseAPDU(this._sw, this._data);
 
     ResponseAPDU.fromBytes(final Uint8List apduBytes) {
-      if(apduBytes == null) {
-        throw ArgumentError.notNull('apduBytes');
-      }
       if(apduBytes.length < 2) {
         throw ArgumentError("Invalid raw response APDU length");
       }

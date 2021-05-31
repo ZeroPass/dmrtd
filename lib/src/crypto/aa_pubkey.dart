@@ -16,7 +16,7 @@ class AAPublicKey {
 
   final Uint8List _encPubKey;
   AAPublicKeyType _type = AAPublicKeyType.EC;
-  Uint8List _subPubKeyBytes;
+  late Uint8List _subPubKeyBytes;
 
   Uint8List rawSubjectPublicKey() {
     return _subPubKeyBytes;

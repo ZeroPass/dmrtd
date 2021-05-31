@@ -15,7 +15,7 @@ import 'package:dmrtd/src/proto/iso7816/sm.dart';
 import 'package:dmrtd/src/proto/ssc.dart';
 
 
-void testProtecting(final CommandAPDU cmd, final SMCipher cipher, final SSC ssc, final Uint8List tvMaskedHeader, final Uint8List tvDataDO, final Uint8List tvDO97, final Uint8List tvM, final Uint8List tvN, final Uint8List tvCC, final Uint8List tvDO8E, final Uint8List tvRawProtectedCmd) {
+void testProtecting(final CommandAPDU cmd, final SMCipher cipher, final SSC ssc, final Uint8List tvMaskedHeader, final Uint8List? tvDataDO, final Uint8List tvDO97, final Uint8List tvM, final Uint8List tvN, final Uint8List tvCC, final Uint8List tvDO8E, final Uint8List tvRawProtectedCmd) {
   final sscCpy = SSC(ssc.toBytes(), ssc.bitSize);
   final sm = MrtdSM(cipher, ssc);
 
@@ -44,7 +44,7 @@ void testProtecting(final CommandAPDU cmd, final SMCipher cipher, final SSC ssc,
   expect( sm.protect(cmd).toBytes(), tvRawProtectedCmd );
 }
 
-void testUprotecting(final ResponseAPDU rapdu, final SMCipher cipher, final SSC ssc, final Uint8List tvDataDO, final Uint8List tvDO99, final Uint8List tvDO8E, final Uint8List tvK, final Uint8List tvCC, final Uint8List tvDecryptedData, final Uint8List tvRawUnprotectedRAPDU) {
+void testUprotecting(final ResponseAPDU rapdu, final SMCipher cipher, final SSC ssc, final Uint8List? tvDataDO, final Uint8List tvDO99, final Uint8List tvDO8E, final Uint8List tvK, final Uint8List tvCC, final Uint8List? tvDecryptedData, final Uint8List tvRawUnprotectedRAPDU) {
   if(rapdu.status != StatusWord.success) {
     return;
   }
@@ -56,16 +56,14 @@ void testUprotecting(final ResponseAPDU rapdu, final SMCipher cipher, final SSC 
   expect( dataDO != null ? TLV.encode(dataDO.tag.value, dataDO.value) : null, tvDataDO );
 
   final do99 = sm.parseDO99FromRAPDU(rapdu, (dataDO?.encodedLen ?? 0));
-  expect( do99 != null , true );
   expect( TLV.encode(do99.tag.value, do99.value), tvDO99 );
   expect( StatusWord.fromBytes(do99.value), rapdu.status );
 
   final do8EStart = (dataDO?.encodedLen ?? 0) + do99.encodedLen;
   final do8E      = sm.parseDO8EFromRAPDU(rapdu, do8EStart);
-  expect( do8E != null , true );
   expect( TLV.encode(do8E.tag.value, do8E.value) , tvDO8E );
 
-  final K = sm.generateK(data: rapdu.data.sublist(0, do8EStart));
+  final K = sm.generateK(data: rapdu.data!.sublist(0, do8EStart));
   expect( K , tvK );
 
   final CC = cipher.mac(K);
@@ -90,7 +88,7 @@ void main() {
     // Test case 1
     var tvCmdAPDU        = CommandAPDU(cla: 0x00, ins: 0xA4, p1: 0x02, p2: 0x0C, data: "011E".parseHex());
     var tvMaskedHeader   = "0CA4020C".parseHex();
-    var tvDataDO         = "8709016375432908C044F6".parseHex();
+    Uint8List? tvDataDO  = "8709016375432908C044F6".parseHex();
     var tvDO97           = Uint8List(0);
     var tvM              = "0CA4020C800000008709016375432908C044F6".parseHex();
     var tvN              = "887022120C06C2270CA4020C800000008709016375432908C044F68000000000".parseHex();
@@ -118,8 +116,8 @@ void main() {
     tvDO8E                     = "8E08FA855A5D4C50A8ED".parseHex();
     var tvK                    = "887022120C06C2289902900080000000".parseHex();
     tvCC                       = "FA855A5D4C50A8ED".parseHex();
-    Uint8List tvDecryptedData  = null;
     var tvRawUnprotectedRAPDU  = "9000".parseHex();
+    Uint8List? tvDecryptedData;
 
     expect( tvSSC.toBytes() , "887022120C06C227".parseHex() );
     testUprotecting(

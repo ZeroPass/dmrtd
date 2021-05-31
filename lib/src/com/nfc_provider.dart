@@ -4,7 +4,9 @@ import 'dart:typed_data';
 import 'package:dmrtd/dmrtd.dart';
 import 'package:dmrtd/extensions.dart';
 import 'package:logging/logging.dart';
+
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
+
 
 enum NfcStatus { notSupported, disabled, enabled }
 
@@ -22,7 +24,7 @@ class NfcProvider extends ComProvider {
   Duration timeout = const Duration(seconds: 10); /// Default transceive timeout. (Android only)
   NfcProvider() : super(_log);
 
-  NFCTag _tag;
+  NFCTag? _tag;
 
   /// On iOS, sets NFC reader session alert message.
   Future<void> setIosAlertMessage(String message) async {
@@ -44,7 +46,7 @@ class NfcProvider extends ComProvider {
   }
 
   @override
-  Future<void> connect({String iosAlertMessage}) async {
+  Future<void> connect({String? iosAlertMessage}) async {
     if (isConnected()) {
       return;
     }
@@ -56,8 +58,8 @@ class NfcProvider extends ComProvider {
           readIso14443B: true,
           readIso18092: false,
           readIso15693: false);
-      if (_tag.type != NFCTagType.iso7816) {
-        _log.info("Ignoring non ISO-7816 tag: ${_tag.type}");
+      if (_tag!.type != NFCTagType.iso7816) {
+        _log.info("Ignoring non ISO-7816 tag: ${_tag!.type}");
         return await disconnect();
       }
     } on Exception catch (e) {
@@ -67,7 +69,7 @@ class NfcProvider extends ComProvider {
 
   @override
   Future<void> disconnect(
-      {String iosAlertMessage, String iosErrorMessage}) async {
+      {String? iosAlertMessage, String? iosErrorMessage}) async {
     if (isConnected()) {
       _log.debug("Disconnecting");
       try {
@@ -87,9 +89,9 @@ class NfcProvider extends ComProvider {
 
   @override
   Future<Uint8List> transceive(final Uint8List data,
-      {Duration timeout}) async {
+      {Duration? timeout}) async {
     try {
-      return await FlutterNfcKit.transceive(data, timeout: timeout ?? this.timeout);
+      return await FlutterNfcKit.transceive(data, timeout: timeout ?? this.timeout)!;
     } on Exception catch(e) {
       throw NfcProviderError.fromException(e);
     }

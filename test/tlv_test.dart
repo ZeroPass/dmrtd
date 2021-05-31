@@ -96,9 +96,9 @@ void main() {
 
       // Case 1 Select COM
       var tvRAPDU = ResponseAPDU.fromBytes("990290008E08FA855A5D4C50A8ED9000".parseHex());
-      var do99    = TLV.decode(tvRAPDU.data);
-      var do8E    = TLV.decode(tvRAPDU.data.sublist(do99.encodedLen));
-      expect( do99.encodedLen + do8E.encodedLen , tvRAPDU.data.length );
+      var do99    = TLV.decode(tvRAPDU.data!);
+      var do8E    = TLV.decode(tvRAPDU.data!.sublist(do99.encodedLen));
+      expect( do99.encodedLen + do8E.encodedLen , tvRAPDU.data!.length );
       expect( do99.tag.value , 0x99 );
       expect( do99.value     , "9000".parseHex() );
       expect( do8E.tag.value , 0x8E );
@@ -106,11 +106,11 @@ void main() {
 
       // Case 2 Read Binary first 4 bytes
       tvRAPDU     = ResponseAPDU.fromBytes("8709019FF0EC34F9922651990290008E08AD55CC17140B2DED9000".parseHex());
-      var do87    = TLV.decode(tvRAPDU.data);
+      var do87    = TLV.decode(tvRAPDU.data!);
       var decDO87 = TLV.decodeTagAndLength("60145F01".parseHex()); // decrypted data of DO87
-      do99        = TLV.decode(tvRAPDU.data.sublist(do87.encodedLen));
-      do8E        = TLV.decode(tvRAPDU.data.sublist(do87.encodedLen + do99.encodedLen));
-      expect( do87.encodedLen + do99.encodedLen + do8E.encodedLen , tvRAPDU.data.length );
+      do99        = TLV.decode(tvRAPDU.data!.sublist(do87.encodedLen));
+      do8E        = TLV.decode(tvRAPDU.data!.sublist(do87.encodedLen + do99.encodedLen));
+      expect( do87.encodedLen + do99.encodedLen + do8E.encodedLen , tvRAPDU.data!.length );
       expect( do87.tag.value        , 0x87 );
       expect( do87.value            , "019FF0EC34F9922651".parseHex() );
       expect( decDO87.tag.value     , 0x60 );
@@ -122,10 +122,10 @@ void main() {
 
       // Case 3 Read Binary the rest of the data
       tvRAPDU = ResponseAPDU.fromBytes("871901FB9235F4E4037F2327DCC8964F1F9B8C30F42C8E2FFF224A990290008E08C8B2787EAEA07D749000".parseHex());
-      do87    = TLV.decode(tvRAPDU.data);
-      do99    = TLV.decode(tvRAPDU.data.sublist(do87.encodedLen));
-      do8E    = TLV.decode(tvRAPDU.data.sublist(do87.encodedLen + do99.encodedLen));
-      expect( do87.encodedLen + do99.encodedLen + do8E.encodedLen , tvRAPDU.data.length );
+      do87    = TLV.decode(tvRAPDU.data!);
+      do99    = TLV.decode(tvRAPDU.data!.sublist(do87.encodedLen));
+      do8E    = TLV.decode(tvRAPDU.data!.sublist(do87.encodedLen + do99.encodedLen));
+      expect( do87.encodedLen + do99.encodedLen + do8E.encodedLen , tvRAPDU.data!.length );
       expect( do87.tag.value        , 0x87 );
       expect( do87.value            , "01FB9235F4E4037F2327DCC8964F1F9B8C30F42C8E2FFF224A".parseHex() );
       expect( do99.tag.value        , 0x99 );

@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:test/test.dart';
 import 'package:dmrtd/src/lds/mrz.dart';
 
+import 'utils.dart';
+
 void main() {
   test('Check digit test', () {
     // Test vectors taken from ICAO 9303-p3 Appendix A to part 3
@@ -76,7 +78,7 @@ void main() {
       expect( mrz.sex           , 'M'                   );
       expect( mrz.dateOfBirth   , DateTime(1934, 7, 12) );
       expect( mrz.dateOfExpiry  , DateTime(1995, 7, 12) );
-      expect( mrz.optionalData  , null                  );
+      expect( mrz.optionalData  , ''                    );
       expect( mrz.optionalData2 , null                  );
     });
 

@@ -11,7 +11,7 @@ import 'proto/mrtd_api.dart';
 
 class PassportError implements Exception {
   final String message;
-  final StatusWord code;
+  final StatusWord? code;
   PassportError(this.message, {this.code});
   String toString() => message;
 }

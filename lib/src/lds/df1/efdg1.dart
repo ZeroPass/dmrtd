@@ -11,7 +11,7 @@ class EfDG1 extends DataGroup {
   static const SFI = 0x01;
   static const TAG = DgTag(0x61);
 
-  MRZ _mrz;
+  late final MRZ _mrz;
   MRZ get mrz => _mrz;
 
   EfDG1.fromBytes(Uint8List data) : super.fromBytes(data);

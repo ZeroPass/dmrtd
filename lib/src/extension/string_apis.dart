@@ -10,7 +10,7 @@ extension StringDecodeApis on String {
   }
 
   Uint8List parseHex() {
-    return hex.decoder.convert(this);
+    return hex.decoder.convert(this) as Uint8List;
   }
 }
 

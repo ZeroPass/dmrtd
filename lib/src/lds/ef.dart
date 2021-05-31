@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 
 class EfParseError implements Exception {
-  String message;
+  final String message;
   EfParseError(this.message);
   String toString() => message;
 }

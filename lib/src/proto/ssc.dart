@@ -12,7 +12,7 @@ import 'package:dmrtd/src/crypto/des.dart';
 /// is equal to the block size of block cipher.
 class SSC {
   final bitSize;
-  BigInt _ssc;
+  late BigInt _ssc;
 
   /// Constructs new [SSC] with [ssc] bytes.
   /// [bitSize] should be equal to the block size of block cipher.

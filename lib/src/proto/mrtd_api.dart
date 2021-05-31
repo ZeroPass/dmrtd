@@ -1,6 +1,5 @@
 // Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
 import 'dart:typed_data';
-import 'package:meta/meta.dart';
 
 import 'bac.dart';
 import 'dba_keys.dart';
@@ -19,7 +18,7 @@ import 'package:logging/logging.dart';
 
 class MrtdApiError implements Exception {
   final String message;
-  final StatusWord code;
+  final StatusWord? code;
   const MrtdApiError(this.message, {this.code});
   String toString() => "MRTDApiError: $message";
 }
@@ -39,7 +38,7 @@ class MrtdApi {
   static const int _defaultReadLength    = 256; // 256 = expect maximum number of bytes. TODO: in production set it to 224 - JMRTD
   int _maxRead                           = _defaultReadLength;
   static const int _readAheadLength      = 8;   // Number of bytes to read at the start of file to determine file length.
-  Future<void> Function() _reinitSession = null;
+  Future<void> Function()? _reinitSession;
 
 
   /// Sends active authentication command to MRTD with [challenge].
@@ -109,13 +108,13 @@ class MrtdApi {
 
     // Read chunk of file to obtain file length
     final chunk1 = await icc.readBinary(offset: 0, ne: _readAheadLength);
-    final dtl = TLV.decodeTagAndLength(chunk1.data);
+    final dtl = TLV.decodeTagAndLength(chunk1.data!);
 
     // Read the rest of the file
-    final length = dtl.length.value - (chunk1.data.length - dtl.encodedLen);
-    final chunk2 = await _readBinary(offset: chunk1.data.length, length: length);
+    final length = dtl.length.value - (chunk1.data!.length - dtl.encodedLen);
+    final chunk2 = await _readBinary(offset: chunk1.data!.length, length: length);
 
-    final rawFile = Uint8List.fromList(chunk1.data + chunk2);
+    final rawFile = Uint8List.fromList(chunk1.data! + chunk2);
     assert(rawFile.length == dtl.encodedLen + dtl.length.value);
     return rawFile;
   }
@@ -133,19 +132,19 @@ class MrtdApi {
 
     // Read chunk of file to obtain file length
     final chunk1 = await icc.readBinaryBySFI(sfi: sfi, offset: 0, ne: _readAheadLength);
-    final dtl = TLV.decodeTagAndLength(chunk1.data);
+    final dtl = TLV.decodeTagAndLength(chunk1.data!);
 
     // Read the rest of the file
-    final length =  dtl.length.value - (chunk1.data.length - dtl.encodedLen);
-    final chunk2 = await _readBinary(offset: chunk1.data.length, length: length);
+    final length =  dtl.length.value - (chunk1.data!.length - dtl.encodedLen);
+    final chunk2 = await _readBinary(offset: chunk1.data!.length, length: length);
 
-    final rawFile = Uint8List.fromList(chunk1.data + chunk2);
+    final rawFile = Uint8List.fromList(chunk1.data! + chunk2);
     assert(rawFile.length == dtl.encodedLen + dtl.length.value);
     return rawFile;
   }
 
   /// Reads [length] long fragment of file starting at [offset].
-  Future<Uint8List> _readBinary({ @required offset, @required length }) async {
+  Future<Uint8List> _readBinary({ required int offset, required int length }) async {
     var data = Uint8List(0);
     while(length > 0) {
       int nRead = _maxRead;
@@ -186,9 +185,9 @@ class MrtdApi {
         }
 
         if(rapdu.data != null) {
-          data    = Uint8List.fromList(data + rapdu.data);
-          offset += rapdu.data.length;
-          length -= rapdu.data.length;
+          data    = Uint8List.fromList(data + rapdu.data!);
+          offset += rapdu.data!.length;
+          length -= rapdu.data!.length;
         }
         else {
           _log.warning("No data received when trying to read binary");

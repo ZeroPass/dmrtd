@@ -1,16 +1,15 @@
 // Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
 import 'dart:typed_data';
 import 'package:dmrtd/extensions.dart';
-import 'package:meta/meta.dart';
 
 // Class defines ISO/IEC 7816-4 command APDU
 class CommandAPDU {
-  int _cla;
-  int _ins;
-  int _p1;
-  int _p2;
-  Uint8List _data;
-  int _ne;
+  late int _cla;
+  late int _ins;
+  late int _p1;
+  late int _p2;
+  Uint8List? _data;
+  late int _ne;
 
   /// Required parameters are [cla], [ins], [p1], [p2].
   ///
@@ -21,7 +20,7 @@ class CommandAPDU {
   /// Max [ne] is 65536.
   /// If [ne] is set to 0, [ne] won't be serialized and send with the command.
   /// If [ne] is set to 256 or 65536 [ne] will be encoded as 0x00, which means arbitrary long data is expected in the response.
-  CommandAPDU({ @required int cla, @required int ins, @required int p1, @required int p2, final Uint8List data, int ne = 0}) {
+  CommandAPDU({ required int cla, required int ins, required int p1, required int p2, final Uint8List? data, int ne = 0}) {
     this.cla  = cla;
     this.ins  = ins;
     this.p1   = p1;
@@ -70,8 +69,8 @@ class CommandAPDU {
     }
   }
 
-  Uint8List get data => _data;
-  set data(Uint8List data) {
+  Uint8List? get data => _data;
+  set data(Uint8List? data) {
     if(data != null && data.length > 0xffff) {
       throw ArgumentError.value(data, "data", "Command APDU invalid parameter value");
     }
@@ -89,17 +88,17 @@ class CommandAPDU {
   }
 
   Uint8List _getLc() {
-    if(_data == null || _data.isEmpty) {
+    if(_data == null || _data!.isEmpty) {
       return Uint8List(0);
     }
 
-    final bool extended = _data.length > 255 || _ne > 256;
+    final bool extended = _data!.length > 255 || _ne > 256;
     final lc  = Uint8List(extended ? 3 : 1);
     final lcv = ByteData.view(lc.buffer);
     if(!extended) { // case 3s
-      lcv.setUint8(0, _data.length);
+      lcv.setUint8(0, _data!.length);
     } else { // extended - case 3e/4e
-      lcv.setUint16(1, _data.length, Endian.big);
+      lcv.setUint16(1, _data!.length, Endian.big);
     }
 
     return lc;
@@ -137,5 +136,5 @@ class CommandAPDU {
 
   /// Returns string representation of command APDU
   String toString() => 
-    "C-APDU(CLA:${_cla.hex()} INS:${_ins.hex()} P1:${_p1.hex()} P2:${_p2.hex()} Le:${_ne} Lc:${_data?.length ?? 0x00} Data:${_data?.hex()})";
+    "C-APDU(CLA:${_cla.hex()} INS:${_ins.hex()} P1:${_p1.hex()} P2:${_p2.hex()} Le:$_ne Lc:${_data?.length ?? 0x00} Data:${_data?.hex()})";
 }
