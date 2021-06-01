@@ -28,6 +28,10 @@ void main() {
       expect( TLV.encode(0x8E, "2EA28A70F3C7B535".parseHex())   , "8E082EA28A70F3C7B535".parseHex()   );
       expect( TLV.encodeIntValue(0x97, 0x04)                    , "970104".parseHex()                 );
       expect( TLV.encodeIntValue(0x97, 0x12)                    , "970112".parseHex()                 );
+
+      // Fuzz testing
+      expect( () => TLV.encodeLength(-1) , throwsTLVError(message: "Can't encode negative or greater than ‭16 777 215 length"));
+      expect( () => TLV.encodeLength(0x10000000) , throwsTLVError(message: "Can't encode negative or greater than ‭16 777 215 length"));
     });
 
     test('TLV decoding test', () {
@@ -134,8 +138,16 @@ void main() {
       expect( do8E.value            , "C8B2787EAEA07D74".parseHex() );
 
       // Fuzz testing
+      expect( () => TLV.decode(Uint8List(0))      , throwsTLVError(message: "Can't decode empty encodedTag")    );
+      expect( () => TLV.decode("00".parseHex())   , throwsTLVError(message: "Can't decode empty encodedLength") );
+      expect( () => TLV.decode("1F".parseHex())   , throwsTLVError(message: "Invalid encoded tag")              );
+      expect( () => TLV.decode("1F80".parseHex()) , throwsTLVError(message: "Invalid encoded tag")              );
+
       expect( () => TLV.decodeLength("".parseHex())           , throwsTLVError(message: "Can't decode empty encodedLength") ); // No byte data
       expect( () => TLV.decodeLength("82".parseHex())         , throwsTLVError(message: "Invalid encoded length")           ); // Missing 2 bytes
       expect( () => TLV.decodeLength("8410000000".parseHex()) , throwsTLVError(message: "Encoded length is too big")        ); // Encoded length too big
+      expect( () => TLV.decode("0082".parseHex())             , throwsTLVError(message: "Invalid encoded length")           ); // Missing 2 bytes
+      expect( () => TLV.decode("008410000000".parseHex())     , throwsTLVError(message: "Encoded length is too big")        ); // Encoded length too big
+      expect( () => TLV.decode("0001".parseHex())             , throwsRangeError                                            );
     });
 }
