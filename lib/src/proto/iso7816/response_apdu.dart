@@ -89,9 +89,9 @@ class StatusWord {
 
   int get value => (sw1 << 8) + sw2;
 
-  const StatusWord({ @required this.sw1, @required this.sw2 }) :
-    assert(sw1 < 256),
-    assert(sw2 < 256);
+  const StatusWord({ required this.sw1, required this.sw2 }) :
+    assert(sw1 >= 0 && sw1 < 256),
+    assert(sw2 >= 0 && sw2 < 256);
 
   static StatusWord fromBytes(Uint8List data, [int offset = 0]) {
     if(data.length < 2 ) {
