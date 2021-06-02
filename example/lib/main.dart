@@ -118,7 +118,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
 
   String _result ="";
   NfcProvider _nfc = NfcProvider();
-  Timer _timerStateUpdater;
+  late Timer _timerStateUpdater;
   final _scrollController = ScrollController();
 
   @override
@@ -157,23 +157,23 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
     });
   }
 
-  DateTime _getDOBDate() {
+  DateTime? _getDOBDate() {
     if(_dob.text.isEmpty) {
       return null;
     }
     return DateFormat.yMd().parse(_dob.text);
   }
 
-  DateTime _getDOEDate() {
+  DateTime? _getDOEDate() {
     if(_doe.text.isEmpty) {
       return null;
     }
     return DateFormat.yMd().parse(_doe.text);
   }
 
-  Future<String> _pickDate(BuildContext context, DateTime firstDate, DateTime initDate, DateTime lastDate) async {
+  Future<String?> _pickDate(BuildContext context, DateTime firstDate, DateTime initDate, DateTime lastDate) async {
     final locale = Localizations.localeOf(context);
-    final DateTime picked = await showDatePicker(
+    final DateTime? picked = await showDatePicker(
       context: context,
       firstDate: firstDate,
       initialDate: initDate,
@@ -206,30 +206,30 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
       final cardAccess = await passport.readEfCardAccess();
 
       _nfc.setIosAlertMessage("Initiating session ...");
-      final bacKeySeed = DBAKeys(_docNumber.text, _getDOBDate(), _getDOEDate());
+      final bacKeySeed = DBAKeys(_docNumber.text, _getDOBDate()!, _getDOEDate()!);
       await passport.startSession(bacKeySeed);
 
       _nfc.setIosAlertMessage(formatProgressMsg("Reading EF.COM ...", 0));
       final efcom = await passport.readEfCOM();
 
       _nfc.setIosAlertMessage(formatProgressMsg("Reading Data Groups ...", 20));
-      EfDG1 dg1;
+      EfDG1? dg1;
       if(efcom.dgTags.contains(EfDG1.TAG)) {
         dg1 = await passport.readEfDG1();
       }
 
-      EfDG2 dg2;
+      EfDG2? dg2;
       if(efcom.dgTags.contains(EfDG2.TAG)) {
         dg2 = await passport.readEfDG2();
       }
 
-      EfDG14 dg14;
+      EfDG14? dg14;
       if(efcom.dgTags.contains(EfDG14.TAG)) {
         dg14 = await passport.readEfDG14();
       }
 
-      EfDG15 dg15;
-      Uint8List sig;
+      EfDG15? dg15;
+      Uint8List? sig;
       if(efcom.dgTags.contains(EfDG15.TAG)) {
         dg15 = await passport.readEfDG15();
         _nfc.setIosAlertMessage(formatProgressMsg("Doing AA ...", 60));
@@ -241,9 +241,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
 
       setState(() {
         String strAccess = "EF.CardAccess=Not Available";
-        if(cardAccess != null) {
-          strAccess = "EF.CardAccess=${cardAccess.toBytes().hex()}";
-        }
+        strAccess = "EF.CardAccess=${cardAccess.toBytes().hex()}";
 
         String strCom = "${formatEfCom(efcom)}";
         String strDG1 = "EF.DG1= Not Available";
@@ -265,7 +263,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
         String strAASig = "";
         if(dg15 != null) {
           strDG15 = formatDG15(dg15);
-          strAASig = "AA.sig=${sig.hex()}";
+          strAASig = "AA.sig=${sig!.hex()}";
         }
 
         _result =  strAccess + "\n\n\n" +
@@ -314,7 +312,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
       });
     }
     finally {
-      if(_alertMessage?.isNotEmpty ?? false){
+      if(_alertMessage.isNotEmpty){
         await _nfc.disconnect(iosErrorMessage: _alertMessage);
       }
       else {
@@ -366,7 +364,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
                 _buildForm(context),
                 SizedBox(height: 20),
                 PlatformButton( // btn Read MRTD
-                  onPressed: _disabledInput() || !_mrzData.currentState.validate() ? null : _readMRTD,
+                  onPressed: _disabledInput() || !_mrzData.currentState!.validate() ? null : _readMRTD,
                   child: PlatformText(_isReading ? 'Reading ...' : 'Read Passport'),
                 ),
                 SizedBox(height: 4),
@@ -430,7 +428,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
               textCapitalization: TextCapitalization.characters,
               autofocus: true,
               validator: (value) {
-                if (value.isEmpty) {
+                if (value?.isEmpty ?? false) {
                   return 'Please enter passport number';
                 }
                 return null;
@@ -447,7 +445,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
               ),
               autofocus: false,
               validator: (value) {
-                if (value.isEmpty) {
+                if (value?.isEmpty ?? false) {
                   return 'Please select Date of Birth';
                 }
                 return null;
@@ -480,7 +478,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
               ),
               autofocus: false,
               validator: (value) {
-                if (value.isEmpty) {
+                if (value?.isEmpty ?? false) {
                   return 'Please select Date of Expiry';
                 }
                 return null;
