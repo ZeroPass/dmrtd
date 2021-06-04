@@ -26,7 +26,7 @@ void main() {
       expect( mrz.nationality   , 'UTO'                 );
       expect( mrz.firstName     , 'ANNA MARIA'          );
       expect( mrz.lastName      , 'ERIKSSON'            );
-      expect( mrz.sex           , 'F'                   );
+      expect( mrz.gender        , 'F'                   );
       expect( mrz.dateOfBirth   , DateTime(1974, 8, 12) );
       expect( mrz.dateOfExpiry  , DateTime(2012, 4, 15) );
       expect( mrz.optionalData  , ''                    );
@@ -42,7 +42,7 @@ void main() {
       expect( mrz.nationality   , 'UTO'                 );
       expect( mrz.firstName     , 'PETER JOHN'          );
       expect( mrz.lastName      , 'STEVENSON'           );
-      expect( mrz.sex           , 'M'                   );
+      expect( mrz.gender        , 'M'                   );
       expect( mrz.dateOfBirth   , DateTime(1934, 7, 12) );
       expect( mrz.dateOfExpiry  , DateTime(1995, 7, 12) );
       expect( mrz.optionalData  , ''                    );
@@ -59,7 +59,7 @@ void main() {
       expect( mrz.nationality   , 'UTO'                 );
       expect( mrz.firstName     , 'ANNA MARIA'          );
       expect( mrz.lastName      , 'ERIKSSON'            );
-      expect( mrz.sex           , 'F'                   );
+      expect( mrz.gender        , 'F'                   );
       expect( mrz.dateOfBirth   , DateTime(1974, 8, 12) );
       expect( mrz.dateOfExpiry  , DateTime(2012, 4, 15) );
       expect( mrz.optionalData  , ''                    );
@@ -75,7 +75,7 @@ void main() {
       expect( mrz.nationality   , 'UTO'                 );
       expect( mrz.firstName     , 'PETER JOHN'          );
       expect( mrz.lastName      , 'STEVENSON'           );
-      expect( mrz.sex           , 'M'                   );
+      expect( mrz.gender           , 'M'                   );
       expect( mrz.dateOfBirth   , DateTime(1934, 7, 12) );
       expect( mrz.dateOfExpiry  , DateTime(1995, 7, 12) );
       expect( mrz.optionalData  , ''                    );
@@ -92,7 +92,7 @@ void main() {
       expect( mrz.nationality   , 'UTO'                 );
       expect( mrz.firstName     , 'ANNA MARIA'          );
       expect( mrz.lastName      , 'ERIKSSON'            );
-      expect( mrz.sex           , 'F'                   );
+      expect( mrz.gender        , 'F'                   );
       expect( mrz.dateOfBirth   , DateTime(1974, 8, 12) );
       expect( mrz.dateOfExpiry  , DateTime(2012, 4, 15) );
       expect( mrz.optionalData  , 'ZE184226B'           );

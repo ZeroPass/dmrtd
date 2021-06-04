@@ -24,7 +24,7 @@ class MRZ {
   late final String nationality;
   String get optionalData => _optData;
   String? get optionalData2 => _optData2;
-  late final String sex;
+  late final String gender;
   late final MRZVersion version;
   late String _docNum;
   late String _optData;
@@ -105,7 +105,7 @@ class MRZ {
       "Data of Birth check digit mismatch"
     );
 
-    sex            = _read(istream, 1);
+    gender            = _read(istream, 1);
     dateOfExpiry   = _readDate(istream);
 
     _assertCheckDigit(dateOfExpiry.formatYYMMDD(), _readInt(istream, 1),
@@ -147,7 +147,7 @@ class MRZ {
       "Data of Birth check digit mismatch"
     );
 
-    sex            = _read(istream, 1);
+    gender            = _read(istream, 1);
     dateOfExpiry   = _readDate(istream);
     _assertCheckDigit(dateOfExpiry.formatYYMMDD(), _readInt(istream, 1),
       "Data of Expiry check digit mismatch"
@@ -186,7 +186,7 @@ class MRZ {
       "Data of Birth check digit mismatch"
     );
 
-    sex            = _read(istream, 1);
+    gender            = _read(istream, 1);
     dateOfExpiry   = _readDate(istream);
     _assertCheckDigit(dateOfExpiry.formatYYMMDD(), _readInt(istream, 1),
       "Data of Expiry check digit mismatch"

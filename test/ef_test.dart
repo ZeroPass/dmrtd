@@ -49,7 +49,7 @@ void main() {
     expect( dg1.mrz.nationality   , 'NLD'                 );
     expect( dg1.mrz.firstName     , 'MARIANNE LOUISE'     );
     expect( dg1.mrz.lastName      , 'VAN DER STEEN'       );
-    expect( dg1.mrz.sex           , 'F'                   );
+    expect( dg1.mrz.gender        , 'F'                   );
     expect( dg1.mrz.dateOfBirth   , DateTime(1972, 8, 14) );
     expect( dg1.mrz.dateOfExpiry  , DateTime(2011, 8, 26) );
     expect( dg1.mrz.optionalData  , '999999990'           );
@@ -73,7 +73,7 @@ void main() {
     expect( dg1.mrz.nationality   , 'HMD'                  );
     expect( dg1.mrz.firstName     , 'JOHN T'               );
     expect( dg1.mrz.lastName      , 'SMITH'                );
-    expect( dg1.mrz.sex           , 'M'                    );
+    expect( dg1.mrz.gender        , 'M'                    );
     expect( dg1.mrz.dateOfBirth   , DateTime(1974, 6, 22)  );
     expect( dg1.mrz.dateOfExpiry  , DateTime(2010, 12, 31) );
     expect( dg1.mrz.optionalData  , ''                     );
@@ -90,7 +90,7 @@ void main() {
     expect( dg1.mrz.nationality   , 'UTO'                  );
     expect( dg1.mrz.firstName     , 'ANNA MARIA'           );
     expect( dg1.mrz.lastName      , 'ERIKSSON'             );
-    expect( dg1.mrz.sex           , 'F'                    );
+    expect( dg1.mrz.gender        , 'F'                    );
     expect( dg1.mrz.dateOfBirth   , DateTime(1974, 8, 12)  );
     expect( dg1.mrz.dateOfExpiry  , DateTime(2012, 4, 15)  );
     expect( dg1.mrz.optionalData  , 'ZE184226B'            );
@@ -108,7 +108,7 @@ void main() {
     expect( dg1.mrz.nationality   , 'D'                    );
     expect( dg1.mrz.firstName     , 'ERIKA'                );
     expect( dg1.mrz.lastName      , 'MUSTERMANN'           );
-    expect( dg1.mrz.sex           , 'F'                    );
+    expect( dg1.mrz.gender        , 'F'                    );
     expect( dg1.mrz.dateOfBirth   , DateTime(1996, 8, 12)  );
     expect( dg1.mrz.dateOfExpiry  , DateTime(2023, 10, 31) );
     expect( dg1.mrz.optionalData  , ''                     );
@@ -119,5 +119,4 @@ void main() {
     expect( () => EfDG1.fromBytes("00".parseHex())   , throwsTLVError(message: "Can't decode empty encodedLength")    );
     expect( () => EfDG1.fromBytes("1C00".parseHex()) , throwsEfParseError(message: "Invalid tag=1C, expected tag=61") );
   });
-
 }
