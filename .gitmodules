@@ -1,0 +1,3 @@
+[submodule "import/flutter_nfc_kit"]
+	path = import/flutter_nfc_kit
+	url = https://github.com/nfcim/flutter_nfc_kit.git
