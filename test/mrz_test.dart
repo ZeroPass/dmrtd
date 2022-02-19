@@ -75,7 +75,7 @@ void main() {
       expect( mrz.nationality   , 'UTO'                 );
       expect( mrz.firstName     , 'PETER JOHN'          );
       expect( mrz.lastName      , 'STEVENSON'           );
-      expect( mrz.gender           , 'M'                   );
+      expect( mrz.gender        , 'M'                   );
       expect( mrz.dateOfBirth   , DateTime(1934, 7, 12) );
       expect( mrz.dateOfExpiry  , DateTime(1995, 7, 12) );
       expect( mrz.optionalData  , ''                    );
@@ -97,6 +97,20 @@ void main() {
       expect( mrz.dateOfExpiry  , DateTime(2012, 4, 15) );
       expect( mrz.optionalData  , 'ZE184226B'           );
       expect( mrz.optionalData2 , null                  );
+
+      mrz = MRZ(Uint8List.fromList("P<D<<SCHMIDT<<FINN<<<<<<<<<<<<<<<<<<<<<<<<<<AA89BXHZ56D<<7503201M2511188<<<<<<<<<<<<<<<8".codeUnits));
+      expect( mrz.version       , MRZVersion.td3         );
+      expect( mrz.documentCode  , 'P'                    );
+      expect( mrz.documentNumber, 'AA89BXHZ5'            );
+      expect( mrz.country       , 'D'                    );
+      expect( mrz.nationality   , 'D'                    );
+      expect( mrz.firstName     , 'FINN'                 );
+      expect( mrz.lastName      , 'SCHMIDT'              );
+      expect( mrz.gender        , 'M'                    );
+      expect( mrz.dateOfBirth   , DateTime(1975, 3, 20)  );
+      expect( mrz.dateOfExpiry  , DateTime(2025, 11, 18) );
+      expect( mrz.optionalData  , ''                     );
+      expect( mrz.optionalData2 , null                   );
     });
 
     test('fuzz tests', () {
