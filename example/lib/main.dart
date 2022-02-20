@@ -1,4 +1,5 @@
 // Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
+import 'package:dmrtd/internal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:async';
@@ -202,8 +203,23 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
         _alertMessage = "Reading Passport ...";
       });
 
-      _nfc.setIosAlertMessage("Reading EF.CardAccess ...");
-      final cardAccess = await passport.readEfCardAccess();
+      _nfc.setIosAlertMessage("Trying to read EF.CardAccess ...");
+      EfCardAccess? cardAccess;
+      try {
+        cardAccess = await passport.readEfCardAccess();
+      }
+      on PassportError catch (e) {
+        if (e.code != StatusWord.fileNotFound) rethrow;
+      }
+
+      _nfc.setIosAlertMessage("Trying to read EF.CardSecurity ...");
+      EfCardSecurity? cardSecurity;
+      try {
+        cardSecurity = await passport.readEfCardSecurity();
+      }
+      on PassportError catch (e) {
+        if (e.code != StatusWord.fileNotFound) rethrow;
+      }
 
       _nfc.setIosAlertMessage("Initiating session ...");
       final bacKeySeed = DBAKeys(_docNumber.text, _getDOBDate()!, _getDOEDate()!);
@@ -241,7 +257,12 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
 
       setState(() {
         String strAccess = "EF.CardAccess=Not Available";
-        strAccess = "EF.CardAccess=${cardAccess.toBytes().hex()}";
+        if (cardAccess != null)
+          strAccess = "EF.CardAccess=${cardAccess.toBytes().hex()}";
+
+        String strSecurity= "EF.CardSecurity=Not Available";
+        if (cardSecurity != null)
+          strSecurity = "EF.CardSecurity=${cardSecurity.toBytes().hex()}";
 
         String strCom = "${formatEfCom(efcom)}";
         String strDG1 = "EF.DG1= Not Available";
@@ -266,12 +287,13 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
           strAASig = "AA.sig=${sig!.hex()}";
         }
 
-        _result =  strAccess + "\n\n\n" +
-                   strCom    + "\n\n\n" +
-                   strDG1    + "\n\n\n" +
-                   strDG15   + "\n\n\n" +
-                   strAASig  + "\n\n\n" +
-                   strDG14   + "\n\n\n" +
+        _result =  strAccess   + "\n\n\n" +
+                   strSecurity + "\n\n\n" +
+                   strCom      + "\n\n\n" +
+                   strDG1      + "\n\n\n" +
+                   strDG15     + "\n\n\n" +
+                   strAASig    + "\n\n\n" +
+                   strDG14     + "\n\n\n" +
                    "EF.SOD=${sod.toBytes().hex()}" + "\n\n\n" +
                    strDG2;
       });
