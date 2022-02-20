@@ -65,12 +65,12 @@ class Passport {
   /// Reads file EF.CardAccess from passport.
   ///
   /// Can throw [ComProviderError] on connection error.
-  /// Throws [ComProviderError] if file doesn't exist.
+  /// Throws [PassportError] if file doesn't exist.
   ///
   /// Note: Might not be available if PACE is not supported
   Future<EfCardAccess> readEfCardAccess() async {
-    await _selectMF();
     _log.debug("Reading EF.CardAccess");
+    await _selectMF();
     return EfCardAccess.fromBytes(
       await _exec(() => _api.readFileBySFI(EfCardAccess.SFI))
     );
@@ -83,9 +83,10 @@ class Passport {
   /// Note: PACE protocol is not supported yet.
   ///
   /// Can throw [ComProviderError] on connection error.
-  /// Throws [ComProviderError] if file doesn't exist or
+  /// Throws [PassportError] if file doesn't exist or
   /// if session was not established via PACE protocol.
   Future<EfCardSecurity> readEfCardSecurity() async {
+    _log.debug("Reading EF.CardSecurity");
     await _selectMF();
     return EfCardSecurity.fromBytes(
       await _exec(() => _api.readFileBySFI(EfCardSecurity.SFI))
@@ -100,8 +101,8 @@ class Passport {
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
   Future<EfCOM> readEfCOM() async {
-    await _selectDF1();
     _log.debug("Reading EF.COM");
+    await _selectDF1();
     return EfCOM.fromBytes(
       await _exec(() => _api.readFileBySFI(EfCOM.SFI))
     );
@@ -130,8 +131,8 @@ class Passport {
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
   Future<EfDG2> readEfDG2() async {
-    await _selectDF1();
     _log.debug("Reading EF.DG2");
+    await _selectDF1();
     return EfDG2.fromBytes(
       await _exec(() => _api.readFileBySFI(EfDG2.SFI))
     );
@@ -149,8 +150,8 @@ class Passport {
   ///
   /// Note: Extended authentication not supported.
   Future<EfDG3> readEfDG3() async {
-    await _selectDF1();
     _log.debug("Reading EF.DG3");
+    await _selectDF1();
     return EfDG3.fromBytes(
       await _exec(() => _api.readFileBySFI(EfDG3.SFI))
     );
@@ -168,8 +169,8 @@ class Passport {
   ///
   /// Note: Extended authentication not supported.
   Future<EfDG4> readEfDG4() async {
-    await _selectDF1();
     _log.debug("Reading EF.DG4");
+    await _selectDF1();
     return EfDG4.fromBytes(
       await _exec(() => _api.readFileBySFI(EfDG4.SFI))
     );
@@ -183,8 +184,8 @@ class Passport {
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
   Future<EfDG5> readEfDG5() async {
-    await _selectDF1();
     _log.debug("Reading EF.DG5");
+    await _selectDF1();
     return EfDG5.fromBytes(
       await _exec(() => _api.readFileBySFI(EfDG5.SFI))
     );
@@ -198,8 +199,8 @@ class Passport {
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
   Future<EfDG7> readEfDG7() async {
-    await _selectDF1();
     _log.debug("Reading EF.DG7");
+    await _selectDF1();
     return EfDG7.fromBytes(
       await _exec(() => _api.readFileBySFI(EfDG7.SFI))
     );
@@ -213,8 +214,8 @@ class Passport {
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
   Future<EfDG8> readEfDG8() async {
-    await _selectDF1();
     _log.debug("Reading EF.DG8");
+    await _selectDF1();
     return EfDG8.fromBytes(
       await _exec(() => _api.readFileBySFI(EfDG8.SFI))
     );
@@ -228,8 +229,8 @@ class Passport {
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
   Future<EfDG9> readEfDG9() async {
-    await _selectDF1();
     _log.debug("Reading EF.DG9");
+    await _selectDF1();
     return EfDG9.fromBytes(
       await _exec(() => _api.readFileBySFI(EfDG9.SFI))
     );
@@ -243,8 +244,8 @@ class Passport {
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
   Future<EfDG10> readEfDG10() async {
-    await _selectDF1();
     _log.debug("Reading EF.DG10");
+    await _selectDF1();
     return EfDG10.fromBytes(
       await _exec(() => _api.readFileBySFI(EfDG10.SFI))
     );
@@ -258,8 +259,8 @@ class Passport {
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
   Future<EfDG11> readEfDG11() async {
-    await _selectDF1();
     _log.debug("Reading EF.DG11");
+    await _selectDF1();
     return EfDG11.fromBytes(
       await _exec(() => _api.readFileBySFI(EfDG11.SFI))
     );
@@ -273,8 +274,8 @@ class Passport {
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
   Future<EfDG12> readEfDG12() async {
-    await _selectDF1();
     _log.debug("Reading EF.DG12");
+    await _selectDF1();
     return EfDG12.fromBytes(
       await _exec(() => _api.readFileBySFI(EfDG12.SFI))
     );
@@ -288,8 +289,8 @@ class Passport {
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
   Future<EfDG13> readEfDG13() async {
-    await _selectDF1();
     _log.debug("Reading EF.DG13");
+    await _selectDF1();
     return EfDG13.fromBytes(
       await _exec(() => _api.readFileBySFI(EfDG13.SFI))
     );
@@ -318,8 +319,8 @@ class Passport {
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
   Future<EfDG15> readEfDG15() async {
-    await _selectDF1();
     _log.debug("Reading EF.DG15");
+    await _selectDF1();
     return EfDG15.fromBytes(
       await _exec(() => _api.readFileBySFI(EfDG15.SFI))
     );
@@ -333,8 +334,8 @@ class Passport {
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
   Future<EfDG16> readEfDG16() async {
-    await _selectDF1();
     _log.debug("Reading EF.DG16");
+    await _selectDF1();
     return EfDG16.fromBytes(
       await _exec(() => _api.readFileBySFI(EfDG16.SFI))
     );
@@ -348,8 +349,8 @@ class Passport {
   /// Throws [PassportError] if file doesn't exist or
   /// if calling this function prior establishing session with passport.
   Future<EfSOD> readEfSOD() async {
-    await _selectDF1();
     _log.debug("Reading EF.SOD");
+    await _selectDF1();
     return EfSOD.fromBytes(
       await _exec(() => _api.readFileBySFI(EfSOD.SFI))
     );
