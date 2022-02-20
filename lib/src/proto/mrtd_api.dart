@@ -25,6 +25,7 @@ class MrtdApiError implements Exception {
 
 /// Defines ICAO 9303 MRTD standard API to
 /// communicate and send commands to MRTD.
+/// TODO: Add ComProvider onConnected notifier and reset _maxRead to _defaultReadLength on new connection
 class MrtdApi {
 
   static const int challengeLen = 8; // 8 bytes
@@ -39,7 +40,6 @@ class MrtdApi {
   int _maxRead                           = _defaultReadLength;
   static const int _readAheadLength      = 8;   // Number of bytes to read at the start of file to determine file length.
   Future<void> Function()? _reinitSession;
-
 
   /// Sends active authentication command to MRTD with [challenge].
   /// [challenge] must be 8 bytes long.
@@ -147,9 +147,9 @@ class MrtdApi {
   Future<Uint8List> _readBinary({ required int offset, required int length }) async {
     var data = Uint8List(0);
     while(length > 0) {
-      int nRead = _maxRead;
-      if(nRead != 256 && nRead > length) {
-        nRead = length;
+      int nRead = length;
+      if(length > _maxRead) {
+        nRead = _maxRead;
       }
 
       _log.debug("_readBinary: offset=$offset nRead=$nRead remaining=$length maxRead=$_maxRead");
