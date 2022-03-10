@@ -29,7 +29,7 @@ class DecodedTV {
 class DecodedTL {
   final DecodedTag tag;
   final DecodedLen length;
-  final int encodedLen; // number of bytes it took to encode tag, value length
+  final int encodedLen; // number of bytes it took to encode tag and value length
   DecodedTL(this.tag, this.length, this.encodedLen);
 }
 

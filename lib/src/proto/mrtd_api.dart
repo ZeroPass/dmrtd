@@ -25,6 +25,7 @@ class MrtdApiError implements Exception {
 
 /// Defines ICAO 9303 MRTD standard API to
 /// communicate and send commands to MRTD.
+/// TODO: Add ComProvider onConnected notifier and reset _maxRead to _defaultReadLength on new connection
 class MrtdApi {
 
   static const int challengeLen = 8; // 8 bytes
@@ -39,7 +40,6 @@ class MrtdApi {
   int _maxRead                           = _defaultReadLength;
   static const int _readAheadLength      = 8;   // Number of bytes to read at the start of file to determine file length.
   Future<void> Function()? _reinitSession;
-
 
   /// Sends active authentication command to MRTD with [challenge].
   /// [challenge] must be 8 bytes long.
@@ -77,7 +77,7 @@ class MrtdApi {
   /// Can throw [ICCError] if command is sent to invalid MRTD document.
   /// Can throw [ComProviderError] in case connection with MRTD is lost.
   Future<void> selectMasterFile() async {
-    _log.debug("Selecting MF");
+    _log.debug("Selecting root Master File");
     // In ICAO 9303 p10 doc, the command to select Master File is defined as sending select APDU
     // command with empty data field. On some passport this command doesn't work and MF is not selected,
     // although success status (9000) is returned. In doc ISO/IEC 7816-4 section 6 an alternative option
@@ -86,9 +86,22 @@ class MrtdApi {
     // see: https://cardwerk.com/smart-card-standard-iso7816-4-section-6-basic-interindustry-commands
     //     'If P1-P2=’0000′ and if the data field is empty or equal to ‘3F00’, then select the MF.'
     //
-    // To maximize our chance for MF to be selected we choose to send the second option as
+    // To maximize our chance for MF to be selected we send select first command with P1-P2=’0000′ as
     // specified in doc ISO/IEC 7816-4 section 6.
-    await icc.selectFileById(p2: _defaultSelectP2, fileId: Uint8List.fromList([0x3F, 0x00]));
+
+    await icc.selectFile(cla: ISO7816_CLA.NO_SM, p1: 0, p2: 0)
+      .onError<ICCError>((error, stackTrace) async {
+        _log.warning("Couldn't select MF by P1: 0, P2: 0 sw=${error.sw}, re-trying to select MF with FileID=3F00");
+        await icc.selectFile(cla: ISO7816_CLA.NO_SM, p1: 0, p2: 0, data: Uint8List.fromList([0x3F, 0x00]))
+          .onError<ICCError>((error, stackTrace) async {
+            _log.warning("Couldn't select MF by P1=0, P2=0, FileID=3F00 sw=${error.sw}, re-trying to select MF with P2=0x0C and FileID=3F00");
+            await icc.selectFileById(p2: _defaultSelectP2, fileId: Uint8List.fromList([0x3F, 0x00]))
+              .onError<ICCError>((error, stackTrace) async {
+                _log.warning("Couldn't select MF by P1=0, P2=0x0C, FileID=3F00 sw=${error.sw}, re-trying to select MF with P2=0x0C");
+                await icc.selectFile(cla: ISO7816_CLA.NO_SM, p1: 0, p2: _defaultSelectP2);
+            });
+          });
+      });
   }
 
   /// Returns raw EF file bytes of selected DF identified by [fid] from MRTD.
@@ -147,9 +160,9 @@ class MrtdApi {
   Future<Uint8List> _readBinary({ required int offset, required int length }) async {
     var data = Uint8List(0);
     while(length > 0) {
-      int nRead = _maxRead;
-      if(nRead != 256 && nRead > length) {
-        nRead = length;
+      int nRead = length;
+      if(length > _maxRead) {
+        nRead = _maxRead;
       }
 
       _log.debug("_readBinary: offset=$offset nRead=$nRead remaining=$length maxRead=$_maxRead");
