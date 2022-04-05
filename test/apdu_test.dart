@@ -7,7 +7,6 @@ import 'package:dmrtd/extensions.dart';
 import 'package:dmrtd/src/crypto/crypto_utils.dart';
 import 'package:dmrtd/src/proto/iso7816/command_apdu.dart';
 import 'package:dmrtd/src/proto/iso7816/response_apdu.dart';
-import 'package:dmrtd/src/extension/string_apis.dart';
 
 void _testStatusWord(StatusWord sw, {required int sw1, required int sw2, required bool isSuccess, required bool isWarning, required bool isError, required String description})
 {

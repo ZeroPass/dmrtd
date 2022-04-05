@@ -4,8 +4,6 @@ import 'package:collection/collection.dart';
 import 'package:dmrtd/dmrtd.dart';
 import 'package:dmrtd/extensions.dart';
 
-import '../lds/tlv.dart';
-
 enum AAPublicKeyType {
   RSA,
   EC
