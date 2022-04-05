@@ -92,13 +92,13 @@ class MrtdApi {
     await icc.selectFile(cla: ISO7816_CLA.NO_SM, p1: 0, p2: 0)
       .onError<ICCError>((error, stackTrace) async {
         _log.warning("Couldn't select MF by P1: 0, P2: 0 sw=${error.sw}, re-trying to select MF with FileID=3F00");
-        await icc.selectFile(cla: ISO7816_CLA.NO_SM, p1: 0, p2: 0, data: Uint8List.fromList([0x3F, 0x00]))
+        return await icc.selectFile(cla: ISO7816_CLA.NO_SM, p1: 0, p2: 0, data: Uint8List.fromList([0x3F, 0x00]))
           .onError<ICCError>((error, stackTrace) async {
             _log.warning("Couldn't select MF by P1=0, P2=0, FileID=3F00 sw=${error.sw}, re-trying to select MF with P2=0x0C and FileID=3F00");
-            await icc.selectFileById(p2: _defaultSelectP2, fileId: Uint8List.fromList([0x3F, 0x00]))
+            return await icc.selectFileById(p2: _defaultSelectP2, fileId: Uint8List.fromList([0x3F, 0x00]))
               .onError<ICCError>((error, stackTrace) async {
                 _log.warning("Couldn't select MF by P1=0, P2=0x0C, FileID=3F00 sw=${error.sw}, re-trying to select MF with P2=0x0C");
-                await icc.selectFile(cla: ISO7816_CLA.NO_SM, p1: 0, p2: _defaultSelectP2);
+                return await icc.selectFile(cla: ISO7816_CLA.NO_SM, p1: 0, p2: _defaultSelectP2);
             });
           });
       });
