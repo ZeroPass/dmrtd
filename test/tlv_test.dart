@@ -30,8 +30,8 @@ void main() {
       expect( TLV.encodeIntValue(0x97, 0x12)                    , "970112".parseHex()                 );
 
       // Fuzz testing
-      expect( () => TLV.encodeLength(-1) , throwsTLVError(message: "Can't encode negative or greater than ‭16 777 215 length"));
-      expect( () => TLV.encodeLength(0x10000000) , throwsTLVError(message: "Can't encode negative or greater than ‭16 777 215 length"));
+      expect( () => TLV.encodeLength(-1) , throwsTLVError(message: "Can't encode negative or greater than 16 777 215 length"));
+      expect( () => TLV.encodeLength(0x10000000) , throwsTLVError(message: "Can't encode negative or greater than 16 777 215 length"));
     });
 
     test('TLV decoding test', () {

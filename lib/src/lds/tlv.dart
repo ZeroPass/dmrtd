@@ -152,10 +152,10 @@ class TLV {
   }
 
   /// Returns BER encoded length
-  /// [length] can't be negative and max value can be ‭16 777 215‬.
+  /// [length] can't be negative and max value can be 16 777 215.
   static Uint8List encodeLength(int length) {
     if (length < 0 || length > 0xFFFFFF) {
-      throw TLVError("Can't encode negative or greater than ‭16 777 215 length");
+      throw TLVError("Can't encode negative or greater than 16 777 215 length");
     }
 
     var byteCount   = Utils.byteCount(length);

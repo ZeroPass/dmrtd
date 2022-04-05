@@ -83,7 +83,6 @@ class MrtdSM extends SecureMessaging {
     }
 
     final data = decryptDataDO(tvDataDO);
-    _log.deVerbose("Decrypted and upadded data=${data?.hex()}");
     return ResponseAPDU(StatusWord.fromBytes(do99.value), data);
   }
 
@@ -104,9 +103,10 @@ class MrtdSM extends SecureMessaging {
     final bool padded = !isDO87 || dtv.value[0] == 0x01; // Defined in ISO/IEC 7816-4 part 5
     var data = cipher.decrypt(dtv.value.sublist(isDO87 ? 1 : 0));
     _log.deVerbose("Decrypted data=${data.hex()}");
-    _log.verbose("Decrypted data is padded: $padded");
+    _log.deVerbose("Decrypted data is padded: $padded");
     if(padded) {
       data = ISO9797.unpad(data);
+      _log.deVerbose("Unpadded data=${data.hex()}");
     }
     return data;
   }
