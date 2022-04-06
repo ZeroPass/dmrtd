@@ -220,11 +220,11 @@ class ICC {
     _log.debug("Sending ${rawCmd.length} byte(s) to ICC: data='${rawCmd.hex()}'");
     Uint8List rawResp = await _com.transceive(rawCmd);
     _log.debug("Received ${rawResp.length} byte(s) from ICC");
-    _log.devDebug(" data='${rawResp.hex()}'");
+    _log.sdDebug(" data='${rawResp.hex()}'");
 
     final rapdu = _unwrap(ResponseAPDU.fromBytes(rawResp));
     _log.debug("Received response from ICC: ${rapdu.status} data_len=${rapdu.data?.length ?? 0}");
-    _log.devDebug(" data=${rapdu.data?.hex()}");
+    _log.sdDebug(" data=${rapdu.data?.hex()}");
     return rapdu;
   }
 

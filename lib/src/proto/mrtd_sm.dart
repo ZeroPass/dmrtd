@@ -29,7 +29,7 @@ class MrtdSM extends SecureMessaging {
   CommandAPDU protect(final CommandAPDU cmd) {
     _log.debug("Protecting APDU");
     _log.verbose("  header=${cmd.rawHeader().hex()}");
-    _log.deVerbose("  data=${cmd.data?.hex()}");
+    _log.sdVerbose("  data=${cmd.data?.hex()}");
     _log.verbose("  Le=${cmd.ne}");
 
     final pcmd   = maskCmd(cmd);
@@ -102,11 +102,11 @@ class MrtdSM extends SecureMessaging {
     final bool isDO87 = tag == SecureMessaging.tagDO87;
     final bool padded = !isDO87 || dtv.value[0] == 0x01; // Defined in ISO/IEC 7816-4 part 5
     var data = cipher.decrypt(dtv.value.sublist(isDO87 ? 1 : 0));
-    _log.deVerbose("Decrypted data=${data.hex()}");
-    _log.deVerbose("Decrypted data is padded: $padded");
+    _log.sdVerbose("Decrypted data=${data.hex()}");
+    _log.sdVerbose("Decrypted data is padded: $padded");
     if(padded) {
       data = ISO9797.unpad(data);
-      _log.deVerbose("Unpadded data=${data.hex()}");
+      _log.sdVerbose("Unpadded data=${data.hex()}");
     }
     return data;
   }
