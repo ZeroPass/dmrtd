@@ -59,11 +59,11 @@ class BAC {
     final RNDifd = randomBytes(nonceLen);
     final Kifd   = randomBytes(kLen);
     _log.verbose("Generated RND.IFD=${RNDifd.hex()}");
-    _log.verbose("Generated K.IFD=${Kifd.hex()}");
+    _log.deVerbose("Generated K.IFD=${Kifd.hex()}");
 
     // Generate S
     final S = generateS(RNDicc: RNDicc, RNDifd: RNDifd, Kifd: Kifd);
-    _log.verbose("Generated S=${S.hex()}");
+    _log.deVerbose("Generated S=${S.hex()}");
 
     // Compute cryptogram Eifd and it's mac Mifd
     final Eifd = E(Kenc: Kenc, S: S);
@@ -74,7 +74,7 @@ class BAC {
     _log.verbose("  Eifd=${Eifd.hex()}");
     _log.verbose("  Mifd=${Mifd.hex()}");
     final ICCea_data = await icc.externalAuthenticate(data: generateEAData(Eifd: Eifd, Mifd: Mifd), ne: eLen + macLen);
-    
+
     final pairEiccMicc = extractEiccAndMicc(ICCea_data: ICCea_data);
     _log.verbose("Received from ICC:");
     _log.verbose("  Eicc=${pairEiccMicc.first.hex()}");
@@ -85,7 +85,7 @@ class BAC {
       _log.error("Verifying mac of Eicc failed");
       throw BACError("Verifying mac of Eicc failed");
     }
-    
+
     // Decrypt R from received Eicc
     _log.debug("Generating session keys KSenc and KSmac");
     final R = D(Kdec: Kenc, Eicc: pairEiccMicc.first);
@@ -93,7 +93,7 @@ class BAC {
 
     // Verify R contains our RND.IFD and extract Kicc from R
     final Kicc = verifyRNDifdAndExtractKicc(RNDifd: RNDifd, R: R);
-    _log.verbose("K.ICC=${Kicc.hex()}");
+    _log.deVerbose("K.ICC=${Kicc.hex()}");
 
     // Calculate session keys from Kifd and Kicc
     final pairKS = calculateSessionKeys(Kifd: Kifd, Kicc: Kicc);
