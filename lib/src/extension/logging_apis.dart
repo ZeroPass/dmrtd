@@ -3,12 +3,12 @@ import 'dart:core';
 import 'package:logging/logging.dart';
 import '../utils.dart';
 
-extension LogAlias on Logger {
+extension LogApis on Logger {
   static final _sdl = Expando<bool>();
 
     /// Log message at level [Level.FINEST].
   void trace(message, [Object? error, StackTrace? stackTrace]) =>
-    log(Level.FINEST, message, error, stackTrace);
+    finest(message, error, stackTrace);
 
   // Log message with sensitive data at [level.FINEST] when logging of sensitive data is enabled.
   void sdTrace(message, [Object? error, StackTrace? stackTrace]) =>
@@ -16,7 +16,7 @@ extension LogAlias on Logger {
 
   /// Log message at level [Level.FINER].
   void verbose(message, [Object? error, StackTrace? stackTrace]) =>
-    log(Level.FINER, message, error, stackTrace);
+    finer(message, error, stackTrace);
 
   // Log message with sensitive data at [level.FINER] when logging of sensitive data is enabled.
   void sdVerbose(message, [Object? error, StackTrace? stackTrace]) =>
@@ -24,7 +24,7 @@ extension LogAlias on Logger {
 
   /// Log message at level [Level.FINE].
   void debug(message, [Object? error, StackTrace? stackTrace]) =>
-    log(Level.FINE, message, error, stackTrace);
+    fine(message, error, stackTrace);
 
   /// Log message with sensitive data at [level.FINE] when logging of sensitive data is enabled.
   void sdDebug(message, [Object? error, StackTrace? stackTrace]) =>
