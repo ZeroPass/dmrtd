@@ -1,7 +1,9 @@
 //  Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
+import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 import 'dart:typed_data';
 
+import 'package:dmrtd/src/extension/logging_apis.dart';
 import 'package:dmrtd/src/extension/datetime_apis.dart';
 import 'package:dmrtd/src/extension/string_apis.dart';
 import 'package:dmrtd/src/extension/uint8list_apis.dart';
@@ -91,6 +93,411 @@ void main() {
       final tenAnd6MonthsFromNow = DateTime(now.year + 10, now.month + 6, now.day);
       final ninetyYearsAgo       = DateTime(now.year - 90, now.month + 6, now.day);
       expect( tenAnd6MonthsFromNow.formatYYMMDD().parseDateYYMMDD(), ninetyYearsAgo );
+    });
+  });
+
+  group('LogApis tests', () {
+    const traceMsg   = 'test trace log msg';
+    const verboseMsg = 'test verbose log msg';
+    const debugMsg   = 'test debug log msg';
+    const infoMsg    = 'test info log msg';
+    const warningMsg = 'test warning log msg';
+    const errorMsg   = 'test error log msg';
+    const shoutMsg   = 'test trace log msg';
+
+    var level = Level.OFF;
+    var logMsg = '';
+    Logger.root.onRecord.listen((record) {
+      level = record.level;
+      logMsg = record.message;
+    });
+
+    test('Log level helper functions', () {
+      Logger.root.level = Level.OFF;
+      // Error test
+      Logger.root.error(errorMsg);
+      expect( logMsg, ''        );
+      expect( level , Level.OFF );
+
+      Logger.root.level = Level.SEVERE;
+      Logger.root.error(errorMsg);
+      expect( logMsg, errorMsg     );
+      expect( level,  Level.SEVERE );
+
+       // Debug test
+      Logger.root.debug(debugMsg);
+      expect( logMsg, errorMsg     );
+      expect( level , Level.SEVERE );
+
+      Logger.root.level = Level.FINE;
+      Logger.root.debug(debugMsg);
+      expect( logMsg, debugMsg   );
+      expect( level,  Level.FINE );
+
+      // Verbose test
+      Logger.root.verbose(verboseMsg);
+      expect( logMsg, debugMsg   );
+      expect( level , Level.FINE );
+
+      Logger.root.level = Level.FINER;
+      Logger.root.verbose(verboseMsg);
+      expect( logMsg, verboseMsg );
+      expect( level, Level.FINER );
+
+      // Trace test
+      Logger.root.trace(traceMsg);
+      expect( logMsg, verboseMsg  );
+      expect( level , Level.FINER );
+
+      Logger.root.level = Level.FINEST;
+      Logger.root.trace(traceMsg);
+      expect( logMsg, traceMsg     );
+      expect( level , Level.FINEST );     
+    });
+
+    test('Sensitive data log test', () {
+      level = Level.OFF;
+      logMsg = '';
+      Logger.root.level = Level.OFF;
+      var log = Logger('test_log');
+
+      var dlog = Logger.detached('detached_test_log');
+      dlog.level = Level.OFF;
+      var dlevel = Level.OFF;
+      var dlogMsg = '';
+      dlog.onRecord.listen((record) {
+        dlevel  = record.level;
+        dlogMsg = record.message;
+      });
+
+      // Shout test
+      Logger.root.logSensitiveData = false;
+      dlog.logSensitiveData = false;
+      Logger.root.sdShout(shoutMsg);
+      expect( logMsg, ''        );
+      expect( level , Level.OFF );
+
+      log.sdShout(shoutMsg);
+      expect( logMsg, ''        );
+      expect( level , Level.OFF );
+
+      dlog.sdShout(shoutMsg);
+      expect( logMsg, ''        );
+      expect( level , Level.OFF );
+
+      Logger.root.level = Level.SHOUT;
+      dlog.level = Level.SHOUT;
+      Logger.root.sdShout(shoutMsg);
+      expect( logMsg, ''        );
+      expect( level , Level.OFF );
+
+      log.sdShout(shoutMsg);
+      expect( logMsg, ''        );
+      expect( level , Level.OFF );
+
+      dlog.sdShout(shoutMsg);
+      expect( logMsg, ''        );
+      expect( level , Level.OFF );
+
+      Logger.root.logSensitiveData = true;
+      Logger.root.sdShout(shoutMsg);
+      expect( logMsg, shoutMsg    );
+      expect( level , Level.SHOUT );
+
+      log.sdShout(shoutMsg);
+      expect( logMsg, shoutMsg    );
+      expect( level , Level.SHOUT );
+
+      dlog.sdShout(shoutMsg);
+      expect( dlogMsg, ''        );
+      expect( dlevel , Level.OFF );
+
+      dlog.logSensitiveData = true;
+      dlog.sdShout(shoutMsg);
+      expect( dlogMsg, shoutMsg     );
+      expect( dlevel , Level.SHOUT );
+
+      // Error test
+      Logger.root.logSensitiveData = false;
+      dlog.logSensitiveData = false;
+      Logger.root.sdError(errorMsg);
+      expect( logMsg, shoutMsg    );
+      expect( level , Level.SHOUT );
+
+      log.sdError(errorMsg);
+      expect( logMsg, shoutMsg    );
+      expect( level , Level.SHOUT );
+
+      dlog.sdError(errorMsg);
+      expect( dlogMsg, shoutMsg    );
+      expect( dlevel , Level.SHOUT );
+
+      Logger.root.level = Level.SEVERE;
+      dlog.level = Level.SEVERE;
+      Logger.root.sdError(errorMsg);
+      expect( logMsg, shoutMsg    );
+      expect( level , Level.SHOUT );
+
+      log.sdError(errorMsg);
+      expect( logMsg, shoutMsg    );
+      expect( level , Level.SHOUT );
+
+      dlog.sdError(errorMsg);
+      expect( dlogMsg, shoutMsg    );
+      expect( dlevel , Level.SHOUT );
+
+      Logger.root.logSensitiveData = true;
+      Logger.root.sdError(errorMsg);
+      expect( logMsg, errorMsg     );
+      expect( level , Level.SEVERE );
+
+      log.sdError(errorMsg);
+      expect( logMsg, errorMsg     );
+      expect( level , Level.SEVERE );
+
+      dlog.sdError(errorMsg);
+      expect( dlogMsg, shoutMsg    );
+      expect( dlevel , Level.SHOUT );
+
+      dlog.logSensitiveData = true;
+      dlog.sdError(errorMsg);
+      expect( dlogMsg, errorMsg     );
+      expect( dlevel , Level.SEVERE );
+
+      // Warning test
+      Logger.root.logSensitiveData = false;
+      dlog.logSensitiveData = false;
+      Logger.root.sdWarning(warningMsg);
+      expect( logMsg, errorMsg     );
+      expect( level , Level.SEVERE );
+
+      log.sdWarning(warningMsg);
+      expect( logMsg, errorMsg     );
+      expect( level , Level.SEVERE );
+
+      dlog.sdWarning(warningMsg);
+      expect( dlogMsg, errorMsg     );
+      expect( dlevel , Level.SEVERE );
+
+      Logger.root.level = Level.WARNING;
+      dlog.level = Level.WARNING;
+      Logger.root.sdWarning(warningMsg);
+      expect( logMsg, errorMsg     );
+      expect( level , Level.SEVERE );
+
+      log.sdWarning(warningMsg);
+      expect( logMsg, errorMsg     );
+      expect( level , Level.SEVERE );
+
+      dlog.sdWarning(warningMsg);
+      expect( dlogMsg, errorMsg     );
+      expect( dlevel , Level.SEVERE );
+
+      Logger.root.logSensitiveData = true;
+      Logger.root.sdWarning(warningMsg);
+      expect( logMsg, warningMsg    );
+      expect( level , Level.WARNING );
+
+      log.sdWarning(warningMsg);
+      expect( logMsg, warningMsg    );
+      expect( level , Level.WARNING );
+
+      dlog.sdWarning(warningMsg);
+      expect( dlogMsg, errorMsg     );
+      expect( dlevel , Level.SEVERE );
+
+      dlog.logSensitiveData = true;
+      dlog.sdWarning(warningMsg);
+      expect( dlogMsg, warningMsg    );
+      expect( dlevel , Level.WARNING );
+
+      // Info test
+      Logger.root.logSensitiveData = false;
+      dlog.logSensitiveData = false;
+      Logger.root.sdInfo(infoMsg);
+      expect( logMsg, warningMsg    );
+      expect( level , Level.WARNING );
+
+      log.sdInfo(infoMsg);
+      expect( logMsg, warningMsg    );
+      expect( level , Level.WARNING );
+
+      dlog.sdInfo(infoMsg);
+      expect( dlogMsg, warningMsg    );
+      expect( dlevel , Level.WARNING );
+
+      Logger.root.level = Level.INFO;
+      dlog.level = Level.INFO;
+      Logger.root.sdInfo(infoMsg);
+      expect( logMsg, warningMsg    );
+      expect( level , Level.WARNING );
+
+      log.sdInfo(infoMsg);
+      expect( logMsg, warningMsg    );
+      expect( level , Level.WARNING );
+
+      dlog.sdInfo(infoMsg);
+      expect( dlogMsg, warningMsg    );
+      expect( dlevel , Level.WARNING );
+
+      Logger.root.logSensitiveData = true;
+      Logger.root.sdInfo(infoMsg);
+      expect( logMsg, infoMsg    );
+      expect( level , Level.INFO );
+
+      log.sdInfo(infoMsg);
+      expect( logMsg, infoMsg    );
+      expect( level , Level.INFO );
+
+      dlog.sdInfo(infoMsg);
+      expect( dlogMsg, warningMsg    );
+      expect( dlevel , Level.WARNING );
+
+      dlog.logSensitiveData = true;
+      dlog.sdInfo(infoMsg);
+      expect( dlogMsg, infoMsg    );
+      expect( dlevel , Level.INFO );
+
+      // Debug test
+      Logger.root.logSensitiveData = false;
+      dlog.logSensitiveData = false;
+      Logger.root.sdDebug(debugMsg);
+      expect( logMsg, infoMsg    );
+      expect( level , Level.INFO );
+
+      log.sdDebug(debugMsg);
+      expect( logMsg, infoMsg    );
+      expect( level , Level.INFO );
+
+      dlog.sdDebug(debugMsg);
+      expect( dlogMsg, infoMsg    );
+      expect( dlevel , Level.INFO );
+
+      Logger.root.level = Level.FINE;
+      dlog.level = Level.FINE;
+      Logger.root.sdDebug(debugMsg);
+      expect( logMsg, infoMsg    );
+      expect( level , Level.INFO );
+
+      log.sdDebug(debugMsg);
+      expect( logMsg, infoMsg    );
+      expect( level , Level.INFO );
+
+      dlog.sdDebug(debugMsg);
+      expect( dlogMsg, infoMsg    );
+      expect( dlevel , Level.INFO );
+
+      Logger.root.logSensitiveData = true;
+      Logger.root.sdDebug(debugMsg);
+      expect( logMsg, debugMsg   );
+      expect( level , Level.FINE );
+
+      log.sdDebug(debugMsg);
+      expect( logMsg, debugMsg   );
+      expect( level , Level.FINE );
+
+      dlog.sdDebug(debugMsg);
+      expect( dlogMsg, infoMsg    );
+      expect( dlevel , Level.INFO );
+
+      dlog.logSensitiveData = true;
+      dlog.sdDebug(debugMsg);
+      expect( dlogMsg, debugMsg   );
+      expect( dlevel , Level.FINE );
+      
+      // Verbose test
+      Logger.root.logSensitiveData = false;
+      dlog.logSensitiveData = false;
+      Logger.root.sdVerbose(verboseMsg);
+      expect( logMsg, debugMsg   );
+      expect( level , Level.FINE );
+
+      log.sdVerbose(verboseMsg);
+      expect( logMsg, debugMsg   );
+      expect( level , Level.FINE );
+
+      dlog.sdVerbose(verboseMsg);
+      expect( dlogMsg, debugMsg   );
+      expect( dlevel , Level.FINE );
+
+      Logger.root.level = Level.FINER;
+      dlog.level = Level.FINER;
+      Logger.root.sdVerbose(verboseMsg);
+      expect( logMsg, debugMsg   );
+      expect( level , Level.FINE );
+
+      log.sdVerbose(verboseMsg);
+      expect( logMsg, debugMsg   );
+      expect( level , Level.FINE );
+
+      dlog.sdVerbose(verboseMsg);
+      expect( dlogMsg, debugMsg   );
+      expect( dlevel , Level.FINE );
+
+      Logger.root.logSensitiveData = true;
+      Logger.root.sdVerbose(verboseMsg);
+      expect( logMsg, verboseMsg  );
+      expect( level , Level.FINER );
+
+      log.sdVerbose(verboseMsg);
+      expect( logMsg, verboseMsg  );
+      expect( level , Level.FINER );
+
+      dlog.sdVerbose(verboseMsg);
+      expect( dlogMsg, debugMsg   );
+      expect( dlevel , Level.FINE );
+
+      dlog.logSensitiveData = true;
+      dlog.sdVerbose(verboseMsg);
+      expect( dlogMsg, verboseMsg  );
+      expect( dlevel , Level.FINER );
+
+      // Trace test
+      Logger.root.logSensitiveData = false;
+      dlog.logSensitiveData = false;
+      Logger.root.sdTrace(traceMsg);
+      expect( logMsg, verboseMsg  );
+      expect( level , Level.FINER );
+
+      log.sdTrace(traceMsg);
+      expect( logMsg, verboseMsg  );
+      expect( level , Level.FINER );
+
+      dlog.sdTrace(traceMsg);
+      expect( dlogMsg, verboseMsg  );
+      expect( dlevel , Level.FINER );
+
+      Logger.root.level = Level.FINEST;
+      dlog.level = Level.FINEST;
+      Logger.root.sdTrace(traceMsg);
+      expect( logMsg, verboseMsg  );
+      expect( level , Level.FINER );
+
+      log.sdTrace(traceMsg);
+      expect( logMsg, verboseMsg  );
+      expect( level , Level.FINER );
+
+      dlog.sdTrace(traceMsg);
+      expect( dlogMsg, verboseMsg  );
+      expect( dlevel , Level.FINER );
+
+      Logger.root.logSensitiveData = true;
+      Logger.root.sdTrace(traceMsg);
+      expect( logMsg, traceMsg     );
+      expect( level , Level.FINEST );
+
+      log.sdTrace(traceMsg);
+      expect( logMsg, traceMsg     );
+      expect( level , Level.FINEST );
+
+      dlog.sdTrace(traceMsg);
+      expect( dlogMsg, verboseMsg  );
+      expect( dlevel , Level.FINER );
+
+      dlog.logSensitiveData = true;
+      dlog.sdTrace(traceMsg);
+      expect( dlogMsg, traceMsg     );
+      expect( dlevel , Level.FINEST );
     });
   });
 }
