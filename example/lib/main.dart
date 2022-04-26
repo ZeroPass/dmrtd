@@ -244,7 +244,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
         _isReading = true;
       });
 
-      await _nfc.connect(iosAlertMessage: "Hold your iPhone near Biometric Passport");
+      await _nfc.connect(iosAlertMessage: "Hold your phone near Biometric Passport");
       final passport = Passport(_nfc);
 
       setState(() {
@@ -258,7 +258,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
         mrtdData.cardAccess = await passport.readEfCardAccess();
       }
       on PassportError catch (e) {
-        if (e.code != StatusWord.fileNotFound) rethrow;
+        //if (e.code != StatusWord.fileNotFound) rethrow;
       }
 
       _nfc.setIosAlertMessage("Trying to read EF.CardSecurity ...");
@@ -267,7 +267,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
         mrtdData.cardSecurity = await passport.readEfCardSecurity();
       }
       on PassportError catch (e) {
-        if (e.code != StatusWord.fileNotFound) rethrow;
+        //if (e.code != StatusWord.fileNotFound) rethrow;
       }
 
       _nfc.setIosAlertMessage("Initiating session ...");

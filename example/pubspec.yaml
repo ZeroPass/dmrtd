@@ -14,9 +14,14 @@ description: A new Flutter project.
 version: 1.2.0
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: '>=2.14.1 <3.0.0'
 
 publish_to: none
+
+dependency_overrides: 
+  flutter_nfc_kit:
+    git:
+      url: https://github.com/ZeroPass/flutter_nfc_kit.git
 
 dependencies:
   dmrtd:
