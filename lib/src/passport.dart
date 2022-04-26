@@ -191,6 +191,21 @@ class Passport {
     );
   }
 
+  /// Reads file EF.DG6 from passport.
+  /// Session with passport should be already
+  /// established before calling this function.
+  ///
+  /// Can throw [ComProviderError] on connection error.
+  /// Throws [PassportError] if file doesn't exist or
+  /// if calling this function prior establishing session with passport.
+  Future<EfDG6> readEfDG6() async {
+    _log.debug("Reading EF.DG6");
+    await _selectDF1();
+    return EfDG6.fromBytes(
+      await _exec(() => _api.readFileBySFI(EfDG6.SFI))
+    );
+  }
+
   /// Reads file EF.DG7 from passport.
   /// Session with passport should be already
   /// established before calling this function.
