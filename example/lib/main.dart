@@ -1,5 +1,6 @@
 // Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
 import 'package:dmrtd/internal.dart';
+import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:async';
@@ -12,15 +13,61 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 
+class MrtdData {
+  EfCardAccess? cardAccess;
+  EfCardSecurity? cardSecurity;
+  EfCOM? com;
+  EfSOD? sod;
+  EfDG1? dg1;
+  EfDG2? dg2;
+  EfDG3? dg3;
+  EfDG4? dg4;
+  EfDG5? dg5;
+  EfDG6? dg6;
+  EfDG7? dg7;
+  EfDG8? dg8;
+  EfDG9? dg9;
+  EfDG10? dg10;
+  EfDG11? dg11;
+  EfDG12? dg12;
+  EfDG13? dg13;
+  EfDG14? dg14;
+  EfDG15? dg15;
+  EfDG16? dg16;
+  Uint8List? aaSig;
+}
+
+final Map<DgTag, String> dgTagToString = {
+  EfDG1.TAG : 'EF.DG1',
+  EfDG2.TAG : 'EF.DG2',
+  EfDG3.TAG : 'EF.DG3',
+  EfDG4.TAG : 'EF.DG4',
+  EfDG5.TAG : 'EF.DG5',
+  EfDG6.TAG : 'EF.DG6',
+  EfDG7.TAG : 'EF.DG7',
+  EfDG8.TAG : 'EF.DG8',
+  EfDG9.TAG : 'EF.DG9',
+  EfDG10.TAG : 'EF.DG10',
+  EfDG11.TAG : 'EF.DG11',
+  EfDG12.TAG : 'EF.DG12',
+  EfDG13.TAG : 'EF.DG13',
+  EfDG14.TAG : 'EF.DG14',
+  EfDG15.TAG : 'EF.DG15',
+  EfDG16.TAG : 'EF.DG16'
+};
 
 String formatEfCom(final EfCOM efCom) {
-  var str = "EF.COM\n"
-            "  version: ${efCom.version}\n"
-            "  unicode version: ${efCom.uincodeVersion}\n"
-            "  DG tags:";
+  var str = "version: ${efCom.version}\n"
+            "unicode version: ${efCom.uincodeVersion}\n"
+            "DG tags:";
 
   for(final t in efCom.dgTags) {
-    str += " 0x${t.value.toRadixString(16)}";
+    try {
+      str += " ${dgTagToString[t]!}";
+    } 
+    catch (e) {
+      str += " 0x${t.value.toRadixString(16)}";
+    }
   }
   return str;
 }
@@ -117,7 +164,8 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
   final _dob = TextEditingController(); // date of birth
   final _doe = TextEditingController(); // date of doc expiry
 
-  String _result ="";
+  MrtdData? _mrtdData;
+
   NfcProvider _nfc = NfcProvider();
   late Timer _timerStateUpdater;
   final _scrollController = ScrollController();
@@ -191,7 +239,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
   void _readMRTD() async {
     try {
       setState(() {
-        _result = "";
+        _mrtdData = null;
         _alertMessage = "Waiting for Passport tag ...";
         _isReading = true;
       });
@@ -204,18 +252,19 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
       });
 
       _nfc.setIosAlertMessage("Trying to read EF.CardAccess ...");
-      EfCardAccess? cardAccess;
+      final mrtdData = MrtdData();
+      
       try {
-        cardAccess = await passport.readEfCardAccess();
+        mrtdData.cardAccess = await passport.readEfCardAccess();
       }
       on PassportError catch (e) {
         if (e.code != StatusWord.fileNotFound) rethrow;
       }
 
       _nfc.setIosAlertMessage("Trying to read EF.CardSecurity ...");
-      EfCardSecurity? cardSecurity;
+
       try {
-        cardSecurity = await passport.readEfCardSecurity();
+        mrtdData.cardSecurity = await passport.readEfCardSecurity();
       }
       on PassportError catch (e) {
         if (e.code != StatusWord.fileNotFound) rethrow;
@@ -226,76 +275,82 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
       await passport.startSession(bacKeySeed);
 
       _nfc.setIosAlertMessage(formatProgressMsg("Reading EF.COM ...", 0));
-      final efcom = await passport.readEfCOM();
+      mrtdData.com = await passport.readEfCOM();
 
       _nfc.setIosAlertMessage(formatProgressMsg("Reading Data Groups ...", 20));
-      EfDG1? dg1;
-      if(efcom.dgTags.contains(EfDG1.TAG)) {
-        dg1 = await passport.readEfDG1();
+
+      if(mrtdData.com!.dgTags.contains(EfDG1.TAG)) {
+        mrtdData.dg1 = await passport.readEfDG1();
       }
 
-      EfDG2? dg2;
-      if(efcom.dgTags.contains(EfDG2.TAG)) {
-        dg2 = await passport.readEfDG2();
+      if(mrtdData.com!.dgTags.contains(EfDG2.TAG)) {
+        mrtdData.dg2 = await passport.readEfDG2();
       }
 
-      EfDG14? dg14;
-      if(efcom.dgTags.contains(EfDG14.TAG)) {
-        dg14 = await passport.readEfDG14();
+      // To read DG3 and DG4 session has to be established with CVCA certificate (not supported).
+      // if(mrtdData.com!.dgTags.contains(EfDG3.TAG)) {
+      //   mrtdData.dg3 = await passport.readEfDG3();
+      // }
+
+      // if(mrtdData.com!.dgTags.contains(EfDG4.TAG)) {
+      //   mrtdData.dg4 = await passport.readEfDG4();
+      // }
+
+      if(mrtdData.com!.dgTags.contains(EfDG5.TAG)) {
+        mrtdData.dg5 = await passport.readEfDG5();
       }
 
-      EfDG15? dg15;
-      Uint8List? sig;
-      if(efcom.dgTags.contains(EfDG15.TAG)) {
-        dg15 = await passport.readEfDG15();
+      if(mrtdData.com!.dgTags.contains(EfDG6.TAG)) {
+        mrtdData.dg6 = await passport.readEfDG6();
+      }
+
+      if(mrtdData.com!.dgTags.contains(EfDG7.TAG)) {
+        mrtdData.dg7 = await passport.readEfDG7();
+      }
+
+      if(mrtdData.com!.dgTags.contains(EfDG8.TAG)) {
+        mrtdData.dg8 = await passport.readEfDG8();
+      }
+
+      if(mrtdData.com!.dgTags.contains(EfDG9.TAG)) {
+        mrtdData.dg9 = await passport.readEfDG9();
+      }
+
+      if(mrtdData.com!.dgTags.contains(EfDG10.TAG)) {
+        mrtdData.dg10 = await passport.readEfDG10();
+      }
+
+      if(mrtdData.com!.dgTags.contains(EfDG11.TAG)) {
+        mrtdData.dg11 = await passport.readEfDG11();
+      }
+
+      if(mrtdData.com!.dgTags.contains(EfDG12.TAG)) {
+        mrtdData.dg12 = await passport.readEfDG12();
+      }
+
+      if(mrtdData.com!.dgTags.contains(EfDG13.TAG)) {
+        mrtdData.dg13 = await passport.readEfDG13();
+      }
+
+      if(mrtdData.com!.dgTags.contains(EfDG14.TAG)) {
+        mrtdData.dg14 = await passport.readEfDG14();
+      }
+
+      if(mrtdData.com!.dgTags.contains(EfDG15.TAG)) {
+        mrtdData.dg15 = await passport.readEfDG15();
         _nfc.setIosAlertMessage(formatProgressMsg("Doing AA ...", 60));
-        sig  = await passport.activeAuthenticate(Uint8List(8));
+        mrtdData.aaSig = await passport.activeAuthenticate(Uint8List(8));
+      }
+
+      if(mrtdData.com!.dgTags.contains(EfDG16.TAG)) {
+        mrtdData.dg16 = await passport.readEfDG16();
       }
 
       _nfc.setIosAlertMessage(formatProgressMsg("Reading EF.SOD ...", 80));
-      final sod = await passport.readEfSOD();
+      mrtdData.sod = await passport.readEfSOD();
 
       setState(() {
-        String strAccess = "EF.CardAccess=Not Available";
-        if (cardAccess != null)
-          strAccess = "EF.CardAccess=${cardAccess.toBytes().hex()}";
-
-        String strSecurity= "EF.CardSecurity=Not Available";
-        if (cardSecurity != null)
-          strSecurity = "EF.CardSecurity=${cardSecurity.toBytes().hex()}";
-
-        String strCom = "${formatEfCom(efcom)}";
-        String strDG1 = "EF.DG1= Not Available";
-        if(dg1 != null) {
-          strDG1 = "EF.DG1.${formatMRZ(dg1.mrz)}";
-        }
-
-        String strDG2 = "EF.DG2= Not Available";
-        if(dg2 != null) {
-          strDG2 = "EF.DG2=${dg2.toBytes().hex()}";
-        }
-
-        String strDG14 = "EF.DG14=Not Available";
-        if(dg14 != null) {
-          strDG14 = "EF.DG14=${dg14.toBytes().hex()}";
-        }
-
-        String strDG15 = "EF.DG15=Not Available";
-        String strAASig = "";
-        if(dg15 != null) {
-          strDG15 = formatDG15(dg15);
-          strAASig = "AA.sig=${sig!.hex()}";
-        }
-
-        _result =  strAccess   + "\n\n\n" +
-                   strSecurity + "\n\n\n" +
-                   strCom      + "\n\n\n" +
-                   strDG1      + "\n\n\n" +
-                   strDG15     + "\n\n\n" +
-                   strAASig    + "\n\n\n" +
-                   strDG14     + "\n\n\n" +
-                   "EF.SOD=${sod.toBytes().hex()}" + "\n\n\n" +
-                   strDG2;
+        _mrtdData = mrtdData;
       });
 
       setState(() {
@@ -357,6 +412,102 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
     return _isReading || !_isNfcAvailable;
   }
 
+  Widget _makeMrtdDataWidget({required String header, required String collapsedText, required dataText}) {
+    return ExpandablePanel(
+        theme: const ExpandableThemeData(
+          headerAlignment: ExpandablePanelHeaderAlignment.center,
+          tapBodyToCollapse: true,
+          hasIcon: true,
+          iconColor: Colors.red, 
+        ),
+        header: Text(header),
+        collapsed: Text(collapsedText, softWrap: true, maxLines: 2, overflow: TextOverflow.ellipsis),
+        expanded: Container(
+          padding: const EdgeInsets.all(18),
+          color: Color.fromARGB(255, 239, 239, 239),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              PlatformTextButton(
+                child: Text('Copy'),
+                onPressed: () =>  Clipboard.setData(ClipboardData(text: dataText)),
+                padding: const EdgeInsets.all(8),
+              ),
+              SelectableText(dataText, textAlign: TextAlign.left)
+          ])
+      ));
+  }
+
+  List<Widget> _mrtdDataWidgets() {
+    List<Widget>  list = [];
+    if (_mrtdData == null) return list;
+
+    if (_mrtdData!.cardAccess != null)
+      list.add(_makeMrtdDataWidget(header: 'EF.CardAccess', collapsedText: '', dataText: _mrtdData!.cardAccess!.toBytes().hex()));
+
+    if (_mrtdData!.cardSecurity != null)
+      list.add(_makeMrtdDataWidget(header: 'EF.CardSecurity', collapsedText: '', dataText: _mrtdData!.cardSecurity!.toBytes().hex()));
+
+    if (_mrtdData!.sod != null)
+      list.add(_makeMrtdDataWidget(header: 'EF.SOD', collapsedText: '', dataText: _mrtdData!.sod!.toBytes().hex()));
+
+    if (_mrtdData!.com != null)
+      list.add(_makeMrtdDataWidget(header: 'EF.COM', collapsedText: '', dataText: formatEfCom(_mrtdData!.com!)));
+
+    if (_mrtdData!.dg1 != null)
+      list.add(_makeMrtdDataWidget(header: 'EF.DG1', collapsedText: '', dataText: formatMRZ(_mrtdData!.dg1!.mrz)));
+
+    if (_mrtdData!.dg2 != null)
+      list.add(_makeMrtdDataWidget(header: 'EF.DG2', collapsedText: '', dataText: _mrtdData!.dg2!.toBytes().hex()));
+
+    if (_mrtdData!.dg3 != null)
+      list.add(_makeMrtdDataWidget(header: 'EF.DG3', collapsedText: '', dataText: _mrtdData!.dg3!.toBytes().hex()));
+
+    if (_mrtdData!.dg4 != null)
+      list.add(_makeMrtdDataWidget(header: 'EF.DG4', collapsedText: '', dataText: _mrtdData!.dg4!.toBytes().hex()));
+
+    if (_mrtdData!.dg5 != null)
+      list.add(_makeMrtdDataWidget(header: 'EF.DG5', collapsedText: '', dataText: _mrtdData!.dg5!.toBytes().hex()));
+
+    if (_mrtdData!.dg6 != null)
+      list.add(_makeMrtdDataWidget(header: 'EF.DG6', collapsedText: '', dataText: _mrtdData!.dg6!.toBytes().hex()));
+
+    if (_mrtdData!.dg7 != null)
+      list.add(_makeMrtdDataWidget(header: 'EF.DG7', collapsedText: '', dataText: _mrtdData!.dg7!.toBytes().hex()));
+
+    if (_mrtdData!.dg8 != null)
+      list.add(_makeMrtdDataWidget(header: 'EF.DG8', collapsedText: '', dataText: _mrtdData!.dg8!.toBytes().hex()));
+
+    if (_mrtdData!.dg9 != null)
+      list.add(_makeMrtdDataWidget(header: 'EF.DG9', collapsedText: '', dataText: _mrtdData!.dg9!.toBytes().hex()));
+
+    if (_mrtdData!.dg10 != null)
+      list.add(_makeMrtdDataWidget(header: 'EF.DG10', collapsedText: '', dataText: _mrtdData!.dg10!.toBytes().hex()));
+
+    if (_mrtdData!.dg11 != null)
+      list.add(_makeMrtdDataWidget(header: 'EF.DG11', collapsedText: '', dataText: _mrtdData!.dg11!.toBytes().hex()));
+
+    if (_mrtdData!.dg12 != null)
+      list.add(_makeMrtdDataWidget(header: 'EF.DG12', collapsedText: '', dataText: _mrtdData!.dg12!.toBytes().hex()));
+
+    if (_mrtdData!.dg13 != null)
+      list.add(_makeMrtdDataWidget(header: 'EF.DG13', collapsedText: '', dataText: _mrtdData!.dg13!.toBytes().hex()));
+
+    if (_mrtdData!.dg14 != null)
+      list.add(_makeMrtdDataWidget(header: 'EF.DG14', collapsedText: '', dataText: _mrtdData!.dg14!.toBytes().hex()));
+
+    if (_mrtdData!.dg15 != null)
+      list.add(_makeMrtdDataWidget(header: 'EF.DG15', collapsedText: '', dataText: _mrtdData!.dg15!.toBytes().hex()));
+
+    if (_mrtdData!.aaSig != null)
+      list.add(_makeMrtdDataWidget(header: 'Active Authentication signature', collapsedText: '', dataText: _mrtdData!.aaSig!.hex()));
+
+    if (_mrtdData!.dg16 != null)
+      list.add(_makeMrtdDataWidget(header: 'EF.DG16', collapsedText: '', dataText: _mrtdData!.dg16!.toBytes().hex()));
+  
+    return list;
+  }
+
   PlatformScaffold _buildPage(BuildContext context) => PlatformScaffold(
     appBar: PlatformAppBar(
       title: Text('MRTD Example App')
@@ -400,7 +551,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(_result.isNotEmpty ? "Passport Data:" : "",
+                      Text(_mrtdData != null ? "Passport Data:" : "",
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 15.0 , fontWeight: FontWeight.bold)
                       ),
@@ -408,11 +559,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
                         padding: EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            SelectableText('$_result',
-                              textAlign: TextAlign.left
-                            )
-                          ]
+                          children: _mrtdDataWidgets()
                         )
                       )
                     ]
