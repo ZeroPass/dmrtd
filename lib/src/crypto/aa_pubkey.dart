@@ -7,13 +7,14 @@ import 'package:dmrtd/extensions.dart';
 enum AAPublicKeyType {
   RSA,
   EC
+  ECC
 }
 
 // Represents Active Authentication Public Key Info
 class AAPublicKey {
 
   final Uint8List _encPubKey;
-  AAPublicKeyType _type = AAPublicKeyType.EC;
+  AAPublicKeyType _type = AAPublicKeyType.ECC;
   late Uint8List _subPubKeyBytes;
 
   Uint8List rawSubjectPublicKey() {
