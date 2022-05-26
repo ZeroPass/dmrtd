@@ -13,12 +13,16 @@ class PassportError implements Exception {
   final String message;
   final StatusWord? code;
   PassportError(this.message, {this.code});
+  @override
   String toString() => message;
 }
 
 enum _DF {
+  // ignore: constant_identifier_names
   None,
+  // ignore: constant_identifier_names
   MF,
+  // ignore: constant_identifier_names
   DF1
 }
 

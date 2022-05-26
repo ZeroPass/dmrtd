@@ -1,7 +1,6 @@
 // Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
 import 'dart:core';
 import 'package:logging/logging.dart';
-import '../utils.dart';
 
 extension LogApis on Logger {
   static final _sdl = Expando<bool>();

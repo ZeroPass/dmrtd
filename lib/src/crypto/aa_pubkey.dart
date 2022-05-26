@@ -5,8 +5,9 @@ import 'package:dmrtd/dmrtd.dart';
 import 'package:dmrtd/extensions.dart';
 
 enum AAPublicKeyType {
+  // ignore: constant_identifier_names
   RSA,
-  EC
+  // ignore: constant_identifier_names
   ECC
 }
 

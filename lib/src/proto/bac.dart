@@ -1,4 +1,6 @@
 // Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
@@ -22,6 +24,7 @@ import 'ssc.dart';
 class BACError implements Exception {
   final String message;
   BACError(this.message);
+  @override
   String toString() => message;
 }
 
@@ -73,9 +76,9 @@ class BAC {
     _log.debug("Sending EXTERNAL AUTHENTICATE command");
     _log.verbose("  Eifd=${Eifd.hex()}");
     _log.verbose("  Mifd=${Mifd.hex()}");
-    final ICCea_data = await icc.externalAuthenticate(data: generateEAData(Eifd: Eifd, Mifd: Mifd), ne: eLen + macLen);
+    final ICCeaData = await icc.externalAuthenticate(data: generateEAData(Eifd: Eifd, Mifd: Mifd), ne: eLen + macLen);
 
-    final pairEiccMicc = extractEiccAndMicc(ICCea_data: ICCea_data);
+    final pairEiccMicc = extractEiccAndMicc(ICCea_data: ICCeaData);
     _log.verbose("Received from ICC:");
     _log.verbose("  Eicc=${pairEiccMicc.first.hex()}");
     _log.verbose("  Micc=${pairEiccMicc.second.hex()}");

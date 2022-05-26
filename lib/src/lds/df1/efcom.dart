@@ -1,4 +1,6 @@
 // Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
+// ignore_for_file: constant_identifier_names
+
 import 'dart:core';
 import 'dart:typed_data';
 import 'package:dmrtd/extensions.dart';
@@ -14,10 +16,10 @@ class EfCOM extends ElementaryFile {
 
   late final String _ver;
   late final String _uver;
-  final _tags = Set<DgTag>();
+  final _tags = <DgTag>{};
 
   get version => _ver;
-  get uincodeVersion => _uver;
+  get unicodeVersion => _uver;
   Set<DgTag> get dgTags => _tags;
 
   EfCOM.fromBytes(Uint8List data) : super.fromBytes(data);
@@ -29,17 +31,17 @@ class EfCOM extends ElementaryFile {
   int get sfi => SFI;
 
   @override
-  void parse(final Uint8List data) {
-    final tlv = TLV.fromBytes(data);
+  void parse(final Uint8List content) {
+    final tlv = TLV.fromBytes(content);
     if(tlv.tag != TAG) {
       throw EfParseError(
         "Invalid EF.COM tag=${tlv.tag.hex()}, expected tag=${TAG.hex()}"
       );
     }
-    final content = tlv.value;
 
     // Parse version number
-    final vtv = TLV.decode(content);
+    final data = tlv.value;
+    final vtv = TLV.decode(data);
     if(vtv.tag.value != 0x5F01) {
       throw EfParseError(
         "Invalid version object tag=${vtv.tag.value.hex()}, expected version object with tag=5F01"
@@ -48,7 +50,7 @@ class EfCOM extends ElementaryFile {
     _ver = String.fromCharCodes(vtv.value);
 
     // Parse string version
-    final uvtv = TLV.decode(content.sublist(vtv.encodedLen));
+    final uvtv = TLV.decode(data.sublist(vtv.encodedLen));
     if(uvtv.tag.value != 0x5F36) {
       throw EfParseError(
         "Invalid unicode version object tag=${uvtv.tag.value.hex()}, expected unicode version object with tag=5F36"
@@ -57,7 +59,7 @@ class EfCOM extends ElementaryFile {
     _uver = String.fromCharCodes(uvtv.value);
 
     // Parse tag list
-    final tvTagList = TLV.decode(content.sublist(vtv.encodedLen + uvtv.encodedLen));
+    final tvTagList = TLV.decode(data.sublist(vtv.encodedLen + uvtv.encodedLen));
     if(tvTagList.tag.value != 0x5C) {
       throw EfParseError(
         "Invalid tag list object tag=${tvTagList.tag.value.hex()}, expected tag list object with tag=5C"

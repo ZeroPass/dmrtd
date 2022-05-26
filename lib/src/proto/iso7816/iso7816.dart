@@ -1,5 +1,5 @@
 // Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
-
+// ignore_for_file: camel_case_types, constant_identifier_names
 
 /// Definition of ISO/IEC 7816-4 Basic interindustry commands (BIC) classes
 class ISO7816_CLA {
@@ -11,7 +11,6 @@ class ISO7816_CLA {
   static const int COMMAND_CHAINING   = 0x10;
 }
 
-
 /// Definition of ISO/IEC 7816-4 BIC instructionş
 class ISO7816_INS {
   static const int GET_CHALLENGE           = 0x84; // changed from 0xB4
@@ -21,7 +20,6 @@ class ISO7816_INS {
   static const int READ_BINARY_EXT         = 0xB1; // read instruction when file chunk offset is larger than 32767 bytes
   static const int SELECT_FILE             = 0xA4;
 }
-
 
 /// Class defines P1 values of ISO/IEC 7816-4 SELECT FILE command
 /// ref: https://cardwerk.com/smart-card-standard-iso7816-4-section-6-basic-interindustry-commands/#table58

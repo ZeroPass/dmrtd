@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 class ComProviderError implements Exception {
   final String message;
   const ComProviderError([this.message = ""]);
+  @override
   String toString() => 'ComProviderError: $message';
 }
 

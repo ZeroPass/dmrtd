@@ -232,6 +232,7 @@ class DESedeCipher extends DESCipher {
 ///
 /// The [data] if [padData] is set to false should be padded to the nearest multiple of 8.
 /// When [padData] is true, the [data] is padded according to the ISO/IEC 9797-1, padding method 2.
+// ignore: non_constant_identifier_names
 Uint8List DESedeEncrypt({ required final Uint8List key, required final Uint8List iv, required final Uint8List data, bool padData = true}) {
   return DESedeCipher(key: key, iv: iv).encrypt(data, padData: padData);
 }
@@ -241,6 +242,7 @@ Uint8List DESedeEncrypt({ required final Uint8List key, required final Uint8List
 ///
 /// The [data] if [padData] is set to false should be padded to the nearest multiple of 8.
 /// When [padData] is true, the [data] is padded according to the ISO/IEC 9797-1, padding method 2.
+// ignore: non_constant_identifier_names
 Uint8List DESedeDecrypt({ required final Uint8List key, required final Uint8List iv, required final Uint8List edata, bool paddedData = true}) {
   return DESedeCipher(key: key, iv: iv).decrypt(edata, paddedData: paddedData);
 }

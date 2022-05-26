@@ -4,30 +4,31 @@ import 'package:dmrtd/extensions.dart';
 
 /// Class defines ISO/IEC 7816-4 response APDU
 class ResponseAPDU {
-    late StatusWord _sw;
-    Uint8List? _data;
+  late StatusWord _sw;
+  Uint8List? _data;
 
-    StatusWord get status => _sw;
-    Uint8List? get data => _data;
+  StatusWord get status => _sw;
+  Uint8List? get data => _data;
 
-    ResponseAPDU(this._sw, this._data);
+  ResponseAPDU(this._sw, this._data);
 
-    ResponseAPDU.fromBytes(final Uint8List apduBytes) {
-      if(apduBytes.length < 2) {
-        throw ArgumentError("Invalid raw response APDU length");
-      }
-
-      if(apduBytes.length > 2) {
-        _data = apduBytes.sublist(0, apduBytes.length - 2);
-      }
-
-      _sw = StatusWord.fromBytes(apduBytes, apduBytes.length - 2);
+  ResponseAPDU.fromBytes(final Uint8List apduBytes) {
+    if(apduBytes.length < 2) {
+      throw ArgumentError("Invalid raw response APDU length");
     }
 
-    Uint8List toBytes() => Uint8List.fromList((_data ?? Uint8List(0))  + _sw.toBytes());
-    String toString() => '$status data=${_data?.hex()}';
-}
+    if(apduBytes.length > 2) {
+      _data = apduBytes.sublist(0, apduBytes.length - 2);
+    }
 
+    _sw = StatusWord.fromBytes(apduBytes, apduBytes.length - 2);
+  }
+
+  Uint8List toBytes() => Uint8List.fromList((_data ?? Uint8List(0))  + _sw.toBytes());
+
+  @override
+  String toString() => '$status data=${_data?.hex()}';
+}
 
 /// Class represents trailer status bytes of ISO/IEC 7816-4 response APDU.
 class StatusWord {
@@ -118,8 +119,8 @@ class StatusWord {
   }
 
   @override
-  bool operator == (covariant StatusWord rhs) {
-    return sw1 == rhs.sw1 && sw2 == rhs.sw2;
+  bool operator == (covariant StatusWord other) {
+    return sw1 == other.sw1 && sw2 == other.sw2;
   }
 
   @override
@@ -129,44 +130,45 @@ class StatusWord {
     return Uint8List.fromList([sw1, sw2]);
   }
 
+  @override
   String toString() {
     return 'sw=${value.hex()}';
   }
 
   String description() {
-         if (this == noInformationGiven)               return "No information given";
-    else if (this == possibleCorruptedData)            return "Part of returned data my be corrupted";
-    else if (this == unexpectedEOF)                    return "End of file reached before reading Le bytes";
-    else if (this == selectedFileInvalidated)          return "Selected file invalidated";
-    else if (this == wrongFCIFormat)                   return "FCI not formatted according to 5.1.5";
-    else if (this == wrongLength)                      return "Wrong length (e.g. wrong Le field)";
-    else if (this == claFunctionNotSupported)          return "Functions in CLA not support";
-    else if (this == logicalChannelNotSupported)       return "Logical channel not supported";
-    else if (this == secureMessagingNotSupported)      return "Secure messaging not supported";
-    else if (this == commandNotAllowed)                return "Command not allowed";
-    else if (this == incompatibleFileStructureCommand) return "Command incompatible with file structure";
-    else if (this == securityStatusNotSatisfied)       return "Security status not satisfied";
-    else if (this == authenticationMethodBlocked)      return "Authentication method blocked";
-    else if (this == referencedDataInvalidated)        return "Referenced data invalidated";
-    else if (this == conditionsNotSatisfied)           return "Conditions of use not satisfied";
-    else if (this == commandNotAllowedNoEF)            return "Command not allowed (no current EF)";
-    else if (this == smDataMissing)                    return "Expected SM data objects missing"; // SM - Secure messaging
-    else if (this == smDataInvalid)                    return "SM data objects incorrect"; // SM - Secure messaging
-    else if (this == wrongParameters)                  return "Wrong parameter(s) P1-P2";
-    else if (this == invalidDataFieldParameters)       return "Incorrect parameters in the data field";
-    else if (this == notSupported)                     return "Function not supported";
-    else if (this == fileNotFound)                     return "File not found";
-    else if (this == recordNotFound)                   return "Record not found";
-    else if (this == notEnoughSpaceInFile)             return "Not enough memory space in the file";
-    else if (this == lcInconsistentWithTLV)            return "Lc inconsistent with TLV structure";
-    else if (this == incorrectParameters)              return "Incorrect parameters P1-P2";
-    else if (this == lcInconsistentWithParameters)     return "Lc inconsistent with P1-P2";
-    else if (this == referencedDataNotFound)           return "Referenced data not found";
-    else if (this == wrongParameters2)                 return "Wrong parameter(s) P1-P2";
-    else if (this == invalidInstructionCode)           return "Instruction code not supported or invalid";
-    else if (this == classNotSupported)                return "Class not supported";
-    else if (this == noPreciseDiagnostics)             return "No precise diagnosis";
-    else if (this == success)                          return "Success";
+         if (this == noInformationGiven)               { return "No information given";                         }
+    else if (this == possibleCorruptedData)            { return "Part of returned data my be corrupted";        }
+    else if (this == unexpectedEOF)                    { return "End of file reached before reading Le bytes";  }
+    else if (this == selectedFileInvalidated)          { return "Selected file invalidated";                    }
+    else if (this == wrongFCIFormat)                   { return "FCI not formatted according to 5.1.5";         }
+    else if (this == wrongLength)                      { return "Wrong length (e.g. wrong Le field)";           }
+    else if (this == claFunctionNotSupported)          { return "Functions in CLA not support";                 }
+    else if (this == logicalChannelNotSupported)       { return "Logical channel not supported";                }
+    else if (this == secureMessagingNotSupported)      { return "Secure messaging not supported";               }
+    else if (this == commandNotAllowed)                { return "Command not allowed";                          }
+    else if (this == incompatibleFileStructureCommand) { return "Command incompatible with file structure";     }
+    else if (this == securityStatusNotSatisfied)       { return "Security status not satisfied";                }
+    else if (this == authenticationMethodBlocked)      { return "Authentication method blocked";                }
+    else if (this == referencedDataInvalidated)        { return "Referenced data invalidated";                  }
+    else if (this == conditionsNotSatisfied)           { return "Conditions of use not satisfied";              }
+    else if (this == commandNotAllowedNoEF)            { return "Command not allowed (no current EF)";          }
+    else if (this == smDataMissing)                    { return "Expected SM data objects missing";             } // SM - Secure messaging
+    else if (this == smDataInvalid)                    { return "SM data objects incorrect";                    } // SM - Secure messaging
+    else if (this == wrongParameters)                  { return "Wrong parameter(s) P1-P2";                     }
+    else if (this == invalidDataFieldParameters)       { return "Incorrect parameters in the data field";       }
+    else if (this == notSupported)                     { return "Function not supported";                       }
+    else if (this == fileNotFound)                     { return "File not found";                               }
+    else if (this == recordNotFound)                   { return "Record not found";                             }
+    else if (this == notEnoughSpaceInFile)             { return "Not enough memory space in the file";          }
+    else if (this == lcInconsistentWithTLV)            { return "Lc inconsistent with TLV structure";           }
+    else if (this == incorrectParameters)              { return "Incorrect parameters P1-P2";                   }
+    else if (this == lcInconsistentWithParameters)     { return "Lc inconsistent with P1-P2";                   }
+    else if (this == referencedDataNotFound)           { return "Referenced data not found";                    }
+    else if (this == wrongParameters2)                 { return "Wrong parameter(s) P1-P2";                     }
+    else if (this == invalidInstructionCode)           { return "Instruction code not supported or invalid";    }
+    else if (this == classNotSupported)                { return "Class not supported";                          }
+    else if (this == noPreciseDiagnostics)             { return "No precise diagnosis";                         }
+    else if (this == success)                          { return "Success";                                      }
     else {
       if(sw1 == sw1WrongLengthWithExactLength) { // Wrong length (wrong Le field: 'XX' indicates the exact length).
         return "Wrong length (exact length: $sw2)";

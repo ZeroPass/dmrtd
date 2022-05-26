@@ -20,6 +20,7 @@ class MrtdApiError implements Exception {
   final String message;
   final StatusWord? code;
   const MrtdApiError(this.message, {this.code});
+  @override
   String toString() => "MRTDApiError: $message";
 }
 

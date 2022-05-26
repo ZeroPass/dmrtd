@@ -1,4 +1,6 @@
 // Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
+// ignore_for_file: constant_identifier_names
+
 import 'dart:typed_data';
 import 'dg.dart';
 import '../../crypto/aa_pubkey.dart';

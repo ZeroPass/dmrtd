@@ -1,10 +1,11 @@
 //  Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
+// ignore_for_file: constant_identifier_names
+
 import 'dart:typed_data';
 import 'des.dart';
 
 /// Class defines ISO/IEC 9797-1 MAC algorithm 3 and padding method 2.
 class ISO9797 {
-
   static const int macAlg3_DigestLen = DESCipher.blockSize;
   static const int macAlg3_Key1Len   = 16; // First possible Alg3 MAC key len is 16 bytes.
   static const int macAlg3_Key2Len   = 24; // Second possible Alg3 MAC key len is 16 bytes.

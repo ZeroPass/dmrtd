@@ -16,7 +16,7 @@ void main() {
     var efCom = EfCOM.fromBytes(tvEfCom);
     expect( efCom.toBytes()                    , tvEfCom  );
     expect( efCom.version                      , "0107"   );
-    expect( efCom.uincodeVersion               , "040000" );
+    expect( efCom.unicodeVersion               , "040000" );
     expect( efCom.dgTags.length                , 4        );
     expect( efCom.dgTags.contains(DgTag(0x61)) , true     );
     expect( efCom.dgTags.contains(DgTag(0x75)) , true     );
@@ -28,7 +28,7 @@ void main() {
     efCom = EfCOM.fromBytes(tvEfCom);
     expect( efCom.toBytes()                    , tvEfCom  );
     expect( efCom.version                      , "1599"   );
-    expect( efCom.uincodeVersion               , "040000" );
+    expect( efCom.unicodeVersion               , "040000" );
     expect( efCom.dgTags.length                , 4        );
     expect( efCom.dgTags.contains(DgTag(0x61)) , true     );
     expect( efCom.dgTags.contains(DgTag(0x75)) , true     );

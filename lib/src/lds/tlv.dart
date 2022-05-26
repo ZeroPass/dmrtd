@@ -37,6 +37,7 @@ class DecodedTL {
 class TLVError implements Exception {
   final String message;
   TLVError(this.message);
+  @override
   String toString() => message;
 }
 

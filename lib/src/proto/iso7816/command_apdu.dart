@@ -135,6 +135,7 @@ class CommandAPDU {
   }
 
   /// Returns string representation of command APDU
+  @override
   String toString() => 
     "C-APDU(CLA:${_cla.hex()} INS:${_ins.hex()} P1:${_p1.hex()} P2:${_p2.hex()} Le:$_ne Lc:${_data?.length ?? 0x00} Data:${_data?.hex()})";
 }

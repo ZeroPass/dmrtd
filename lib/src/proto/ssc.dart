@@ -11,7 +11,7 @@ import 'package:dmrtd/src/crypto/des.dart';
 /// SSC by definition is unsigned integer whose bit size
 /// is equal to the block size of block cipher.
 class SSC {
-  final bitSize;
+  final int bitSize;
   late BigInt _ssc;
 
   /// Constructs new [SSC] with [ssc] bytes.

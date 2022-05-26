@@ -1,4 +1,6 @@
 // Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
+// ignore_for_file: constant_identifier_names
+
 import 'package:crypto/crypto.dart';
 import 'package:fixnum/fixnum.dart';
 import 'dart:typed_data';
@@ -6,6 +8,7 @@ import 'dart:typed_data';
 
 /// Implements key derivation function as specified in ICAO 9303 p11 Section 9.7.1
 /// Key is derived by [hash] object using [keySeed] bytes and [counter] number.
+// ignore: non_constant_identifier_names
 Uint8List KDF(final Hash hash, final Uint8List keySeed, final Int32 counter) {
   Uint8List preimage = Uint8List(keySeed.length + 4);
   preimage.setRange(0, keySeed.length, keySeed);

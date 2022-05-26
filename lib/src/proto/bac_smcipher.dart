@@ -4,6 +4,7 @@ import 'iso7816/smcipher.dart';
 import '../crypto/des.dart';
 import '../crypto/iso9797.dart';
 
+// ignore: camel_case_types
 class BAC_SMCipher implements SMCipher {
   Uint8List encKey;
   Uint8List macKey;

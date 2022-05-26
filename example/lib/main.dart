@@ -1,5 +1,6 @@
 // Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
-import 'package:dmrtd/internal.dart';
+// ignore_for_file: prefer_adjacent_string_concatenation, prefer_interpolation_to_compose_strings
+
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -58,7 +59,7 @@ final Map<DgTag, String> dgTagToString = {
 
 String formatEfCom(final EfCOM efCom) {
   var str = "version: ${efCom.version}\n"
-            "unicode version: ${efCom.uincodeVersion}\n"
+            "unicode version: ${efCom.unicodeVersion}\n"
             "DG tags:";
 
   for(final t in efCom.dgTags) {
@@ -149,6 +150,7 @@ class MrtdEgApp extends StatelessWidget  {
 
 class MrtdHomePage extends StatefulWidget {
   @override
+  // ignore: library_private_types_in_public_api
   _MrtdHomePageState createState() => _MrtdHomePageState();
 }
 
@@ -166,7 +168,8 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
 
   MrtdData? _mrtdData;
 
-  NfcProvider _nfc = NfcProvider();
+  final NfcProvider _nfc = NfcProvider();
+  // ignore: unused_field
   late Timer _timerStateUpdater;
   final _scrollController = ScrollController();
 
@@ -257,7 +260,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
       try {
         mrtdData.cardAccess = await passport.readEfCardAccess();
       }
-      on PassportError catch (e) {
+      on PassportError {
         //if (e.code != StatusWord.fileNotFound) rethrow;
       }
 
@@ -266,7 +269,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
       try {
         mrtdData.cardSecurity = await passport.readEfCardSecurity();
       }
-      on PassportError catch (e) {
+      on PassportError {
         //if (e.code != StatusWord.fileNotFound) rethrow;
       }
 
@@ -442,68 +445,89 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
     List<Widget>  list = [];
     if (_mrtdData == null) return list;
 
-    if (_mrtdData!.cardAccess != null)
+    if (_mrtdData!.cardAccess != null) {
       list.add(_makeMrtdDataWidget(header: 'EF.CardAccess', collapsedText: '', dataText: _mrtdData!.cardAccess!.toBytes().hex()));
+    }
 
-    if (_mrtdData!.cardSecurity != null)
+    if (_mrtdData!.cardSecurity != null) {
       list.add(_makeMrtdDataWidget(header: 'EF.CardSecurity', collapsedText: '', dataText: _mrtdData!.cardSecurity!.toBytes().hex()));
+    }
 
-    if (_mrtdData!.sod != null)
+    if (_mrtdData!.sod != null) {
       list.add(_makeMrtdDataWidget(header: 'EF.SOD', collapsedText: '', dataText: _mrtdData!.sod!.toBytes().hex()));
+    }
 
-    if (_mrtdData!.com != null)
+    if (_mrtdData!.com != null) {
       list.add(_makeMrtdDataWidget(header: 'EF.COM', collapsedText: '', dataText: formatEfCom(_mrtdData!.com!)));
+    }
 
-    if (_mrtdData!.dg1 != null)
+    if (_mrtdData!.dg1 != null) {
       list.add(_makeMrtdDataWidget(header: 'EF.DG1', collapsedText: '', dataText: formatMRZ(_mrtdData!.dg1!.mrz)));
+    }
 
-    if (_mrtdData!.dg2 != null)
+    if (_mrtdData!.dg2 != null) {
       list.add(_makeMrtdDataWidget(header: 'EF.DG2', collapsedText: '', dataText: _mrtdData!.dg2!.toBytes().hex()));
+    }
 
-    if (_mrtdData!.dg3 != null)
+    if (_mrtdData!.dg3 != null) {
       list.add(_makeMrtdDataWidget(header: 'EF.DG3', collapsedText: '', dataText: _mrtdData!.dg3!.toBytes().hex()));
+    }
 
-    if (_mrtdData!.dg4 != null)
+    if (_mrtdData!.dg4 != null) {
       list.add(_makeMrtdDataWidget(header: 'EF.DG4', collapsedText: '', dataText: _mrtdData!.dg4!.toBytes().hex()));
+    }
 
-    if (_mrtdData!.dg5 != null)
+    if (_mrtdData!.dg5 != null) {
       list.add(_makeMrtdDataWidget(header: 'EF.DG5', collapsedText: '', dataText: _mrtdData!.dg5!.toBytes().hex()));
+    }
 
-    if (_mrtdData!.dg6 != null)
+    if (_mrtdData!.dg6 != null) {
       list.add(_makeMrtdDataWidget(header: 'EF.DG6', collapsedText: '', dataText: _mrtdData!.dg6!.toBytes().hex()));
+    }
 
-    if (_mrtdData!.dg7 != null)
+    if (_mrtdData!.dg7 != null) {
       list.add(_makeMrtdDataWidget(header: 'EF.DG7', collapsedText: '', dataText: _mrtdData!.dg7!.toBytes().hex()));
+    }
 
-    if (_mrtdData!.dg8 != null)
+    if (_mrtdData!.dg8 != null) {
       list.add(_makeMrtdDataWidget(header: 'EF.DG8', collapsedText: '', dataText: _mrtdData!.dg8!.toBytes().hex()));
+    }
 
-    if (_mrtdData!.dg9 != null)
+    if (_mrtdData!.dg9 != null) {
       list.add(_makeMrtdDataWidget(header: 'EF.DG9', collapsedText: '', dataText: _mrtdData!.dg9!.toBytes().hex()));
+    }
 
-    if (_mrtdData!.dg10 != null)
+    if (_mrtdData!.dg10 != null) {
       list.add(_makeMrtdDataWidget(header: 'EF.DG10', collapsedText: '', dataText: _mrtdData!.dg10!.toBytes().hex()));
+    }
 
-    if (_mrtdData!.dg11 != null)
+    if (_mrtdData!.dg11 != null) {
       list.add(_makeMrtdDataWidget(header: 'EF.DG11', collapsedText: '', dataText: _mrtdData!.dg11!.toBytes().hex()));
+    }
 
-    if (_mrtdData!.dg12 != null)
+    if (_mrtdData!.dg12 != null) {
       list.add(_makeMrtdDataWidget(header: 'EF.DG12', collapsedText: '', dataText: _mrtdData!.dg12!.toBytes().hex()));
+    }
 
-    if (_mrtdData!.dg13 != null)
+    if (_mrtdData!.dg13 != null) {
       list.add(_makeMrtdDataWidget(header: 'EF.DG13', collapsedText: '', dataText: _mrtdData!.dg13!.toBytes().hex()));
+    }
 
-    if (_mrtdData!.dg14 != null)
+    if (_mrtdData!.dg14 != null) {
       list.add(_makeMrtdDataWidget(header: 'EF.DG14', collapsedText: '', dataText: _mrtdData!.dg14!.toBytes().hex()));
+    }
 
-    if (_mrtdData!.dg15 != null)
+    if (_mrtdData!.dg15 != null) {
       list.add(_makeMrtdDataWidget(header: 'EF.DG15', collapsedText: '', dataText: _mrtdData!.dg15!.toBytes().hex()));
+    }
 
-    if (_mrtdData!.aaSig != null)
+    if (_mrtdData!.aaSig != null) {
       list.add(_makeMrtdDataWidget(header: 'Active Authentication signature', collapsedText: '', dataText: _mrtdData!.aaSig!.hex()));
+    }
 
-    if (_mrtdData!.dg16 != null)
+    if (_mrtdData!.dg16 != null) {
       list.add(_makeMrtdDataWidget(header: 'EF.DG16', collapsedText: '', dataText: _mrtdData!.dg16!.toBytes().hex()));
+    }
   
     return list;
   }
@@ -529,7 +553,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
                     style: TextStyle(fontSize: 18.0 , fontWeight: FontWeight.bold)
                   ),
                   SizedBox(width: 4),
-                  Text('${_isNfcAvailable ? "Yes" : "No"}',
+                  Text(_isNfcAvailable ? "Yes" : "No",
                     style: TextStyle(fontSize: 18.0)
                   )
                 ]),
@@ -620,17 +644,17 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
                 return null;
               },
               onTap: () async {
-                FocusScope.of(context).requestFocus(new FocusNode());
+                FocusScope.of(context).requestFocus(FocusNode());
                 // Can pick date which dates 15 years back or more
                 final now = DateTime.now();
                 final firstDate = DateTime(now.year - 90, now.month, now.day);
                 final lastDate  = DateTime(now.year - 15, now.month, now.day);
                 final initDate  = _getDOBDate();
                 final date = await _pickDate(context,
-                  firstDate, initDate != null ? initDate : lastDate, lastDate
+                  firstDate, initDate ?? lastDate, lastDate
                 );
 
-                FocusScope.of(context).requestFocus(new FocusNode());
+                FocusScope.of(context).requestFocus(FocusNode());
                 if(date != null) {
                   _dob.text = date;
                 }
@@ -653,17 +677,17 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
                 return null;
               },
               onTap: () async {
-                FocusScope.of(context).requestFocus(new FocusNode());
+                FocusScope.of(context).requestFocus(FocusNode());
                 // Can pick date from tomorrow and up to 10 years
                 final now = DateTime.now();
                 final firstDate = DateTime(now.year, now.month, now.day + 1);
                 final lastDate  = DateTime(now.year + 10, now.month + 6, now.day);
                 final initDate  = _getDOEDate();
                 final date = await _pickDate(context, firstDate,
-                  initDate != null ? initDate : firstDate, lastDate
+                  initDate ?? firstDate, lastDate
                 );
 
-                FocusScope.of(context).requestFocus(new FocusNode());
+                FocusScope.of(context).requestFocus(FocusNode());
                 if(date != null) {
                   _doe.text = date;
                 }

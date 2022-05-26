@@ -11,6 +11,7 @@ import 'smcipher.dart';
 class SMError implements Exception {
   final String message;
   SMError(this.message);
+  @override
   String toString() => "SMError: $message";
 }
 

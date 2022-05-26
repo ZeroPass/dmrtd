@@ -10,6 +10,7 @@ enum MRZVersion { td1, td2, td3 }
 class MRZParseError implements Exception {
   final String message;
   MRZParseError(this.message);
+  @override
   String toString() => message;
 }
 
@@ -212,7 +213,7 @@ class MRZ {
   }
 
   void _setNames(List<String> nameIds) {
-    if (nameIds.length > 0) {
+    if (nameIds.isNotEmpty) {
       lastName = nameIds[0];
     }
     if (nameIds.length > 1) {
@@ -245,10 +246,6 @@ class MRZ {
 
   static DateTime _readDate(InputStream istream) {
     return _read(istream, 6).parseDateYYMMDD();
-  }
-
-  static int _readInt(InputStream istream, int maxLength ) {
-    return int.parse(_read(istream, maxLength));
   }
 
   static int _readCD(InputStream istream) {

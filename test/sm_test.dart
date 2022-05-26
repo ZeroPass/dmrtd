@@ -34,6 +34,7 @@ void testProtecting(final CommandAPDU cmd, final SMCipher cipher, final SSC ssc,
   final N = sm.generateN(M: M);
   expect( N, tvN );
 
+  // ignore: non_constant_identifier_names
   final CC = cipher.mac(N);
   expect( CC, tvCC );
 
@@ -66,6 +67,7 @@ void testUprotecting(final ResponseAPDU rapdu, final SMCipher cipher, final SSC 
   final K = sm.generateK(data: rapdu.data!.sublist(0, do8EStart));
   expect( K , tvK );
 
+  // ignore: non_constant_identifier_names
   final CC = cipher.mac(K);
   expect( CC , tvCC );
 

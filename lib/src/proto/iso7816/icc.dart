@@ -17,6 +17,7 @@ class ICCError implements Exception {
   final StatusWord sw;
   final Uint8List? data;
   ICCError(this.message, this.sw, this.data);
+  @override
   String toString() => 'ICC Error: $message $sw';
 }
 
@@ -46,7 +47,7 @@ class ICC {
   /// Sends EXTERNAL AUTHENTICATE command to ICC.
   /// ICC should return it's computed authentication data.
   /// Can throw [ICCError] or [ComProviderError].
-  Future<Uint8List> externalAuthenticate({ required Uint8List data, required int ne, int cla: ISO7816_CLA.NO_SM }) async {
+  Future<Uint8List> externalAuthenticate({ required Uint8List data, required int ne, int cla = ISO7816_CLA.NO_SM }) async {
     final rapdu = await _transceive(
       CommandAPDU(cla: cla, ins: ISO7816_INS.EXTERNAL_AUTHENTICATE, p1: 0x00, p2: 0x00, data: data, ne: ne)
     );
@@ -59,7 +60,7 @@ class ICC {
   /// Sends INTERNAL AUTHENTICATE command to ICC.
   /// ICC should return it's computed authentication data.
   /// Can throw [ICCError] or [ComProviderError].
-  Future<Uint8List> internalAuthenticate({ required Uint8List data, int p1 = 0x00, int p2 = 0x00, required int ne, int cla: ISO7816_CLA.NO_SM }) async {
+  Future<Uint8List> internalAuthenticate({ required Uint8List data, int p1 = 0x00, int p2 = 0x00, required int ne, int cla = ISO7816_CLA.NO_SM }) async {
     final rapdu = await _transceive(
       CommandAPDU(cla: cla, ins: ISO7816_INS.INTERNAL_AUTHENTICATE, p1: p1, p2: p2, data: data, ne: ne)
     );
@@ -72,7 +73,7 @@ class ICC {
   /// Sends GET CHALLENGE command to ICC and ICC should return
   /// [challengeLength] long challenge.
   /// Can throw [ICCError] or [ComProviderError].
-  Future<Uint8List> getChallenge({ required int challengeLength, int cla: ISO7816_CLA.NO_SM }) async {
+  Future<Uint8List> getChallenge({ required int challengeLength, int cla = ISO7816_CLA.NO_SM }) async {
     final rapdu = await _transceive(
       CommandAPDU(cla: cla, ins: ISO7816_INS.GET_CHALLENGE, p1: 0x00, p2: 0x00, ne: challengeLength)
     );
@@ -88,7 +89,7 @@ class ICC {
   /// Can throw [ICCError] if R-APDU returns no data and error status or [ComProviderError].
   ///
   /// Note: Use [readBinaryExt] to read data chunks at offsets greater than 32 767.
-  Future<ResponseAPDU> readBinary({ required int offset, required int ne, int cla: ISO7816_CLA.NO_SM }) async {
+  Future<ResponseAPDU> readBinary({ required int offset, required int ne, int cla = ISO7816_CLA.NO_SM }) async {
     if(offset > 32766) {
       throw ArgumentError.value(offset, null, "Max read binary offset can be 32 767 bytes");
     }
@@ -107,7 +108,7 @@ class ICC {
   /// File is identified by [sfi].
   /// Max [offset] can be 255.
   /// Can throw [ICCError] if R-APDU returns no data and error status or [ComProviderError].
-  Future<ResponseAPDU> readBinaryBySFI({ required int sfi, required int offset, required int ne, int cla: ISO7816_CLA.NO_SM }) async {
+  Future<ResponseAPDU> readBinaryBySFI({ required int sfi, required int offset, required int ne, int cla = ISO7816_CLA.NO_SM }) async {
     if(offset >  255) {
       throw ArgumentError.value(offset, null, "readBinaryBySFI: Max offset can be 256 bytes");
     }
@@ -124,7 +125,7 @@ class ICC {
   /// It returns [ne] long chunk of data at [offset].
   /// [offset] can be greater than 32 767.
   /// Can throw [ICCError] if R-APDU returns no data and error status or [ComProviderError].
-  Future<ResponseAPDU> readBinaryExt({ required int offset, required int ne, int cla: ISO7816_CLA.NO_SM }) async {
+  Future<ResponseAPDU> readBinaryExt({ required int offset, required int ne, int cla = ISO7816_CLA.NO_SM }) async {
     // Returned data will be encoded in BER-TLV with tag 0x53.
     // We add additional bytes to ne for this extra data.
     final enNeLen  = TLV.encodeLength(ne).length;
@@ -149,7 +150,7 @@ class ICC {
 
   /// Sends SELECT FILE command to ICC.
   /// Can throw [ICCError] or [ComProviderError].
-  Future<Uint8List?> selectFile({ required int p1, required int p2, int cla: ISO7816_CLA.NO_SM, Uint8List? data, int ne = 0 }) async {
+  Future<Uint8List?> selectFile({ required int p1, required int p2, int cla = ISO7816_CLA.NO_SM, Uint8List? data, int ne = 0 }) async {
     final rapdu = await _transceive(
       CommandAPDU(cla: cla, ins: ISO7816_INS.SELECT_FILE, p1: p1, p2: p2, data: data, ne: ne)
     );
@@ -162,31 +163,31 @@ class ICC {
   /// Selects MF, DF or EF by file ID.
   /// If [fileId] is null, then MF is selected.
   /// Can throw [ICCError] or [ComProviderError].
-  Future<Uint8List?> selectFileById({ required Uint8List fileId, int p2 = 0, int cla: ISO7816_CLA.NO_SM, int ne = 0 }) async {
+  Future<Uint8List?> selectFileById({ required Uint8List fileId, int p2 = 0, int cla = ISO7816_CLA.NO_SM, int ne = 0 }) async {
     return await selectFile(cla: cla, p1: ISO97816_SelectFileP1.byID, p2: p2, data: fileId, ne: ne);
   }
 
   /// Selects child DF by [childDF] ID.
   /// Can throw [ICCError] or [ComProviderError].
-  Future<Uint8List?> selectChildDF({ required Uint8List childDF, int p2 = 0, int cla: ISO7816_CLA.NO_SM, int ne = 0 }) async {
+  Future<Uint8List?> selectChildDF({ required Uint8List childDF, int p2 = 0, int cla = ISO7816_CLA.NO_SM, int ne = 0 }) async {
     return await selectFile(cla: cla, p1: ISO97816_SelectFileP1.byChildDFID, p2: p2, data: childDF, ne: ne);
   }
 
   /// Selects EF under current DF by [efId].
   /// Can throw [ICCError] or [ComProviderError].
-  Future<Uint8List?> selectEF({ required Uint8List efId, int p2 = 0, int cla: ISO7816_CLA.NO_SM, int ne = 0 }) async {
+  Future<Uint8List?> selectEF({ required Uint8List efId, int p2 = 0, int cla = ISO7816_CLA.NO_SM, int ne = 0 }) async {
     return await selectFile(cla: cla, p1: ISO97816_SelectFileP1.byEFID, p2: p2, data: efId, ne: ne);
   }
 
   /// Selects parent DF under current DF.
   /// Can throw [ICCError] or [ComProviderError].
-  Future<Uint8List?> selectParentDF({ int p2 = 0, int cla: ISO7816_CLA.NO_SM, int ne = 0 }) async {
+  Future<Uint8List?> selectParentDF({ int p2 = 0, int cla = ISO7816_CLA.NO_SM, int ne = 0 }) async {
     return await selectFile(cla: cla, p1: ISO97816_SelectFileP1.parentDF, p2: p2, ne: ne);
   }
 
   /// Selects file by DF name
   /// Can throw [ICCError] or [ComProviderError].
-  Future<Uint8List?> selectFileByDFName({ required Uint8List dfName, int p2 = 0, int cla: ISO7816_CLA.NO_SM, int ne = 0 }) async {
+  Future<Uint8List?> selectFileByDFName({ required Uint8List dfName, int p2 = 0, int cla = ISO7816_CLA.NO_SM, int ne = 0 }) async {
     return await selectFile(cla: cla, p1: ISO97816_SelectFileP1.byDFName, p2: p2, data: dfName, ne: ne);
   }
 
@@ -194,7 +195,7 @@ class ICC {
   /// If [fromMF] is true, then file is selected by [path] starting from MF, otherwise from currentDF.
   /// [path] must not include MF/Current DF ID.
   /// Can throw [ICCError] or [ComProviderError].
-  Future<Uint8List?> selectFileByPath({ required Uint8List path, required bool fromMF, int p2 = 0, int cla: ISO7816_CLA.NO_SM, int ne = 0 }) async {
+  Future<Uint8List?> selectFileByPath({ required Uint8List path, required bool fromMF, int p2 = 0, int cla = ISO7816_CLA.NO_SM, int ne = 0 }) async {
     final p1 = fromMF ? ISO97816_SelectFileP1.byPathFromMF : ISO97816_SelectFileP1.byPath;
     return await selectFile(cla: cla, p1: p1, p2: p2, data: path, ne: ne);
   }

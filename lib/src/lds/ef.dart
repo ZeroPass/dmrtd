@@ -5,6 +5,7 @@ import 'package:meta/meta.dart';
 class EfParseError implements Exception {
   final String message;
   EfParseError(this.message);
+  @override
   String toString() => message;
 }
 

@@ -11,8 +11,8 @@ class DgTag {
   const DgTag(this.value);
 
   @override
-  bool operator == (covariant DgTag rhs) {
-    return value == rhs.value;
+  bool operator == (covariant DgTag other) {
+    return value == other.value;
   }
 
   @override
@@ -25,8 +25,8 @@ abstract class DataGroup extends ElementaryFile {
   DataGroup.fromBytes(Uint8List data) : super.fromBytes(data);
 
   @override
-  void parse(Uint8List data) {
-    final tlv = TLV.fromBytes(data);
+  void parse(Uint8List content) {
+    final tlv = TLV.fromBytes(content);
     if(tlv.tag != tag) {
       throw EfParseError(
         "Invalid tag=${tlv.tag.hex()}, expected tag=${tag.hex()}"
