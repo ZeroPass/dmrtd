@@ -1,4 +1,4 @@
-// Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
+// Created by Crt Vavros, copyright © 2022 ZeroPass. All rights reserved.
 // ignore_for_file: camel_case_types, constant_identifier_names
 
 /// Definition of ISO/IEC 7816-4 Basic interindustry commands (BIC) classes

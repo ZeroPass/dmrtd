@@ -1,4 +1,4 @@
-// Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
+// Created by Crt Vavros, copyright © 2022 ZeroPass. All rights reserved.
 export 'src/crypto/crypto_utils.dart';
 export 'src/crypto/des.dart';
 export 'src/crypto/iso9797.dart';

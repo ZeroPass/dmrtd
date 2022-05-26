@@ -1,4 +1,4 @@
-// Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
+// Created by Crt Vavros, copyright © 2022 ZeroPass. All rights reserved.
 // ignore_for_file: prefer_adjacent_string_concatenation, prefer_interpolation_to_compose_strings
 
 import 'package:expandable/expandable.dart';

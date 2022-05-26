@@ -1,4 +1,4 @@
-// Created by Crt Vavros, copyright © 2021 ZeroPass. All rights reserved.
+// Created by Crt Vavros, copyright © 2022 ZeroPass. All rights reserved.
 import 'dart:typed_data';
 import '../utils.dart';
 
