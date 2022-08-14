@@ -9,6 +9,8 @@ import 'package:dmrtd/extensions.dart';
 
 import 'dg.dart';
 
+enum PhotoType { jpeg, jpeg2000 }
+
 class EfDG2 extends DataGroup {
   static const FID = 0x0102;
   static const SFI = 0x02;
@@ -33,7 +35,13 @@ class EfDG2 extends DataGroup {
   int get tag => TAG.value;
 
   Uint8List? photoData;
-  int? photoDataType;
+  int? _photoDataType;
+
+  PhotoType? get photoType {
+    if (_photoDataType == null) return null;
+
+    return _photoDataType == 0 ? PhotoType.jpeg : PhotoType.jpeg2000;
+  }
 
   @override
   void parse(Uint8List content) {
@@ -160,7 +168,7 @@ class EfDG2 extends DataGroup {
     // faceImageType = binToInt(data[offset..<offset+1])
     offset += 1;
     // imageDataType = binToInt(data[offset..<offset+1])
-    photoDataType =
+    _photoDataType =
         data.sublist(offset, offset + 1).buffer.asByteData().getInt8(0);
     offset += 1;
     // imageWidth = binToInt(data[offset..<offset+2])
