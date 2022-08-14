@@ -94,7 +94,7 @@ class EfDG12 extends DataGroup {
           _issuingAuthority = utf8.decode(uvtv.value);
           break;
         case DATE_OF_ISSUE_TAG:
-          _dateOfIssue = DateTime.parse(String.fromCharCodes(uvtv.value));
+          _dateOfIssue = String.fromCharCodes(uvtv.value).parseDate();
           break;
       }
     }
