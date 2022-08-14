@@ -33,6 +33,7 @@ class EfDG2 extends DataGroup {
   int get tag => TAG.value;
 
   Uint8List? photoData;
+  int? photoDataType;
 
   @override
   void parse(Uint8List content) {
@@ -159,6 +160,8 @@ class EfDG2 extends DataGroup {
     // faceImageType = binToInt(data[offset..<offset+1])
     offset += 1;
     // imageDataType = binToInt(data[offset..<offset+1])
+    photoDataType =
+        data.sublist(offset, offset + 1).buffer.asByteData().getInt8(0);
     offset += 1;
     // imageWidth = binToInt(data[offset..<offset+2])
     offset += 2;
@@ -174,6 +177,7 @@ class EfDG2 extends DataGroup {
     offset += 2;
 
     photoData = sbh.first.value.sublist(offset);
+
     // final image = TLV.decode(photoData);
 
     // var imageDataHex = photoData.hex();
