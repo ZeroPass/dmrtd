@@ -38,11 +38,6 @@ class EfDG11 extends DataGroup {
   static const OTHER_VALID_TD_NUMBERS_TAG = 0x5F17;
   static const CUSTODY_INFORMATION_TAG = 0x5F18;
 
-  // 5F0F is always used inside A0 constructed object
-  static const CONTENT_SPECIFIC_CONSTRUCTED_TAG = 0xA0;
-
-  // Used in A0 constructed object to indicate single byte count of simple objects
-  static const COUNT_TAG = 0x02;
   static const TAG_LIST_TAG = 0x5c;
 
   String? _nameOfHolder;
