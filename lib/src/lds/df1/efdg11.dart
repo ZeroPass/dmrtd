@@ -43,6 +43,7 @@ class EfDG11 extends DataGroup {
 
   // Used in A0 constructed object to indicate single byte count of simple objects
   static const COUNT_TAG = 0x02;
+  static const TAG_LIST_TAG = 0x5c;
 
   String? _nameOfHolder;
   final _otherNames = <String>[];
@@ -93,7 +94,7 @@ class EfDG11 extends DataGroup {
 
     final data = tlv.value;
     final tagListTag = TLV.decode(data);
-    if (tagListTag.tag.value != 0x5c) {
+    if (tagListTag.tag.value != TAG_LIST_TAG) {
       throw EfParseError(
           "Invalid version object tag=${tagListTag.tag.value.hex()}, expected version object with tag=5c");
     }
