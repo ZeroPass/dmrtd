@@ -96,8 +96,6 @@ class EfDG11 extends DataGroup {
     var tagListLength = tlv.value.length;
     int tagListBytesRead = tagListTag.encodedLen;
 
-    // int expectedTagCount = (tagListLength / 2).toInt();
-
     while (tagListBytesRead < tagListLength) {
       final uvtv = TLV.decode(data.sublist(tagListBytesRead));
       tagListBytesRead += uvtv.encodedLen;
