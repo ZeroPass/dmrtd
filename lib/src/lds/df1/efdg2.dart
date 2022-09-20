@@ -9,7 +9,7 @@ import 'package:dmrtd/extensions.dart';
 
 import 'dg.dart';
 
-enum PhotoType { jpeg, jpeg2000 }
+enum ImageType { jpeg, jpeg2000 }
 
 class EfDG2 extends DataGroup {
   static const FID = 0x0102;
@@ -20,6 +20,9 @@ class EfDG2 extends DataGroup {
   static const BIOMETRIC_INFORMATION_TEMPLATE_TAG = 0x7F60;
 
   static const BIOMETRIC_HEADER_TEMPLATE_BASE_TAG = 0xA1;
+
+  static const BIOMETRIC_DATA_BLOCK_TAG = 0x5F2E;
+  static const BIOMETRIC_DATA_BLOCK_CONSTRUCTED_TAG = 0x7F2E;
 
   static const SMT_TAG = 0x7D;
 
@@ -34,13 +37,33 @@ class EfDG2 extends DataGroup {
   @override
   int get tag => TAG.value;
 
-  Uint8List? photoData;
-  int? _photoDataType;
+  late int versionNumber;
+  late int lengthOfRecord;
+  late int numberOfFacialImages;
+  late int facialRecordDataLength;
+  late int nrFeaturePoints;
+  late int gender;
+  late int eyeColor;
+  late int hairColor;
+  late int featureMask;
+  late int expression;
+  late int poseAngle;
+  late int poseAngleUncertainty;
+  late int faceImageType;
+  late int imageWidth;
+  late int imageHeight;
+  late int imageColorSpace;
+  late int sourceType;
+  late int deviceType;
+  late int quality;
 
-  PhotoType? get photoType {
-    if (_photoDataType == null) return null;
+  Uint8List? imageData;
+  int? _imageDataType;
 
-    return _photoDataType == 0 ? PhotoType.jpeg : PhotoType.jpeg2000;
+  ImageType? get imageType {
+    if (_imageDataType == null) return null;
+
+    return _imageDataType == 0 ? ImageType.jpeg : ImageType.jpeg2000;
   }
 
   @override
@@ -69,11 +92,11 @@ class EfDG2 extends DataGroup {
     int bitCount = (bict.value[0] & 0xFF);
 
     for (var i = 0; i < bitCount; i++) {
-      _readBit(bigt.value.sublist(bict.encodedLen), i);
+      _readBIT(bigt.value.sublist(bict.encodedLen), i);
     }
   }
 
-  _readBit(Uint8List stream, int index) {
+  _readBIT(Uint8List stream, int index) {
     final tvl = TLV.decode(stream);
 
     if (tvl.tag.value != BIOMETRIC_INFORMATION_TEMPLATE_TAG) {
@@ -88,16 +111,21 @@ class EfDG2 extends DataGroup {
     } else if ((bht.tag.value & 0xA0) == 0xA0) {
       var sbh = _readBHT(tvl.value);
 
-      var bdb = _decodeSMTValue();
-
-      var faceInfo = _readBiometricDataBlock(sbh);
+      _readBiometricDataBlock(sbh);
     }
   }
 
+  //TODO Reads a biometric information template protected with secure messaging.
   _readStaticallyProtectedBIT() {}
 
   List<DecodedTV> _readBHT(Uint8List stream) {
     final bht = TLV.decode(stream);
+
+    if (bht.tag.value != BIOMETRIC_HEADER_TEMPLATE_BASE_TAG) {
+      throw EfParseError(
+          "Invalid object tag=${bht.tag.value.hex()}, expected tag=${BIOMETRIC_INFORMATION_TEMPLATE_TAG}");
+    }
+
     int bhtLength = stream.length;
     int bytesRead = bht.encodedLen;
     var elements = <DecodedTV>[];
@@ -108,56 +136,68 @@ class EfDG2 extends DataGroup {
     }
 
     return elements;
-    // const expectedBHTTag =
-    //     (BIOMETRIC_HEADER_TEMPLATE_BASE_TAG /* + index */) & 0xFF;
-    // if (tvl.tag.value != expectedBHTTag) {
-    //   throw EfParseError(
-    //       "Invalid object tag=${tvl.tag.value.hex()}, expected tag=${BIOMETRIC_INFORMATION_TEMPLATE_TAG}");
-    // }
-
-    // var bht = TLV.decode(tvl.value);
   }
 
-  _decodeSMTValue() {}
-
   _readBiometricDataBlock(List<DecodedTV> sbh) {
-    final tlv = TLV.decode(sbh.first.value);
+    var firstBlock = sbh.first;
+    if (firstBlock.tag.value != BIOMETRIC_DATA_BLOCK_TAG &&
+        firstBlock.tag.value != BIOMETRIC_DATA_BLOCK_CONSTRUCTED_TAG) {
+      throw EfParseError(
+          "Invalid object tag=${firstBlock.tag.value.hex()}, expected tag=$BIOMETRIC_DATA_BLOCK_TAG or $BIOMETRIC_DATA_BLOCK_CONSTRUCTED_TAG ");
+    }
 
-    var data = sbh.first.value;
-
+    var data = firstBlock.value;
     if (data[0] != 0x46 &&
         data[1] != 0x41 &&
         data[2] != 0x43 &&
         data[3] != 0x00) {
-      throw EfParseError("biometric data block is invalid");
+      throw EfParseError("Biometric data block is invalid");
     }
 
     var offset = 4;
-    // versionNumber = binToInt(data[offset..<offset+4])
+
+    versionNumber = _extractContent(data, start: offset, end: offset + 4);
+
+    if (versionNumber != 0x30313000) {
+      throw EfParseError("Version of Biometric data is not valid");
+    }
+
     offset += 4;
-    // lengthOfRecord = binToInt(data[offset..<offset+4])
+
+    lengthOfRecord = _extractContent(data, start: offset, end: offset + 4);
     offset += 4;
-    // numberOfFacialImages = binToInt(data[offset..<offset+2])
+
+    numberOfFacialImages =
+        _extractContent(data, start: offset, end: offset + 2);
     offset += 2;
 
-    // facialRecordDataLength = binToInt(data[offset..<offset+4])
+    facialRecordDataLength =
+        _extractContent(data, start: offset, end: offset + 4);
     offset += 4;
-    var nrFeaturePoints =
-        data.sublist(offset, offset + 2).buffer.asByteData().getInt16(0);
+
+    nrFeaturePoints = _extractContent(data, start: offset, end: offset + 2);
     offset += 2;
-    // gender = binToInt(data[offset..<offset+1])
+
+    gender = _extractContent(data, start: offset, end: offset + 1);
     offset += 1;
-    // eyeColor = binToInt(data[offset..<offset+1])
+
+    eyeColor = _extractContent(data, start: offset, end: offset + 1);
     offset += 1;
-    // hairColor = binToInt(data[offset..<offset+1])
+
+    hairColor = _extractContent(data, start: offset, end: offset + 1);
     offset += 1;
-    // featureMask = binToInt(data[offset..<offset+3])
+
+    featureMask = _extractContent(data, start: offset, end: offset + 3);
     offset += 3;
-    // expression = binToInt(data[offset..<offset+2])
+
+    expression = _extractContent(data, start: offset, end: offset + 2);
     offset += 2;
-    // poseAngle = binToInt(data[offset..<offset+3])
+
+    poseAngle = _extractContent(data, start: offset, end: offset + 3);
     offset += 3;
-    // poseAngleUncertainty = binToInt(data[offset..<offset+3])
+
+    poseAngleUncertainty =
+        _extractContent(data, start: offset, end: offset + 3);
     offset += 3;
 
     // Features (not handled). There shouldn't be any but if for some reason there were,
@@ -165,30 +205,39 @@ class EfDG2 extends DataGroup {
     // The Feature block is 8 bytes
     offset += nrFeaturePoints * 8;
 
-    // faceImageType = binToInt(data[offset..<offset+1])
+    faceImageType = _extractContent(data, start: offset, end: offset + 1);
     offset += 1;
-    // imageDataType = binToInt(data[offset..<offset+1])
-    _photoDataType =
-        data.sublist(offset, offset + 1).buffer.asByteData().getInt8(0);
+
+    _imageDataType = _extractContent(data, start: offset, end: offset + 1);
     offset += 1;
-    // imageWidth = binToInt(data[offset..<offset+2])
-    offset += 2;
-    // imageHeight = binToInt(data[offset..<offset+2])
-    offset += 2;
-    // imageColorSpace = binToInt(data[offset..<offset+1])
-    offset += 1;
-    // sourceType = binToInt(data[offset..<offset+1])
-    offset += 1;
-    // deviceType = binToInt(data[offset..<offset+2])
-    offset += 2;
-    // quality = binToInt(data[offset..<offset+2])
+
+    imageWidth = _extractContent(data, start: offset, end: offset + 2);
     offset += 2;
 
-    photoData = sbh.first.value.sublist(offset);
+    imageHeight = _extractContent(data, start: offset, end: offset + 2);
+    offset += 2;
 
-    // final image = TLV.decode(photoData);
+    imageColorSpace = _extractContent(data, start: offset, end: offset + 1);
+    offset += 1;
 
-    // var imageDataHex = photoData.hex();
-    // final imageHex = image.value.hex();
+    sourceType = _extractContent(data, start: offset, end: offset + 1);
+    offset += 1;
+
+    deviceType = _extractContent(data, start: offset, end: offset + 2);
+    offset += 2;
+
+    quality = _extractContent(data, start: offset, end: offset + 2);
+    offset += 2;
+
+    imageData = sbh.first.value.sublist(offset);
+  }
+
+  int _extractContent(Uint8List data, {required int start, required int end}) {
+    if (end - start == 1) {
+      return data.sublist(start, end).buffer.asByteData().getInt8(0);
+    } else if (end - start < 4)
+      return data.sublist(start, end).buffer.asByteData().getInt16(0);
+    // else if(end - start == 4)
+    return data.sublist(start, end).buffer.asByteData().getInt32(0);
   }
 }
