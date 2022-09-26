@@ -31,10 +31,23 @@ class MRZ {
   late String _docNum;
   late String _optData;
   String? _optData2;
-  late String rawContent;
 
-  MRZ(Uint8List encodedMRZ) {
+  final Uint8List _encoded;
+
+  MRZ(Uint8List encodedMRZ) : _encoded = encodedMRZ {
     _parse(encodedMRZ);
+  }
+
+  Uint8List toBytes() {
+    return _encoded;
+  }
+
+  String toEncodedString() {
+    var data = toBytes();
+    final inputStream = InputStream(data);
+    var result = _read(inputStream, data.length);
+
+    return result;
   }
 
   static int calculateCheckDigit(String checkString) {
@@ -110,8 +123,6 @@ class MRZ {
     } else {
       throw MRZParseError("Invalid MRZ data");
     }
-    istream.reset();
-    rawContent = _read(istream, data.length);
   }
 
   void _parseTD1(InputStream istream) {
