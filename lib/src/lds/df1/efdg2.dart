@@ -25,6 +25,7 @@ class EfDG2 extends DataGroup {
   static const BIOMETRIC_DATA_BLOCK_CONSTRUCTED_TAG = 0x7F2E;
 
   static const SMT_TAG = 0x7D;
+  static const VERSION_NUMBER = 0x30313000;
 
   EfDG2.fromBytes(Uint8List data) : super.fromBytes(data);
 
@@ -158,7 +159,7 @@ class EfDG2 extends DataGroup {
 
     versionNumber = _extractContent(data, start: offset, end: offset + 4);
 
-    if (versionNumber != 0x30313000) {
+    if (versionNumber != VERSION_NUMBER) {
       throw EfParseError("Version of Biometric data is not valid");
     }
 
