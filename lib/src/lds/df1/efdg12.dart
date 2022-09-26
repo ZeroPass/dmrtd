@@ -38,13 +38,9 @@ class EfDG12 extends DataGroup {
   static const TAG_LIST_TAG = 0x5c;
 
   DateTime? _dateOfIssue;
-  String? _imageOfFrontTag;
-  String? _imageOfRearTag;
   String? _issuingAuthority;
 
   DateTime? get dateOfIssue => _dateOfIssue;
-  String? get imageOfFrontTag => _imageOfFrontTag;
-  String? get imageOfRearTag => _imageOfRearTag;
   String? get issuingAuthority => _issuingAuthority;
 
   final _tags = <DgTag>{};
