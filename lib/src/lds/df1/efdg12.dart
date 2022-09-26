@@ -42,10 +42,7 @@ class EfDG12 extends DataGroup {
 
   DateTime? get dateOfIssue => _dateOfIssue;
   String? get issuingAuthority => _issuingAuthority;
-
-  final _tags = <DgTag>{};
-
-  Set<DgTag> get dgTags => _tags;
+  
 
   EfDG12.fromBytes(Uint8List data) : super.fromBytes(data);
 
