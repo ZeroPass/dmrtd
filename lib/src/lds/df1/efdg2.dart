@@ -24,6 +24,7 @@ class EfDG2 extends DataGroup {
   static const BIOMETRIC_DATA_BLOCK_TAG = 0x5F2E;
   static const BIOMETRIC_DATA_BLOCK_CONSTRUCTED_TAG = 0x7F2E;
 
+  static const BIOMETRIC_INFORMATION_COUNT_TAG = 0x02;
   static const SMT_TAG = 0x7D;
   static const VERSION_NUMBER = 0x30313000;
 
@@ -85,9 +86,9 @@ class EfDG2 extends DataGroup {
 
     final bict = TLV.decode(bigt.value);
 
-    if (bict.tag.value != 0X02) {
+    if (bict.tag.value != BIOMETRIC_INFORMATION_COUNT_TAG) {
       throw EfParseError(
-          "Invalid object tag=${bict.tag.value.hex()}, expected tag=${0X02}");
+          "Invalid object tag=${bict.tag.value.hex()}, expected tag=$BIOMETRIC_INFORMATION_COUNT_TAG");
     }
 
     int bitCount = (bict.value[0] & 0xFF);
