@@ -7,6 +7,7 @@ import '../extension/datetime_apis.dart';
 import '../extension/string_apis.dart';
 
 enum MRZVersion { td1, td2, td3 }
+
 class MRZParseError implements Exception {
   final String message;
   MRZParseError(this.message);
@@ -31,11 +32,25 @@ class MRZ {
   late String _optData;
   String? _optData2;
 
-  MRZ(Uint8List encodedMRZ) {
+  final Uint8List _encoded;
+
+  MRZ(Uint8List encodedMRZ) : _encoded = encodedMRZ {
     _parse(encodedMRZ);
   }
 
-  static int calculateCheckDigit(String checkString)  {
+  Uint8List toBytes() {
+    return _encoded;
+  }
+
+  String toEncodedString() {
+    var data = toBytes();
+    final inputStream = InputStream(data);
+    var result = _read(inputStream, data.length);
+
+    return result;
+  }
+
+  static int calculateCheckDigit(String checkString) {
     const charMap = {
       "0" :  "0",  "1" :  "1",
       "2" :  "2",  "3" :  "3",
@@ -64,7 +79,7 @@ class MRZ {
     for (int i = 0; i < checkString.length; i++) {
       final lookup = charMap[checkString[i]];
       final number = int.tryParse(lookup ?? "");
-      if(number == null) {
+      if (number == null) {
         return 0;
       }
 
@@ -80,41 +95,36 @@ class MRZ {
     if (data.length == 90) {
       version = MRZVersion.td1;
       _parseTD1(istream);
-    }
-    else if (data.length == 72) {
+    } else if (data.length == 72) {
       version = MRZVersion.td2;
       _parseTD2(istream);
-    }
-    else if (data.length == 88) {
+    } else if (data.length == 88) {
       version = MRZVersion.td3;
       _parseTD3(istream);
-    }
-    else {
+    } else {
       throw MRZParseError("Invalid MRZ data");
     }
   }
 
   void _parseTD1(InputStream istream) {
-    documentCode   = _read(istream, 2);
-    country        = _read(istream, 3);
-    _docNum        = _read(istream, 9);
+    documentCode = _read(istream, 2);
+    country = _read(istream, 3);
+    _docNum = _read(istream, 9);
     final cdDocNum = _readWithPad(istream, 1);
-    _optData       = _read(istream, 15);
-    dateOfBirth    = _readDate(istream);
+    _optData = _read(istream, 15);
+    dateOfBirth = _readDate(istream);
 
     _assertCheckDigit(dateOfBirth.formatYYMMDD(), _readCD(istream),
-      "Data of Birth check digit mismatch"
-    );
+        "Data of Birth check digit mismatch");
 
-    gender            = _read(istream, 1);
-    dateOfExpiry   = _readDate(istream);
+    gender = _read(istream, 1);
+    dateOfExpiry = _readDate(istream);
 
     _assertCheckDigit(dateOfExpiry.formatYYMMDD(), _readCD(istream),
-      "Data of Expiry check digit mismatch"
-    );
+        "Data of Expiry check digit mismatch");
 
     nationality = _read(istream, 3);
-    _optData2   = _read(istream, 11);
+    _optData2 = _read(istream, 11);
     _parseExtendedDocumentNumber(cdDocNum);
 
     final cdComposite = _readCD(istream);
@@ -129,30 +139,26 @@ class MRZ {
     composite += _readWithPad(istream, 7);
     istream.skip(3);
     composite += _readWithPad(istream, 11);
-    _assertCheckDigit(composite, cdComposite,
-      "Composite check digit mismatch"
-    );
+    _assertCheckDigit(composite, cdComposite, "Composite check digit mismatch");
   }
 
   void _parseTD2(InputStream istream) {
-    documentCode   = _read(istream, 2);
-    country        = _read(istream, 3);
+    documentCode = _read(istream, 2);
+    country = _read(istream, 3);
     _setNames(_readNameIdentifiers(istream, 31));
 
-    _docNum        = _read(istream, 9);
+    _docNum = _read(istream, 9);
     final cdDocNum = _readWithPad(istream, 1);
 
-    nationality    = _read(istream, 3);
-    dateOfBirth    = _readDate(istream);
+    nationality = _read(istream, 3);
+    dateOfBirth = _readDate(istream);
     _assertCheckDigit(dateOfBirth.formatYYMMDD(), _readCD(istream),
-      "Data of Birth check digit mismatch"
-    );
+        "Data of Birth check digit mismatch");
 
-    gender            = _read(istream, 1);
-    dateOfExpiry   = _readDate(istream);
+    gender = _read(istream, 1);
+    dateOfExpiry = _readDate(istream);
     _assertCheckDigit(dateOfExpiry.formatYYMMDD(), _readCD(istream),
-      "Data of Expiry check digit mismatch"
-    );
+        "Data of Expiry check digit mismatch");
 
     _optData = _read(istream, 7);
     _parseExtendedDocumentNumber(cdDocNum);
@@ -166,37 +172,31 @@ class MRZ {
     composite += _readWithPad(istream, 7);
     istream.skip(1);
     composite += _readWithPad(istream, 14);
-    _assertCheckDigit(composite, cdComposite,
-      "Composite check digit mismatch"
-    );
+    _assertCheckDigit(composite, cdComposite, "Composite check digit mismatch");
   }
 
   void _parseTD3(InputStream istream) {
-    documentCode   = _read(istream, 2);
-    country        = _read(istream, 3);
+    documentCode = _read(istream, 2);
+    country = _read(istream, 3);
     _setNames(_readNameIdentifiers(istream, 39));
 
     _docNum = _read(istream, 9);
-    _assertCheckDigit(_docNum, _readCD(istream),
-      "Document Number check digit mismatch"
-    );
+    _assertCheckDigit(
+        _docNum, _readCD(istream), "Document Number check digit mismatch");
 
-    nationality    = _read(istream, 3);
-    dateOfBirth    = _readDate(istream);
+    nationality = _read(istream, 3);
+    dateOfBirth = _readDate(istream);
     _assertCheckDigit(dateOfBirth.formatYYMMDD(), _readCD(istream),
-      "Data of Birth check digit mismatch"
-    );
+        "Data of Birth check digit mismatch");
 
-    gender            = _read(istream, 1);
-    dateOfExpiry   = _readDate(istream);
+    gender = _read(istream, 1);
+    dateOfExpiry = _readDate(istream);
     _assertCheckDigit(dateOfExpiry.formatYYMMDD(), _readCD(istream),
-      "Data of Expiry check digit mismatch"
-    );
+        "Data of Expiry check digit mismatch");
 
     _optData = _read(istream, 14);
-    _assertCheckDigit(_optData, _readCD(istream),
-      "Optional data check digit mismatch"
-    );
+    _assertCheckDigit(
+        _optData, _readCD(istream), "Optional data check digit mismatch");
 
     final cdComposite = _readCD(istream);
 
@@ -207,9 +207,7 @@ class MRZ {
     composite += _readWithPad(istream, 7);
     istream.skip(1);
     composite += _readWithPad(istream, 22);
-    _assertCheckDigit(composite, cdComposite,
-      "Composite check digit mismatch"
-    );
+    _assertCheckDigit(composite, cdComposite, "Composite check digit mismatch");
   }
 
   void _setNames(List<String> nameIds) {
@@ -223,21 +221,19 @@ class MRZ {
 
   void _parseExtendedDocumentNumber(String strCdDocNum) {
     int cdDocNum = 0;
-    if(strCdDocNum == '<' && _optData.length > 2) {
+    if (strCdDocNum == '<' && _optData.length > 2) {
       final dnSecondPart = _optData.split('<')[0];
       _docNum += dnSecondPart.substring(0, dnSecondPart.length - 1);
 
-      cdDocNum  = int.parse(dnSecondPart[dnSecondPart.length - 1]);
-      _optData  = _optData2 ?? '';
+      cdDocNum = int.parse(dnSecondPart[dnSecondPart.length - 1]);
+      _optData = _optData2 ?? '';
       _optData2 = null;
-    }
-    else {
+    } else {
       cdDocNum = int.parse(strCdDocNum);
     }
 
-    _assertCheckDigit(_docNum, cdDocNum,
-      "Document Number check digit mismatch"
-    );
+    _assertCheckDigit(
+        _docNum, cdDocNum, "Document Number check digit mismatch");
   }
 
   static String _read(InputStream istream, int maxLength) {
@@ -251,7 +247,8 @@ class MRZ {
   static int _readCD(InputStream istream) {
     var scd = _readWithPad(istream, 1);
     if (scd == '<') return 0;
-    return int.tryParse(scd) ?? (throw MRZParseError("Invalid check digit character in MRZ"));
+    return int.tryParse(scd) ??
+        (throw MRZParseError("Invalid check digit character in MRZ"));
   }
 
   static List<String> _readNameIdentifiers(InputStream istream, int maxLength) {
