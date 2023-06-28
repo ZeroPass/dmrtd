@@ -560,7 +560,7 @@ class _MrtdHomePageState extends State<MrtdHomePage> {
                 SizedBox(height: 40),
                 _buildForm(context),
                 SizedBox(height: 20),
-                PlatformButton( // btn Read MRTD
+                PlatformElevatedButton( // btn Read MRTD
                   onPressed: _disabledInput() || !_mrzData.currentState!.validate() ? null : _readMRTD,
                   child: PlatformText(_isReading ? 'Reading ...' : 'Read Passport'),
                 ),
