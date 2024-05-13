@@ -1,7 +1,7 @@
 // Created by Crt Vavros, copyright © 2022 ZeroPass. All rights reserved.
 import 'package:dmrtd/dmrtd.dart';
 import 'package:dmrtd/extensions.dart';
-import 'package:dmrtd/src/proto/bac_smcipher.dart';
+import 'package:dmrtd/src/proto/des_smcipher.dart';
 import 'package:test/test.dart';
 
 import 'dart:typed_data';
@@ -84,7 +84,7 @@ void main() {
     // Test vectors taken from Appendix D.4 to the Part 11 of ICAO 7816 p11 doc
     final tvKSEnc  = "979EC13B1CBFE9DCD01AB0FED307EAE5".parseHex();
     final tvKSMAC  = "F1CB1F1FB5ADF208806B89DC579DC1F8".parseHex();
-    final smCipher = BAC_SMCipher(tvKSEnc, tvKSMAC);
+    final smCipher = DES_SMCipher(tvKSEnc, tvKSMAC);
     final tvSSC    = DESedeSSC("887022120C06C226".parseHex());
 
     // Test case 1

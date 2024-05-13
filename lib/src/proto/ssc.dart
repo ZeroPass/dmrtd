@@ -2,6 +2,7 @@
 import 'dart:typed_data';
 
 import 'package:dmrtd/extensions.dart';
+import 'package:dmrtd/src/crypto/aes.dart';
 import 'package:dmrtd/src/crypto/des.dart';
 
 
@@ -17,7 +18,7 @@ class SSC {
   /// Constructs new [SSC] with [ssc] bytes.
   /// [bitSize] should be equal to the block size of block cipher.
   SSC(Uint8List ssc, this.bitSize) {
-    if(bitSize % 8 != 0) {
+    if((bitSize % 8) != 0) {
       throw ArgumentError.value(bitSize, null, "(bitSize) must be multiple of 8");
     }
 
@@ -45,4 +46,14 @@ class SSC {
 class DESedeSSC extends SSC {
   DESedeSSC(Uint8List ssc) :
     super(ssc, DESedeCipher.blockSize * 8);
+}
+
+class DESede_PACE_SSC extends SSC {
+  DESede_PACE_SSC() :
+        super(Uint8List(8), DESedeCipher.blockSize * 8);
+}
+
+class AES_SSC extends SSC {
+  // icao 9303 p11 doc section 9.8.7.3 specifies that AES SSC is 16 bytes long and is initialized to 0.
+  AES_SSC() : super(Uint8List(16), AESCipher128().size * 8);
 }
