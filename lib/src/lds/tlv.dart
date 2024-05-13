@@ -41,6 +41,15 @@ class TLVError implements Exception {
   String toString() => message;
 }
 
+class TLVEmpty{
+  final int tag;
+  TLVEmpty(this.tag);
+
+  Uint8List toBytes() {
+    return TLV.encode(tag, Uint8List(0));
+  }
+}
+
 /// Class Represents BER-TLV encoding/decoding functions.
 class TLV {
   int tag;

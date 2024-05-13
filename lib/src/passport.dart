@@ -2,6 +2,7 @@
 import 'dart:typed_data';
 import 'package:dmrtd/dmrtd.dart';
 import 'package:dmrtd/extensions.dart';
+import 'package:dmrtd/src/proto/access_key.dart';
 import 'package:logging/logging.dart';
 
 import 'proto/iso7816/icc.dart';
@@ -43,10 +44,22 @@ class Passport {
   /// Can throw [ComProviderError] on connection failure.
   /// Throws [PassportError] when provided [keys] are invalid or
   /// if BAC session is not supported.
-  Future<void> startSession(final DBAKeys keys) async {
+  Future<void> startSession(final DBAKey keys) async {
     _log.debug("Starting session");
     await _selectDF1();
     await _exec(() => _api.initSessionViaBAC(keys));
+    _log.debug("Session established");
+  }
+
+  /// Starts new Secure Messaging session with passport
+  /// using PACE (Password Authenticated Connection Establishment) protocol.
+  ///
+  /// Can throw [ComProviderError] on connection failure.
+  /// Throws [PassportError] when provided [keys] are invalid or
+  /// if BAC session is not supported.
+  Future<void> startSessionPACE(final AccessKey accessKey, EfCardAccess efCardAccess) async {
+    _log.debug("Starting session");
+    await _exec(() => _api.initSessionViaPACE(accessKey, efCardAccess));
     _log.debug("Session established");
   }
 
@@ -74,10 +87,25 @@ class Passport {
   /// Note: Might not be available if PACE is not supported
   Future<EfCardAccess> readEfCardAccess() async {
     _log.debug("Reading EF.CardAccess");
-    await _selectMF();
+    //
+    bool demo = false;
+
+    Uint8List data;
+    if (demo){
+      data =
+      Uint8List.fromList([49, 20, 48, 18, 6, 10, 4, 0, 127, 0, 7, 2, 2, 4, 2, 2, 2, 1, 2, 2, 1, 12]);//[49, 20, 48, 18, 6, 10, 4, 0, 127, 0, 7, 2, 2, 4, 2, 2, 2, 1, 2, 2, 1, 12]
+      // same data in hex format: 31 14 30 12 6 a 4 0 7f 0 7 2 2 4 2 2   2 1 2   2 1 c
     return EfCardAccess.fromBytes(
-      await _exec(() => _api.readFileBySFI(EfCardAccess.SFI))
-    );
+        data);
+    }
+    else {
+      await _selectMF();
+      return EfCardAccess.fromBytes(
+          await _exec(() => _api.readFileBySFI(EfCardAccess.SFI))
+      );
+    }
+
+
   }
 
   /// Reads file EF.CardSecurity from passport.

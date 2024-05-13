@@ -57,6 +57,81 @@ class ICC {
     return rapdu.data!;
   }
 
+  //start of pace protocol
+
+  /// Sends SET 'AUTHENTICATION TEMPLATE FOR MUTUAL AUTHENTICATION' command to ICC.
+  /// ICC if it is ready returns (90 00) or not ready (not 90 00) - throws exception.
+  /// Can throw [ICCError] or [ComProviderError].
+  Future<bool> setAT({ required Uint8List data, int ne = 0, int cla = ISO7816_CLA.NO_SM }) async {
+    _log.sdVerbose("Sending SET 'AUTHENTICATION TEMPLATE FOR MUTUAL AUTHENTICATION' command to ICC"
+        " data='${data.hex()}'"
+        " ne=$ne"
+        " cla=${cla.hex()}");
+    final rapdu = await _transceive(
+        CommandAPDU(cla: cla, ins: ISO7816_INS.MANAGE_SECURITY_ENVIRONMENT, p1: 0xc1, p2: 0xa4, data: data, ne: ne)
+    );
+    if(rapdu.status != StatusWord.success) {
+      throw ICCError("Authentication template failed", rapdu.status, rapdu.data);
+    }
+    return true;
+  }
+
+  /// Sends GENERAL AUTHENTICATE - step 1 command to ICC.
+  /// ICC should return dynamic authentication data (with encrypted nonce in it).
+  /// Can throw [ICCError] or [ComProviderError].
+  Future<Uint8List> generalAuthenticatePACEstep1({ required Uint8List data, int ne = 256, int cla = ISO7816_CLA.COMMAND_CHAINING }) async {
+    //4.4.4.2 GENERAL AUTHENTICATE
+    _log.sdVerbose("Sending GENERAL AUTHENTICATE - step 1 command to ICC"
+        " data='${data.hex()}'"
+        " ne=$ne"
+        " cla=${cla.hex()}");
+    final rapdu = await _transceive(
+        CommandAPDU(cla: cla, ins: ISO7816_INS.GENERAL_AUTHENTICATE, p1: 0x00, p2: 0x00, data: data, ne: ne)
+    );
+    if(rapdu.status != StatusWord.success) {
+      throw ICCError("General authentication template (step 1) failed", rapdu.status, rapdu.data);
+    }
+    return rapdu.data!;
+  }
+
+  /// Sends GENERAL AUTHENTICATE - step 2 or 3' command to ICC.
+  /// ICC should return dynamic authentication data (with encrypted nonce in it).
+  /// Can throw [ICCError] or [ComProviderError].
+  Future<Uint8List> generalAuthenticatePACEstep2and3({ required Uint8List data, int ne = 256, int cla = ISO7816_CLA.COMMAND_CHAINING }) async {
+    //4.4.4.2 GENERAL AUTHENTICATE
+    _log.sdVerbose("Sending GENERAL AUTHENTICATE - step 2 or 3' command to ICC"
+        " data='${data.hex()}'"
+        " ne=$ne"
+        " cla=${cla.hex()}");
+    final rapdu = await _transceive(
+        CommandAPDU(cla: cla, ins: ISO7816_INS.GENERAL_AUTHENTICATE, p1: 0x00, p2: 0x00, data: data, ne: ne)
+    );
+    if(rapdu.status != StatusWord.success) {
+      throw ICCError("General authentication template (step 2 or 3) failed", rapdu.status, rapdu.data);
+    }
+    return rapdu.data!;
+  }
+
+  /// Sends GENERAL AUTHENTICATE - step 4' command to ICC.
+  /// ICC should return dynamic authentication data (with encrypted nonce in it).
+  /// Can throw [ICCError] or [ComProviderError].
+  Future<Uint8List> generalAuthenticatePACEstep4({ required Uint8List data, int ne = 256, int cla = ISO7816_CLA.NO_SM }) async {
+    //4.4.4.2 GENERAL AUTHENTICATE
+    _log.sdVerbose("Sending GENERAL AUTHENTICATE - step 4' command to ICC"
+        " data='${data.hex()}'"
+        " ne=$ne"
+        " cla=${cla.hex()}");
+    final rapdu = await _transceive(
+        CommandAPDU(cla: cla, ins: ISO7816_INS.GENERAL_AUTHENTICATE, p1: 0x00, p2: 0x00, data: data, ne: ne)
+    );
+    if(rapdu.status != StatusWord.success) {
+      throw ICCError("General authentication template (step 4) failed", rapdu.status, rapdu.data);
+    }
+    return rapdu.data!;
+  }
+
+  //end of pace protocol
+
   /// Sends INTERNAL AUTHENTICATE command to ICC.
   /// ICC should return it's computed authentication data.
   /// Can throw [ICCError] or [ComProviderError].
@@ -213,7 +288,6 @@ class ICC {
     }
     return rapdu;
   }
-
   Future<ResponseAPDU> _transceive(final CommandAPDU cmd) async {
     _log.debug("Transceiving to ICC: $cmd");
     final rawCmd = _wrap(cmd).toBytes();

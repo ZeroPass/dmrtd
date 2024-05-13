@@ -15,8 +15,8 @@ import '../crypto/crypto_utils.dart';
 import '../types/pair.dart';
 
 import 'iso7816/icc.dart';
-import 'bac_smcipher.dart';
-import 'dba_keys.dart';
+import 'des_smcipher.dart';
+import 'dba_key.dart';
 import 'mrtd_sm.dart';
 import 'ssc.dart';
 
@@ -42,8 +42,8 @@ class BAC {
   static const eLen     = sLen;                      // Encrypted cryptogram S length 32 bytes
   static const macLen   = ISO9797.macAlg3_DigestLen; // 8 bytes
 
-  static Future<void> initSession({ required DBAKeys dbaKeys, required ICC icc }) async {
-    _log.debug("Starting BAC SM key establishment ...");
+  static Future<void> initSession({ required DBAKey dbaKeys, required ICC icc }) async {
+
 
     final Kenc = dbaKeys.encKey;
     final Kmac = dbaKeys.macKey;
@@ -109,7 +109,7 @@ class BAC {
     _log.verbose("Calculated SCC=${ssc.toBytes().hex()}");
 
     _log.debug("Finished BAC SM key establishment");
-    icc.sm = MrtdSM(BAC_SMCipher(pairKS.first, pairKS.second), ssc);
+    icc.sm = MrtdSM(DES_SMCipher(pairKS.first, pairKS.second), ssc);
     _log.debug("SM session is set up");
   }
 
@@ -136,7 +136,7 @@ class BAC {
     }
 
     // Derive keys from key seed
-    final KSenc = DeriveKey.desEDE(keySeed);
+    final KSenc = DeriveKey. desEDE(keySeed);
     final KSmac = DeriveKey.iso9797MacAlg3(keySeed);
     return Pair<Uint8List, Uint8List>(KSenc, KSmac);
   }

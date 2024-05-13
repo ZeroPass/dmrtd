@@ -25,7 +25,6 @@ class EfDG12 extends DataGroup {
   static const ENDORSEMENTS_AND_OBSERVATIONS_TAG = 0x5F1B;
   static const TAX_OR_EXIT_REQUIREMENTS_TAG = 0x5F1C;
 
-  // Image per ISO/IEC 10918
   static const IMAGE_OF_FRONT_TAG = 0x5F1D;
 
   // Image per ISO/IEC 10918

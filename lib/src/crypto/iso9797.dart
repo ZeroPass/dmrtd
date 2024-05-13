@@ -2,10 +2,15 @@
 // ignore_for_file: constant_identifier_names
 
 import 'dart:typed_data';
+import 'package:dmrtd/extensions.dart';
+import 'package:logging/logging.dart';
+
 import 'des.dart';
 
 /// Class defines ISO/IEC 9797-1 MAC algorithm 3 and padding method 2.
 class ISO9797 {
+  static final _log = Logger("ISO9797");
+
   static const int macAlg3_DigestLen = DESCipher.blockSize;
   static const int macAlg3_Key1Len   = 16; // First possible Alg3 MAC key len is 16 bytes.
   static const int macAlg3_Key2Len   = 24; // Second possible Alg3 MAC key len is 16 bytes.
@@ -40,10 +45,14 @@ class ISO9797 {
   }
 
   // Returns padded data according to ISO/IEC 9797-1, padding method 2 scheme.
-  static Uint8List pad(Uint8List data) {
-    final Uint8List padBlock = Uint8List.fromList([0x80, 0, 0, 0, 0, 0, 0, 0]);
-    final padSize = DESCipher.blockSize - (data.length % DESCipher.blockSize);
-    return Uint8List.fromList(data + padBlock.sublist(0, padSize));
+  static Uint8List pad(Uint8List data, int n) {
+    _log.sdVerbose("Data: ${data.hex()}, size: ${data.length}, n: $n");
+    final Uint8List padBlock = Uint8List(n);
+    padBlock[0] = 0x80;
+    final padSize = n - (data.length % n);
+    final padded = Uint8List.fromList(data + padBlock.sublist(0, padSize));
+    _log.sdVerbose("Padded data: ${padded.hex()}, size: ${padded.length}");
+    return padded;
   }
 
   // Returns unpadded data according to ISO/IEC 9797-1, padding method 2 scheme.

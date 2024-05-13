@@ -1,8 +1,11 @@
 // Created by Crt Vavros, copyright © 2022 ZeroPass. All rights reserved.
 import 'dart:typed_data';
 
+import 'package:dmrtd/dmrtd.dart';
+
+import 'access_key.dart';
 import 'bac.dart';
-import 'dba_keys.dart';
+import 'dba_key.dart';
 import 'iso7816/iso7816.dart';
 import 'iso7816/icc.dart';
 import 'iso7816/response_apdu.dart';
@@ -14,6 +17,8 @@ import '../utils.dart';
 
 import 'package:dmrtd/extensions.dart';
 import 'package:logging/logging.dart';
+
+import 'pace.dart';
 
 
 class MrtdApiError implements Exception {
@@ -37,7 +42,7 @@ class MrtdApi {
   // See: Section 4.1 https://www.icao.int/publications/Documents/9303_p10_cons_en.pdf
   static const _defaultSelectP2          = ISO97816_SelectFileP2.returnFCP | ISO97816_SelectFileP2.returnFMD;
   final _log                             = Logger("mrtd.api");
-  static const int _defaultReadLength    = 256; // 256 = expect maximum number of bytes. TODO: in production set it to 224 - JMRTD
+  static const int _defaultReadLength    = 112; // 256 = expect maximum number of bytes. TODO: in production set it to 224 - JMRTD
   int _maxRead                           = _defaultReadLength;
   static const int _readAheadLength      = 8;   // Number of bytes to read at the start of file to determine file length.
   Future<void> Function()? _reinitSession;
@@ -56,13 +61,26 @@ class MrtdApi {
   /// Initializes Secure Messaging session via BAC protocol using [keys].
   /// Can throw [ICCError] if provided wrong keys.
   /// Can throw [ComProviderError] in case connection with MRTD is lost.
-  Future<void> initSessionViaBAC(final DBAKeys keys) async {
+  Future<void> initSessionViaBAC(final DBAKey keys) async {
     _log.debug("Initiating SM session using BAC protocol");
     await BAC.initSession(dbaKeys: keys, icc: icc);
     _reinitSession = () async {
       _log.debug("Re-initiating SM session using BAC protocol");
       icc.sm = null;
       await BAC.initSession(dbaKeys: keys, icc: icc);
+    };
+  }
+
+  /// Initializes Secure Messaging session via PACE protocol using [keys].
+  /// Can throw [ICCError] if provided wrong keys.
+  /// Can throw [ComProviderError] in case connection with MRTD is lost.
+  Future<void> initSessionViaPACE(final AccessKey accessKey, EfCardAccess efCardAccess) async {
+    _log.debug("Initiating SM session using PACE protocol (only DBA for now)");
+    await PACE.initSession(accessKey: accessKey, icc: icc, efCardAccess: efCardAccess);
+    _reinitSession = () async {
+      _log.debug("Re-initiating SM session using PACE protocol");
+      icc.sm = null;
+      await PACE.initSession(accessKey: accessKey, icc: icc, efCardAccess: efCardAccess);
     };
   }
 

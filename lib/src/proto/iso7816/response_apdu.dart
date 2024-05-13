@@ -44,6 +44,8 @@ class StatusWord {
   static const selectedFileInvalidated           = StatusWord(sw1: 0x62, sw2: 0x83);
   static const wrongFCIFormat                    = StatusWord(sw1: 0x62, sw2: 0x84);
 
+  static const authenticationFailed              = StatusWord(sw1: 0x63, sw2: 0x00);
+
   // Errors
   static const wrongLength                       = StatusWord(sw1: 0x67, sw2: 0x00);
   static const claFunctionNotSupported           = StatusWord(sw1: 0x68, sw2: 0x00);
@@ -115,7 +117,7 @@ class StatusWord {
   }
 
   bool isError() {
-    return sw1 >= 0x64 && sw1 != 0x90;
+    return (sw1 >= 0x64 && sw1 != 0x90);
   }
 
   @override
@@ -141,6 +143,7 @@ class StatusWord {
     else if (this == unexpectedEOF)                    { return "End of file reached before reading Le bytes";  }
     else if (this == selectedFileInvalidated)          { return "Selected file invalidated";                    }
     else if (this == wrongFCIFormat)                   { return "FCI not formatted according to 5.1.5";         }
+    else if (this == authenticationFailed)             { return "The protocol (step) failed.";                  }
     else if (this == wrongLength)                      { return "Wrong length (e.g. wrong Le field)";           }
     else if (this == claFunctionNotSupported)          { return "Functions in CLA not support";                 }
     else if (this == logicalChannelNotSupported)       { return "Logical channel not supported";                }

@@ -41,4 +41,28 @@ class Utils {
     }
     return raw.sublist( raw.length - i >= minLen ? i : raw.length  - minLen);
   }
+
+  static Uint8List bigIntToUint8List({required BigInt bigInt}) =>
+      bigIntToByteData(bigInt).buffer.asUint8List();
+
+  static ByteData bigIntToByteData(BigInt bigInt) {
+    final data = ByteData((bigInt.bitLength / 8).ceil());
+    var _bigInt = bigInt;
+
+    for (var i = 1; i <= data.lengthInBytes; i++) {
+      data.setUint8(data.lengthInBytes - i, _bigInt.toUnsigned(8).toInt());
+      _bigInt = _bigInt >> 8;
+    }
+
+    return data;
+  }
+
+  static BigInt uint8ListToBigInt(Uint8List bytes, {bool isLittleEndian = false}) {
+    BigInt result = BigInt.zero;
+    for (int i = 0; i < bytes.length; i++) {
+      int power = isLittleEndian ? i : (bytes.length - i - 1);
+      result += BigInt.from(bytes[i]) << (8 * power);
+    }
+    return result;
+  }
 }

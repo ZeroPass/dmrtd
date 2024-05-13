@@ -137,7 +137,7 @@ class DESCipher {
 
   Uint8List _padOrRef(final Uint8List data, final bool padData) {
     if (padData) {
-      return ISO9797.pad(data);
+      return ISO9797.pad(data, blockSize);
     }
     return data;
   }

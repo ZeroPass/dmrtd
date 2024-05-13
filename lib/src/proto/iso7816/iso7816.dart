@@ -13,12 +13,14 @@ class ISO7816_CLA {
 
 /// Definition of ISO/IEC 7816-4 BIC instructionş
 class ISO7816_INS {
-  static const int GET_CHALLENGE           = 0x84; // changed from 0xB4
-  static const int EXTERNAL_AUTHENTICATE   = 0x82;
-  static const int INTERNAL_AUTHENTICATE   = 0x88;
-  static const int READ_BINARY             = 0xB0;
-  static const int READ_BINARY_EXT         = 0xB1; // read instruction when file chunk offset is larger than 32767 bytes
-  static const int SELECT_FILE             = 0xA4;
+  static const int MANAGE_SECURITY_ENVIRONMENT  = 0x22;
+  static const int GET_CHALLENGE                = 0x84; // changed from 0xB4
+  static const int GENERAL_AUTHENTICATE         = 0x86;
+  static const int EXTERNAL_AUTHENTICATE        = 0x82;
+  static const int INTERNAL_AUTHENTICATE        = 0x88;
+  static const int READ_BINARY                  = 0xB0;
+  static const int READ_BINARY_EXT              = 0xB1; // read instruction when file chunk offset is larger than 32767 bytes
+  static const int SELECT_FILE                  = 0xA4;
 }
 
 /// Class defines P1 values of ISO/IEC 7816-4 SELECT FILE command
