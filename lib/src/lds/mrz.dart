@@ -112,13 +112,13 @@ class MRZ {
     _docNum = _read(istream, 9);
     final cdDocNum = _readWithPad(istream, 1);
     _optData = _read(istream, 15);
-    dateOfBirth = _readDate(istream);
+    dateOfBirth = _readDate(istream, futureDate: false);
 
     _assertCheckDigit(dateOfBirth.formatYYMMDD(), _readCD(istream),
         "Data of Birth check digit mismatch");
 
     gender = _read(istream, 1);
-    dateOfExpiry = _readDate(istream);
+    dateOfExpiry = _readDate(istream, futureDate: true);
 
     _assertCheckDigit(dateOfExpiry.formatYYMMDD(), _readCD(istream),
         "Data of Expiry check digit mismatch");
@@ -151,12 +151,12 @@ class MRZ {
     final cdDocNum = _readWithPad(istream, 1);
 
     nationality = _read(istream, 3);
-    dateOfBirth = _readDate(istream);
+    dateOfBirth = _readDate(istream, futureDate: false);
     _assertCheckDigit(dateOfBirth.formatYYMMDD(), _readCD(istream),
         "Data of Birth check digit mismatch");
 
     gender = _read(istream, 1);
-    dateOfExpiry = _readDate(istream);
+    dateOfExpiry = _readDate(istream, futureDate: true);
     _assertCheckDigit(dateOfExpiry.formatYYMMDD(), _readCD(istream),
         "Data of Expiry check digit mismatch");
 
@@ -185,12 +185,12 @@ class MRZ {
         _docNum, _readCD(istream), "Document Number check digit mismatch");
 
     nationality = _read(istream, 3);
-    dateOfBirth = _readDate(istream);
+    dateOfBirth = _readDate(istream, futureDate: false);
     _assertCheckDigit(dateOfBirth.formatYYMMDD(), _readCD(istream),
         "Data of Birth check digit mismatch");
 
     gender = _read(istream, 1);
-    dateOfExpiry = _readDate(istream);
+    dateOfExpiry = _readDate(istream, futureDate: true);
     _assertCheckDigit(dateOfExpiry.formatYYMMDD(), _readCD(istream),
         "Data of Expiry check digit mismatch");
 
@@ -240,8 +240,8 @@ class MRZ {
     return _readWithPad(istream, maxLength).replaceAll(RegExp(r'<+$'), '');
   }
 
-  static DateTime _readDate(InputStream istream) {
-    return _read(istream, 6).parseDateYYMMDD();
+  static DateTime _readDate(InputStream istream, {bool futureDate = false}) {
+    return _read(istream, 6).parseDateYYMMDD(futureDate: futureDate);
   }
 
   static int _readCD(InputStream istream) {
