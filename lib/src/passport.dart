@@ -32,7 +32,7 @@ class Passport {
 
   final _log = Logger("passport");
   final MrtdApi _api;
-  _DF _dfSelectd = _DF.None;
+  _DF _dfSelected = _DF.None;
 
   /// Constructs new [Passport] instance with communication [provider].
   /// [provider] should be already connected.
@@ -404,22 +404,22 @@ class Passport {
   }
 
   Future<void> _selectMF() async {
-    if(_dfSelectd != _DF.MF) {
+    if(_dfSelected != _DF.MF) {
       _log.debug("Selecting MF");
       await _exec(() =>
         _api.selectMasterFile()
       );
-      _dfSelectd = _DF.MF;
+      _dfSelected = _DF.MF;
     }
   }
 
   Future<void> _selectDF1() async {
-    if(_dfSelectd != _DF.DF1) {
+    if(_dfSelected != _DF.DF1) {
       _log.debug("Selecting DF1");
       await _exec(() =>
         _api.selectEMrtdApplication()
       );
-      _dfSelectd = _DF.DF1;
+      _dfSelected = _DF.DF1;
     }
   }
 
