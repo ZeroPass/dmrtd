@@ -31,6 +31,7 @@ void testProtecting(final CommandAPDU cmd, final SMCipher cipher, final SSC ssc,
   final M = sm.generateM(cmd: pcmd, dataDO: dataDO, do97: do97);
   expect( M, tvM );
 
+  ssc.increment(); // ssc has to be incremented prior to generating N
   final N = sm.generateN(M: M);
   expect( N, tvN );
 
@@ -64,6 +65,7 @@ void testUprotecting(final ResponseAPDU rapdu, final SMCipher cipher, final SSC 
   final do8E      = sm.parseDO8EFromRAPDU(rapdu, do8EStart);
   expect( TLV.encode(do8E.tag.value, do8E.value) , tvDO8E );
 
+  ssc.increment(); // ssc has to be incremented prior to generating K
   final K = sm.generateK(data: rapdu.data!.sublist(0, do8EStart));
   expect( K , tvK );
 
@@ -81,7 +83,7 @@ void testUprotecting(final ResponseAPDU rapdu, final SMCipher cipher, final SSC 
 void main() {
   test('Testing MRTD Secure Messaging', () {
 
-    // Test vectors taken from Appendix D.4 to the Part 11 of ICAO 7816 p11 doc
+    // Test vectors taken from Appendix D.4 to the Part 11 of ICAO 9303 p11 doc
     final tvKSEnc  = "979EC13B1CBFE9DCD01AB0FED307EAE5".parseHex();
     final tvKSMAC  = "F1CB1F1FB5ADF208806B89DC579DC1F8".parseHex();
     final smCipher = DES_SMCipher(tvKSEnc, tvKSMAC);
