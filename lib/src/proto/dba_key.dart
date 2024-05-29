@@ -99,10 +99,10 @@ class DBAKey extends AccessKey {
   String get mrtdNumber => _mrtdNum;
 
   /// Returns passport owner's date of birth used for calculating key seed.
-  DateTime get dateOfBirth => _dob.parseDateYYMMDD();
+  DateTime get dateOfBirth => _dob.parseDateYYMMDD(futureDate: false);
 
   /// Returns passport date of expiry used for calculating key seed.
-  DateTime get dateOfExpiry => _doe.parseDateYYMMDD();
+  DateTime get dateOfExpiry => _doe.parseDateYYMMDD(futureDate: true);
 
   /// Very sensitive data. Do not use in production!
   @override

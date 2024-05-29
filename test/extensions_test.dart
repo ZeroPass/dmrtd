@@ -80,19 +80,43 @@ void main() {
       expect( '121212'.parseDateYYMMDD() , DateTime(2012, 12, 12) );
       expect( '201212'.parseDateYYMMDD() , DateTime(2020, 12, 12) );
 
+      expect( '891109'.parseDateYYMMDD(futureDate: false) , DateTime(1989, 11, 9)  );
+      expect( '760501'.parseDateYYMMDD(futureDate: false) , DateTime(1976, 05, 01) );
+      expect( '000215'.parseDateYYMMDD(futureDate: false) , DateTime(2000, 02, 15) );
+      expect( '111111'.parseDateYYMMDD(futureDate: false) , DateTime(2011, 11, 11) );
+      expect( '121212'.parseDateYYMMDD(futureDate: false) , DateTime(2012, 12, 12) );
+      expect( '201212'.parseDateYYMMDD(futureDate: false) , DateTime(2020, 12, 12) );
+
+      expect( '891109'.parseDateYYMMDD(futureDate: true) , DateTime(1989, 11, 9)  );
+      expect( '760501'.parseDateYYMMDD(futureDate: true) , DateTime(1976, 05, 01) );
+      expect( '000215'.parseDateYYMMDD(futureDate: true) , DateTime(2000, 02, 15) );
+      expect( '111111'.parseDateYYMMDD(futureDate: true) , DateTime(2011, 11, 11) );
+      expect( '121212'.parseDateYYMMDD(futureDate: true) , DateTime(2012, 12, 12) );
+      expect( '201212'.parseDateYYMMDD(futureDate: true) , DateTime(2020, 12, 12) );
+
       final now = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-      expect( now.formatYYMMDD().parseDateYYMMDD() , now );
+      expect( now.formatYYMMDD().parseDateYYMMDD(), now );
+      expect( now.formatYYMMDD().parseDateYYMMDD(futureDate: false), now );
+      expect( now.formatYYMMDD().parseDateYYMMDD(futureDate: true) , now );
 
+      // 1 month future date
       final nextMonth = DateTime(now.year, now.month + 1, now.day);
-      expect( nextMonth.formatYYMMDD().parseDateYYMMDD(), nextMonth );
+      expect( nextMonth.formatYYMMDD().parseDateYYMMDD()                  != nextMonth, true ); // by default future date is not expected
+      expect( nextMonth.formatYYMMDD().parseDateYYMMDD(futureDate: false) != nextMonth, true );
+      expect( nextMonth.formatYYMMDD().parseDateYYMMDD(futureDate: true)  == nextMonth, true );
 
+      // 10 years future date
       final tenFromNow  = DateTime(now.year + 10, now.month, now.day);
-      expect( tenFromNow.formatYYMMDD().parseDateYYMMDD(), tenFromNow );
+      expect( tenFromNow.formatYYMMDD().parseDateYYMMDD()                  != tenFromNow, true ); // by default future date is not expected
+      expect( tenFromNow.formatYYMMDD().parseDateYYMMDD(futureDate: false) != tenFromNow, true );
+      expect( tenFromNow.formatYYMMDD().parseDateYYMMDD(futureDate: true)  == tenFromNow, true );
 
-      // 10 years and 6 months from now should wind date back for a century.
+      // 10 years and 6 months future date
       final tenAnd6MonthsFromNow = DateTime(now.year + 10, now.month + 6, now.day);
       final ninetyYearsAgo       = DateTime(now.year - 90, now.month + 6, now.day);
-      expect( tenAnd6MonthsFromNow.formatYYMMDD().parseDateYYMMDD(), ninetyYearsAgo );
+      expect( tenAnd6MonthsFromNow.formatYYMMDD().parseDateYYMMDD()                 , ninetyYearsAgo );
+      expect( tenAnd6MonthsFromNow.formatYYMMDD().parseDateYYMMDD(futureDate: false), ninetyYearsAgo );
+      expect( tenAnd6MonthsFromNow.formatYYMMDD().parseDateYYMMDD(futureDate: true) , tenAnd6MonthsFromNow );
     });
   });
 
@@ -152,7 +176,7 @@ void main() {
       Logger.root.level = Level.FINEST;
       Logger.root.trace(traceMsg);
       expect( logMsg, traceMsg     );
-      expect( level , Level.FINEST );     
+      expect( level , Level.FINEST );
     });
 
     test('Sensitive data log test', () {
@@ -404,7 +428,7 @@ void main() {
       dlog.sdDebug(debugMsg);
       expect( dlogMsg, debugMsg   );
       expect( dlevel , Level.FINE );
-      
+
       // Verbose test
       Logger.root.logSensitiveData = false;
       dlog.logSensitiveData = false;
