@@ -1,15 +1,15 @@
 ## Dart library for ICAO Machine Readable Travel Documents standard - Biometric Passport
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![test](https://github.com/ZeroPass/dmrtd/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/ZeroPass/dmrtd/actions/workflows/test.yml)
+[![LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg?style=for-the-badge)](LICENSE.LGPL)
+[![tests](https://img.shields.io/github/actions/workflow/status/ZeroPass/dmrtd/test.yml?label=Tests&branch=master&logo=github&style=for-the-badge)](https://github.com/ZeroPass/dmrtd/actions/workflows/test.yml)
 
 DMRTD is dart implementation of [ICAO 9303](https://www.icao.int/publications/pages/publication.aspx?docnum=9303) standard.
 Library provide APIs to send commands to and read data from MRTD.
 
 ## Key features
-* BAC session key establishment
-* Reading all elementary files from MRTD e.g. EF.SOD, EF.DG1, EF.DG15 ...  
-  *Note: most of files can't be fully parsed yet*
-* Executing `Active Authentication` on MRTD
+* PACE & BAC session key establishment protocol
+* Reading all elementary files from MRTD, e.g.: EF.DG1, EF.DG2, EF.DG11, EF.DG12, EF.DG15 ...  
+  *Note: most of files are not fully parsed yet.*
+* Executing `Active Authentication` on MRTD (i.e.: sign arbitrary data with passport)
 * Basic implementation of ICC ISO7816-4 smart card standard
 * Implementation of ISO 9797 Algorithm 3 MAC and padding scheme
 
