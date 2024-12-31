@@ -28,38 +28,41 @@ class AAPublicKey {
 
   AAPublicKeyType get type => _type;
 
+  /// Parses AAPublicKey from [encPubKey] bytes which should be DER encoded ASN.1 bytes.
+  ///
+  /// Throws [Exception] when provided bytes doesn't contain correct DER encoded ASN.1 AAPublicKey format.
   AAPublicKey.fromBytes(final Uint8List encPubKey) : _encPubKey = encPubKey {
     // Parse key type and SubjectPublicKey bytes
 
     final tvPubKeyInfo = TLV.decode(encPubKey);
-    if(tvPubKeyInfo.tag.value != 0x30) { // Sequence
-      EfParseError(
+    if (tvPubKeyInfo.tag.value != 0x30) { // Sequence
+      throw Exception(
         "Invalid SubjectPublicKeyInfo tag=${tvPubKeyInfo.tag.value.hex()}, expected tag=30"
       );
     }
 
     final tvAlg = TLV.decode(tvPubKeyInfo.value);
-    if(tvAlg.tag.value != 0x30) { // Sequence
-      EfParseError(
+    if (tvAlg.tag.value != 0x30) { // Sequence
+      throw Exception(
         "Invalid AlgorithmIdentifier tag=${tvAlg.tag.value.hex()}, expected tag=30"
       );
     }
 
     final tvAlgOID = TLV.decode(tvAlg.value);
-    if(tvAlg.tag.value != 0x06) { // OID
-      EfParseError(
+    if (tvAlg.tag.value != 0x06) { // OID
+      throw Exception(
         "Invalid Algorithm OID object tag=${tvAlgOID.tag.value.hex()}, expected tag=06"
       );
     }
 
     final rsaOID = "2A864886F70D010101".parseHex();
-    if(ListEquality().equals(tvAlgOID.value, rsaOID)) {
+    if (ListEquality().equals(tvAlgOID.value, rsaOID)) {
       _type = AAPublicKeyType.RSA;
     }
 
     _subPubKeyBytes = tvPubKeyInfo.value.sublist(tvAlg.encodedLen);
-    if(_subPubKeyBytes[0] != 0x03) { // Bit String
-      EfParseError(
+    if (_subPubKeyBytes[0] != 0x03) { // Bit String
+      throw Exception(
         "Invalid SubjectPublicKey object tag=${_subPubKeyBytes[0].hex()}, expected tag=03"
       );
     }

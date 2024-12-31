@@ -74,7 +74,7 @@ class MrtdSM extends SecureMessaging {
       return rapdu;
     }
 
-    //increment SSC should be made before decrypting data
+    // Increment SSC should be made before decrypting data
     _ssc.increment();
 
     _log.debug("Unprotecting RAPDU: $rapdu");
