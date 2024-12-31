@@ -13,9 +13,9 @@ import 'package:dmrtd/dmrtd.dart';
 import 'package:dmrtd/extensions.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:dmrtd/src/proto/can_key.dart';
+import 'package:intl/intl.dart';
 
 import 'package:dmrtd/src/proto/ecdh_pace.dart';
 

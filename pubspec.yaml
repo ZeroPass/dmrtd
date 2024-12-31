@@ -5,20 +5,22 @@ description: Dart implementation of ICAO Doc 9303 MRTD, created by ZeroPass
 version: 2.0.0
 
 environment:
-  sdk: '>=2.17.1 <3.0.0'
+  sdk: ^3.6.0
 
 dependencies:
-  archive: ^3.1.2
-  collection: ^1.16.0
-  convert: ^3.0.0
-  crypto: ^3.0.1
+  archive: ^3.6.1
+  collection: ^1.19.0
+  convert: ^3.1.2
+  crypto: ^3.0.6
   expandable: ^5.0.1
-  fixnum: ^1.0.0
-  flutter_nfc_kit: ^3.4.2
-  logging: ^1.0.1
-  meta: ^1.3.0
+  fixnum: ^1.1.1
+  flutter_nfc_kit: ^3.6.0-rc.6
+    #git:
+    #  url: https://github.com/ZeroPass/flutter_nfc_kit.git
+  logging: ^1.3.0
+  meta: ^1.15.0
   tripledes_nullsafety: ^1.0.3
-  pointycastle: ^3.7.4
+  pointycastle: ^3.9.1
   diffie_hellman: ^0.1.2
   crypto_keys_plus: ^0.4.0 # till cypto_keys lib is not updated
 
