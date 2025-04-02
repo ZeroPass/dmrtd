@@ -86,14 +86,16 @@ class EfDG11 extends DataGroup {
     final tlv = TLV.fromBytes(content);
     if (tlv.tag != tag) {
       throw EfParseError(
-          "Invalid DG11 tag=${tlv.tag.hex()}, expected tag=${TAG.value.hex()}");
+        "Invalid DG11 tag=${tlv.tag.hex()}, expected tag=${TAG.value.hex()}",
+      );
     }
 
     final data = tlv.value;
     final tagListTag = TLV.decode(data);
     if (tagListTag.tag.value != TAG_LIST_TAG) {
       throw EfParseError(
-          "Invalid version object tag=${tagListTag.tag.value.hex()}, expected version object with tag=5c");
+        "Invalid version object tag=${tagListTag.tag.value.hex()}, expected version object with tag=5c",
+      );
     }
     var tagListLength = tlv.value.length;
     int tagListBytesRead = tagListTag.encodedLen;
@@ -113,7 +115,10 @@ class EfDG11 extends DataGroup {
           _otherNames.add(utf8.decode(uvtv.value));
           break;
         case FULL_DATE_OF_BIRTH_TAG:
-          _fullDateOfBirth = String.fromCharCodes(uvtv.value).parseDate();
+          _fullDateOfBirth =
+              uvtv.value.length == 4
+                  ? uvtv.value.toDate()
+                  : String.fromCharCodes(uvtv.value).parseDate();
           break;
         case PLACE_OF_BIRTH_TAG:
           _placeOfBirth.add(utf8.decode(uvtv.value));
