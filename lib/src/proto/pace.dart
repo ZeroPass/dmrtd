@@ -544,7 +544,7 @@ class PACE {
 
     if (cipherAlgorithm == CipherAlgorithm.AES) {
       _log.debug("Cipher algorithm: AES.");
-      AESCipher aesCipher = AESChiperSelector.getChiper(size: KEY_LENGTH.s128); //size is not important
+      AESCipher aesCipher = AESChiperSelector.getChiper(size: keyLength);
       Uint8List computedAuthToken = aesCipher.calculateCMAC(data: inputData, key: macKey);
       _log.sdVerbose("Computed auth token: ${computedAuthToken.hex()}");
       return computedAuthToken;
@@ -580,8 +580,8 @@ class PACE {
 
       if (cipherAlgo == CipherAlgorithm.AES){
         _log.debug("PACE.decryptNonce; Cipher algorithm: AES");
-        AESCipher aesCipher128 = AESChiperSelector.getChiper(size: KEY_LENGTH.s128);
-        Uint8List decryptedNonce = aesCipher128.decrypt(data: nonce, key: k_pi);
+        AESCipher aesCipher = AESChiperSelector.getChiper(size: keyLength);
+        Uint8List decryptedNonce = aesCipher.decrypt(data: nonce, key: k_pi);
         _log.sdVerbose("PACE.decryptNonce; Decrypted nonce: ${decryptedNonce.hex()}");
         return decryptedNonce;
       }
