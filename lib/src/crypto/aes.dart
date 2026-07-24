@@ -176,7 +176,7 @@ class AESChiperSelector{
         return AESCipher128();
       case KEY_LENGTH.s192:
         _log.finer("AES chiper with 192-bit key size selected.");
-        return AESCipher128();
+        return AESCipher192();
       case KEY_LENGTH.s256:
         _log.finer("AES chiper with 256-bit key size selected.");
         return AESCipher256();
