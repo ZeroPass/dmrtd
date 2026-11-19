@@ -24,7 +24,13 @@ abstract class PublicKeyPACE {
 class PublicKeyPACEeCDH extends PublicKeyPACE{
   final BigInt _x;
   final BigInt _y;
-  PublicKeyPACEeCDH({required BigInt x, required BigInt y}):
+
+  /// Length in bytes of each encoded coordinate, ceil(fieldBits / 8).
+  /// Coordinates are encoded with FE2OS (BSI TR-03111 3.1.3), i.e. left-padded
+  /// with zeros to this length. If null, the minimal encoding is used.
+  final int? coordinateLength;
+
+  PublicKeyPACEeCDH({required BigInt x, required BigInt y, this.coordinateLength}):
         _x = x,
         _y = y,
         super(algo: TOKEN_AGREEMENT_ALGO.ECDH);
@@ -32,13 +38,23 @@ class PublicKeyPACEeCDH extends PublicKeyPACE{
   PublicKeyPACEeCDH.fromECPoint({required ECPoint public}):
         _x = public.x!.toBigInteger()!,
         _y = public.y!.toBigInteger()!,
+        coordinateLength = (public.curve.fieldSize + 7) ~/ 8,
         super(algo: TOKEN_AGREEMENT_ALGO.ECDH);
 
   BigInt get x => _x;
   BigInt get y => _y;
 
-  Uint8List get xBytes => Utils.bigIntToUint8List(bigInt: _x);
-  Uint8List get yBytes => Utils.bigIntToUint8List(bigInt: _y);
+  Uint8List get xBytes => _fe2os(_x);
+  Uint8List get yBytes => _fe2os(_y);
+
+  Uint8List _fe2os(BigInt value) {
+    final bytes = Utils.bigIntToUint8List(bigInt: value);
+    final length = coordinateLength;
+    if (length == null || bytes.length >= length) {
+      return bytes;
+    }
+    return Uint8List(length)..setRange(length - bytes.length, length, bytes);
+  }
 
   @override
   Uint8List toBytes() {
@@ -48,6 +64,7 @@ class PublicKeyPACEeCDH extends PublicKeyPACE{
   PublicKeyPACEeCDH.fromHex({required Uint8List hexKey}):
         _x = Utils.uint8ListToBigInt(hexKey.sublist(0, hexKey.length ~/ 2)),
         _y = Utils.uint8ListToBigInt(hexKey.sublist(hexKey.length ~/ 2)),
+        coordinateLength = hexKey.length ~/ 2,
         super(algo: TOKEN_AGREEMENT_ALGO.ECDH);
 
   @override
