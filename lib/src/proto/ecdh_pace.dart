@@ -122,7 +122,7 @@ class ECDHPace {
       throw ECDHPaceError(
           "Public key has no parameters(as BigInteger). Something went wrong in PC library.");
     }
-    return PublicKeyPACEeCDH(x: x, y: y);
+    return PublicKeyPACEeCDH(x: x, y: y, coordinateLength: (point.curve.fieldSize + 7) ~/ 8);
   }
 
   void generateKeyPairFromPriv({required Uint8List privKey}){
@@ -246,7 +246,7 @@ class ECDHPace {
       _log.error("Public key has no parameters (as BigInteger). Something went wrong in PC library.");
       throw ECDHPaceError("Public key has no parameters(as BigInteger). Something went wrong in PC library.");
     }
-    return PublicKeyPACEeCDH(x:x, y:y);
+    return PublicKeyPACEeCDH(x:x, y:y, coordinateLength: (domainParameters.curve.fieldSize + 7) ~/ 8);
   }
 
   PublicKeyPACEeCDH getPubKeyEphemeral(){
@@ -265,7 +265,7 @@ class ECDHPace {
       _log.error("Public ephemeral key has no parameters (as BigInteger). Something went wrong in PC library.");
       throw ECDHPaceError("Public ephemeral key has no parameters(as BigInteger). Something went wrong in PC library.");
     }
-    return PublicKeyPACEeCDH(x:x, y:y);
+    return PublicKeyPACEeCDH(x:x, y:y, coordinateLength: (domainParameters.curve.fieldSize + 7) ~/ 8);
   }
 
   ECPoint getSharedSecret({required ECPublicKey otherPubKey}){
