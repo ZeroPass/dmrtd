@@ -31,6 +31,21 @@ class EfCardAccess extends ElementaryFile {
   @override
   int get sfi => SFI;
 
+  // id-PACE (BSI TR-03110 / ICAO 9303-11, 9.2.1)
+  static const _ID_PACE = "0.4.0.127.0.7.2.2.4.";
+
+  // PACEInfo ::= SEQUENCE { protocol (an id-PACE OID), version INTEGER, parameterId INTEGER OPTIONAL }.
+  // PACEDomainParameterInfo also starts with an id-PACE OID, but its second element is an
+  // AlgorithmIdentifier (a SEQUENCE), so the INTEGER check tells the two apart.
+  static bool _isPaceInfo(ASN1Sequence seq) {
+    final el = seq.elements;
+    if (el == null || el.length < 2) return false;
+    final oid = el[0];
+    return oid is ASN1ObjectIdentifier &&
+        (oid.objectIdentifierAsString?.startsWith(_ID_PACE) ?? false) &&
+        el[1] is ASN1Integer;
+  }
+
   @override
   void parse(Uint8List content) {
     _log.sdVerbose("Parsing EF.CardAccess" + content.hex());
@@ -43,21 +58,26 @@ class EfCardAccess extends ElementaryFile {
 
     ASN1Set set = parser.nextObject() as ASN1Set;
 
-    // there are 2 structures of EF.CardAccess but second one is not required
-    // - PaceInfo
-    // - PACEDomainParameterInfo
+    // EF.CardAccess is a SET OF SecurityInfo (ICAO 9303-11, 9.2): besides PACEInfo it can hold
+    // PACEDomainParameterInfo, ChipAuthenticationInfo, TerminalAuthenticationInfo and others,
+    // in any order. Use the first PACEInfo in the set, not whatever element comes first.
 
     if (set.elements == null || set.elements!.length < 1) {
-      _log.error("Invalid structure of EF.CardAccess. More than one element in set.");
-      throw EfParseError("Invalid structure of EF.CardAccess. More than one element in set.");
+      _log.error("Invalid structure of EF.CardAccess. No element in set.");
+      throw EfParseError("Invalid structure of EF.CardAccess. No element in set.");
     }
 
-    if (set.elements![0] is! ASN1Sequence ){
-      _log.error("Invalid structure of EF.CardAccess. First element in set is not ASN1Sequence.");
-      throw EfParseError("Invalid structure of EF.CardAccess. First element in set is not ASN1Sequence.");
+    final ASN1Sequence? paceInfoSeq = set.elements!
+        .whereType<ASN1Sequence>()
+        .cast<ASN1Sequence?>()
+        .firstWhere((e) => _isPaceInfo(e!), orElse: () => null);
+
+    if (paceInfoSeq == null) {
+      _log.error("Invalid structure of EF.CardAccess. No PACEInfo in set.");
+      throw EfParseError("Invalid structure of EF.CardAccess. No PACEInfo in set.");
     }
 
-    PaceInfo pi = PaceInfo(content: set.elements![0] as ASN1Sequence);
+    PaceInfo pi = PaceInfo(content: paceInfoSeq);
     _log.info("PaceInfo parsed.");
 
     _log.sdDebug("PaceInfo: $pi");
